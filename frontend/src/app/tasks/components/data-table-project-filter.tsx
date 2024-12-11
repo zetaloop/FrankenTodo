@@ -47,7 +47,7 @@ export function DataTableProjectFilter({
                     role="combobox"
                     aria-expanded={open}
                     aria-label="选择项目"
-                    className="h-8 w-[200px] justify-between"
+                    className="h-8 w-[150px] lg:w-[250px] justify-between"
                 >
                     <span className={cn(
                         "truncate",
@@ -58,7 +58,7 @@ export function DataTableProjectFilter({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0" align="start">
+            <PopoverContent className="w-[150px] lg:w-[250px] p-0" align="start">
                 <Command>
                     <CommandInput placeholder="项目" />
                     <CommandList>
