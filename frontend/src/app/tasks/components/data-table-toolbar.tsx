@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const [selectedProject, setSelectedProject] = useState("all");
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
 
     return (
         <div className="flex items-center justify-between">
@@ -31,15 +32,9 @@ export function DataTableToolbar<TData>({
                 />
                 <Input
                     placeholder="搜索任务..."
-                    value={
-                        (table
-                            .getColumn("title")
-                            ?.getFilterValue() as string) ?? ""
-                    }
+                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table
-                            .getColumn("title")
-                            ?.setFilterValue(event.target.value)
+                        table.getColumn("title")?.setFilterValue(event.target.value)
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
@@ -57,6 +52,20 @@ export function DataTableToolbar<TData>({
                         options={priorities}
                     />
                 )}
+                {selectedRows.length > 0 && (
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => {
+                            // 这里添加删除选中任务的逻辑
+                            console.log("删除选中的任务", selectedRows);
+                        }}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        删除所选 ({selectedRows.length})
+                    </Button>
+                )}
                 {isFiltered && (
                     <Button
                         variant="ghost"
@@ -64,7 +73,7 @@ export function DataTableToolbar<TData>({
                         className="h-8 px-2 lg:px-3"
                     >
                         清除筛选
-                        <X />
+                        <X className="ml-2 h-4 w-4" />
                     </Button>
                 )}
             </div>
