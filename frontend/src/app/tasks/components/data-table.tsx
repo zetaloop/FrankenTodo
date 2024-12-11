@@ -14,6 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  Row,
 } from "@tanstack/react-table"
 
 import {
@@ -27,6 +28,8 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
+import { TaskDetailDialog } from "./task-detail-dialog"
+import { Task } from "../data/schema"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -44,6 +47,8 @@ export function DataTable<TData, TValue>({
     []
   )
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [selectedTask, setSelectedTask] = React.useState<TData | null>(null)
+  const [openDialog, setOpenDialog] = React.useState(false)
 
   const table = useReactTable({
     data,
@@ -66,6 +71,19 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  const handleRowClick = (e: React.MouseEvent, row: Row<TData>) => {
+    const target = e.target as HTMLElement
+    if (
+      target.closest('input[type="checkbox"]') ||
+      target.closest('button')
+    ) {
+      return
+    }
+    
+    setSelectedTask(row.original)
+    setOpenDialog(true)
+  }
 
   return (
     <div className="space-y-4">
@@ -96,6 +114,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer"
+                  onClick={(e) => handleRowClick(e, row)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -121,6 +141,11 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <DataTablePagination table={table} />
+      <TaskDetailDialog
+        task={selectedTask as Task}
+        open={openDialog}
+        onOpenChange={setOpenDialog}
+      />
     </div>
   )
 }
