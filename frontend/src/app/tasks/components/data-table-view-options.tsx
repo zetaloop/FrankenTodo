@@ -18,7 +18,7 @@ interface DataTableViewOptionsProps<TData> {
 }
 
 const columnNames: Record<string, string> = {
-    id: "任务",
+    id: "编号",
     title: "标题",
     status: "状态",
     priority: "优先级"

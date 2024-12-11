@@ -14,17 +14,23 @@ export const columns: ColumnDef<Task>[] = [
     {
         id: "select",
         header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="全选"
-                className="translate-y-[2px]"
-            />
+            <div 
+                className="cursor-pointer" 
+                onClick={() => table.toggleAllPageRowsSelected()}
+            >
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) =>
+                        table.toggleAllPageRowsSelected(!!value)
+                    }
+                    aria-label="全选"
+                    className="translate-y-[2px]"
+                    onClick={(e) => e.stopPropagation()}
+                />
+            </div>
         ),
         cell: ({ row }) => (
             <Checkbox
@@ -39,8 +45,13 @@ export const columns: ColumnDef<Task>[] = [
     },
     {
         accessorKey: "id",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="任务" />
+        header: ({ column, table }) => (
+            <div 
+                className="cursor-pointer" 
+                onClick={() => table.toggleAllPageRowsSelected()}
+            >
+                <DataTableColumnHeader column={column} title="编号" />
+            </div>
         ),
         cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
         enableSorting: false,
