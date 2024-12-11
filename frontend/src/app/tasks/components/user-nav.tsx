@@ -42,7 +42,7 @@ export function UserNav() {
                     <DropdownMenuItem>设置</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>退出</DropdownMenuItem>
+                <DropdownMenuItem>退出登录</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
