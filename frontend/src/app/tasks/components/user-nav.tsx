@@ -21,7 +21,7 @@ export function UserNav() {
                 >
                     <Avatar className="h-9 w-9">
                         <AvatarImage src="/avatars/03.png" alt="@shadcn" />
-                        <AvatarFallback>SC</AvatarFallback>
+                        <AvatarFallback>Lu</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
@@ -29,34 +29,20 @@ export function UserNav() {
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                            shadcn
+                            戏晴
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                            m@example.com
+                            lumen@example.com
                         </p>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        个人资料
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        账单
-                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        设置
-                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>新建团队</DropdownMenuItem>
+                    <DropdownMenuItem>账户（云同步敬请期待）</DropdownMenuItem>
+                    <DropdownMenuItem>设置</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    退出登录
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <DropdownMenuItem>退出</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
