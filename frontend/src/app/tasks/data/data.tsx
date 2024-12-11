@@ -27,44 +27,44 @@ export const labels = [
 export const statuses = [
   {
     value: "backlog",
-    label: "Backlog",
+    label: "未确定",
     icon: HelpCircle,
   },
   {
     value: "todo",
-    label: "Todo",
+    label: "未开始",
     icon: Circle,
   },
   {
     value: "in progress",
-    label: "In Progress",
+    label: "进行中",
     icon: Timer,
   },
   {
     value: "done",
-    label: "Done",
+    label: "已完成",
     icon: CheckCircle,
   },
   {
     value: "canceled",
-    label: "Canceled",
+    label: "已取消",
     icon: CircleOff,
   },
 ]
 
 export const priorities = [
   {
-    label: "Low",
+    label: "低",
     value: "low",
     icon: ArrowDown,
   },
   {
-    label: "Medium",
+    label: "中",
     value: "medium",
     icon: ArrowRight,
   },
   {
-    label: "High",
+    label: "高",
     value: "high",
     icon: ArrowUp,
   },

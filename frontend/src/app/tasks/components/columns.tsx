@@ -22,7 +22,7 @@ export const columns: ColumnDef<Task>[] = [
                 onCheckedChange={(value) =>
                     table.toggleAllPageRowsSelected(!!value)
                 }
-                aria-label="Select all"
+                aria-label="全选"
                 className="translate-y-[2px]"
             />
         ),
@@ -30,7 +30,7 @@ export const columns: ColumnDef<Task>[] = [
             <Checkbox
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
+                aria-label="选择一项"
                 className="translate-y-[2px]"
             />
         ),
@@ -40,7 +40,7 @@ export const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "id",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Task" />
+            <DataTableColumnHeader column={column} title="任务" />
         ),
         cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
         enableSorting: false,
@@ -49,7 +49,7 @@ export const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "title",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Title" />
+            <DataTableColumnHeader column={column} title="标题" />
         ),
         cell: ({ row }) => {
             const label = labels.find(
@@ -69,7 +69,7 @@ export const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "status",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Status" />
+            <DataTableColumnHeader column={column} title="状态" />
         ),
         cell: ({ row }) => {
             const status = statuses.find(
@@ -96,7 +96,7 @@ export const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "priority",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Priority" />
+            <DataTableColumnHeader column={column} title="优先级" />
         ),
         cell: ({ row }) => {
             const priority = priorities.find(

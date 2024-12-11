@@ -17,6 +17,13 @@ interface DataTableViewOptionsProps<TData> {
     table: Table<TData>;
 }
 
+const columnNames: Record<string, string> = {
+    id: "任务",
+    title: "标题",
+    status: "状态",
+    priority: "优先级"
+};
+
 export function DataTableViewOptions<TData>({
     table,
 }: DataTableViewOptionsProps<TData>) {
@@ -29,11 +36,11 @@ export function DataTableViewOptions<TData>({
                     className="ml-auto hidden h-8 lg:flex"
                 >
                     <Settings2 />
-                    View
+                    视图
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[150px]">
-                <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                <DropdownMenuLabel>表格列</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table
                     .getAllColumns()
@@ -52,7 +59,7 @@ export function DataTableViewOptions<TData>({
                                     column.toggleVisibility(!!value)
                                 }
                             >
-                                {column.id}
+                                {columnNames[column.id] || column.id}
                             </DropdownMenuCheckboxItem>
                         );
                     })}

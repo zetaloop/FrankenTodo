@@ -38,16 +38,16 @@ export function DataTableRowActions<TData>({
                     className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
                 >
                     <MoreHorizontal />
-                    <span className="sr-only">Open menu</span>
+                    <span className="sr-only">打开菜单</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem>Edit</DropdownMenuItem>
-                <DropdownMenuItem>Make a copy</DropdownMenuItem>
-                <DropdownMenuItem>Favorite</DropdownMenuItem>
+                <DropdownMenuItem>编辑</DropdownMenuItem>
+                <DropdownMenuItem>复制</DropdownMenuItem>
+                <DropdownMenuItem>收藏</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
                         <DropdownMenuRadioGroup value={task.label}>
                             {labels.map((label) => (
@@ -63,7 +63,7 @@ export function DataTableRowActions<TData>({
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    Delete
+                    删除
                     <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                 </DropdownMenuItem>
             </DropdownMenuContent>

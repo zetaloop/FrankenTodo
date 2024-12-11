@@ -10,8 +10,8 @@ import { UserNav } from "./components/user-nav"
 import { taskSchema } from "./data/schema"
 
 export const metadata: Metadata = {
-  title: "Tasks",
-  description: "A task and issue tracker build using Tanstack Table.",
+  title: "任务清单",
+  description: "项目任务管理器。",
 }
 
 // Simulate a database read for tasks.
@@ -49,9 +49,9 @@ export default async function TaskPage() {
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
+            <h2 className="text-2xl font-bold tracking-tight">欢迎回来！</h2>
             <p className="text-muted-foreground">
-              Here&apos;s a list of your tasks for this month!
+              以下是您当前项目的任务清单
             </p>
           </div>
           <div className="flex items-center space-x-2">
