@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
-import { Check, PlusCircle } from "lucide-react";
+import { Check, Filter } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     size="sm"
                     className="h-8 border-dashed"
                 >
-                    <PlusCircle />
+                    <Filter />
                     {title}
                     {selectedValues?.size > 0 && (
                         <>
