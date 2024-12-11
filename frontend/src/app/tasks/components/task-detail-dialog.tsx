@@ -15,6 +15,7 @@ import { Task } from "../data/schema"
 import { priorities, statuses } from "../data/data"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
+import { TaskLabelSelect } from "./task-label-select"
 
 interface TaskDetailDialogProps {
   task: Task | null
@@ -109,20 +110,36 @@ export function TaskDetailDialog({
             </Tabs>
           </div>
 
-          <div className="grid gap-2">
-            <Label>优先级</Label>
-            <Tabs defaultValue={task.priority} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                {priorities.map((priority) => (
-                  <TabsTrigger key={priority.value} value={priority.value} className="flex items-center gap-2">
-                    {priority.icon && (
-                      <priority.icon className="h-4 w-4" />
-                    )}
-                    <span>{priority.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label>优先级</Label>
+              <Tabs defaultValue={task.priority} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  {priorities.map((priority) => (
+                    <TabsTrigger 
+                      key={priority.value} 
+                      value={priority.value} 
+                      className="flex items-center gap-2"
+                    >
+                      {priority.icon && (
+                        <priority.icon className="h-4 w-4" />
+                      )}
+                      <span>{priority.label}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>标签</Label>
+              <TaskLabelSelect 
+                value={task.label || ""}
+                onChange={(value) => {
+                  console.log("选择的标签:", value)
+                }}
+              />
+            </div>
           </div>
         </div>
 
