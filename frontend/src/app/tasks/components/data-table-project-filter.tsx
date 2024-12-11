@@ -19,7 +19,7 @@ import * as React from "react";
 const projects = [
     {
         value: "fd9b02ca-5ac9-40c6-b756-ead6786675ae",
-        label: "FrankTodo 任务管理系统第二版本云服务",
+        label: "FrankenTodo 任务管理系统",
     },
     {
         value: "62da762d-715b-4c15-a8e7-4c53fd83bea3",
