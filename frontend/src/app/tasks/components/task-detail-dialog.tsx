@@ -110,7 +110,17 @@ export function TaskDetailDialog({
             </Tabs>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-2">
+            <div className="grid gap-2">
+              <Label>标签</Label>
+              <TaskLabelSelect 
+                value={task.label || ""}
+                onChange={(value) => {
+                  console.log("选择的标签:", value)
+                }}
+              />
+            </div>
+
             <div className="grid gap-2">
               <Label>优先级</Label>
               <Tabs defaultValue={task.priority} className="w-full">
@@ -130,24 +140,21 @@ export function TaskDetailDialog({
                 </TabsList>
               </Tabs>
             </div>
-
-            <div className="grid gap-2">
-              <Label>标签</Label>
-              <TaskLabelSelect 
-                value={task.label || ""}
-                onChange={(value) => {
-                  console.log("选择的标签:", value)
-                }}
-              />
-            </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
-          </Button>
-          <Button type="submit">保存</Button>
+        <DialogFooter className="flex items-center">
+          <div className="flex-1 text-left">
+            <Button variant="link" className="text-destructive">
+              删除任务
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              取消
+            </Button>
+            <Button type="submit">保存</Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
