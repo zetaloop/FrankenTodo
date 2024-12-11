@@ -121,7 +121,7 @@ export function TaskDetailDialog({
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 content-start">
               <Label>优先级</Label>
               <Tabs defaultValue={task.priority} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">

@@ -43,7 +43,7 @@ export function TaskLabelSelect({
           role="combobox"
           aria-expanded={open}
           aria-label="选择标签"
-          className="w-full justify-between"
+          className="w-full justify-between min-h-10 h-auto"
         >
           <div className="flex gap-1 flex-wrap">
             {selectedLabels.size > 0 ? (
@@ -66,8 +66,8 @@ export function TaskLabelSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <Command className="w-full">
           <CommandInput placeholder="搜索标签..." />
           <CommandList>
             <CommandEmpty>
@@ -77,7 +77,6 @@ export function TaskLabelSelect({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    // 这里添加创建新标签的逻辑
                     console.log("创建新标签")
                   }}
                 >
