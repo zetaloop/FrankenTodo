@@ -1,7 +1,7 @@
 "use client";
 
 import { Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,6 @@ import {
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuSub,
     DropdownMenuSubContent,
     DropdownMenuSubTrigger,
@@ -31,42 +30,59 @@ export function DataTableRowActions<TData>({
     const task = taskSchema.parse(row.original);
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                    variant="ghost"
-                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                >
-                    <MoreHorizontal />
-                    <span className="sr-only">打开菜单</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem>编辑</DropdownMenuItem>
-                <DropdownMenuItem>复制</DropdownMenuItem>
-                <DropdownMenuItem>收藏</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                        <DropdownMenuRadioGroup value={task.label}>
-                            {labels.map((label) => (
-                                <DropdownMenuRadioItem
-                                    key={label.value}
-                                    value={label.value}
-                                >
-                                    {label.label}
-                                </DropdownMenuRadioItem>
-                            ))}
-                        </DropdownMenuRadioGroup>
-                    </DropdownMenuSubContent>
-                </DropdownMenuSub>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    删除
-                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+            <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => {
+                    console.log("编辑", task)
+                }}
+            >
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">编辑</span>
+            </Button>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => {
+                    console.log("删除", task)
+                }}
+            >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">删除</span>
+            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                    >
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">更多操作</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[160px]">
+                    <DropdownMenuItem>复制</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuRadioGroup value={task.label}>
+                                {labels.map((label) => (
+                                    <DropdownMenuRadioItem
+                                        key={label.value}
+                                        value={label.value}
+                                    >
+                                        {label.label}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
     );
 }
