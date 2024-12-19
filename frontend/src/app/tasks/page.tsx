@@ -46,6 +46,45 @@ export default function TaskPage() {
     fetchTasks()
   }, [selectedProjectId])
 
+  const handleCreateProject = async () => {
+    try {
+      const newProject = await api.projects.create({
+        name: "新项目",
+        description: "项目描述"
+      })
+      setProjects(prev => [...prev, newProject])
+      setSelectedProjectId(newProject.id)
+    } catch (error) {
+      console.error("创建项目失败:", error)
+    }
+  }
+
+  const handleEditProject = async () => {
+    if (!selectedProjectId) return
+    try {
+      const updatedProject = await api.projects.update(selectedProjectId, {
+        name: "更新的项目名称",
+        description: "更新的项目描述"
+      })
+      setProjects(prev => 
+        prev.map(p => p.id === updatedProject.id ? updatedProject : p)
+      )
+    } catch (error) {
+      console.error("更新项目失败:", error)
+    }
+  }
+
+  const handleDeleteProject = async () => {
+    if (!selectedProjectId) return
+    try {
+      await api.projects.delete(selectedProjectId)
+      setProjects(prev => prev.filter(p => p.id !== selectedProjectId))
+      setSelectedProjectId("")
+    } catch (error) {
+      console.error("删除项目失败:", error)
+    }
+  }
+
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -69,6 +108,9 @@ export default function TaskPage() {
             projects={projects}
             selectedProjectId={selectedProjectId}
             onProjectChange={setSelectedProjectId}
+            onCreateProject={handleCreateProject}
+            onEditProject={handleEditProject}
+            onDeleteProject={handleDeleteProject}
           />
         )}
       </div>

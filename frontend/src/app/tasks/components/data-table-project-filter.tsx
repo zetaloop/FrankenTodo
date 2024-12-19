@@ -6,6 +6,7 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
+    CommandSeparator,
 } from "@/components/ui/command";
 import {
     Popover,
@@ -14,19 +15,21 @@ import {
 } from "@/components/ui/popover";
 import { Project } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
-import { Circle, ChevronsUpDown } from "lucide-react";
+import { Circle, ChevronsUpDown, Plus } from "lucide-react";
 import * as React from "react";
 
 interface DataTableProjectFilterProps {
     projects: Project[]
     value: string
     onChange: (value: string) => void
+    onCreateProject?: () => void
 }
 
 export function DataTableProjectFilter({
     projects,
     value,
     onChange,
+    onCreateProject,
 }: DataTableProjectFilterProps) {
     const [open, setOpen] = React.useState(false)
     const selectedProject = projects.find((project) => project.id === value)
@@ -76,6 +79,19 @@ export function DataTableProjectFilter({
                                     <span className="truncate">{project.name}</span>
                                 </CommandItem>
                             ))}
+                        </CommandGroup>
+                        <CommandSeparator />
+                        <CommandGroup>
+                            <CommandItem
+                                onSelect={() => {
+                                    onCreateProject?.()
+                                    setOpen(false)
+                                }}
+                                className="flex items-center gap-2"
+                            >
+                                <Plus className="h-4 w-4" />
+                                <span>新建项目</span>
+                            </CommandItem>
                         </CommandGroup>
                     </CommandList>
                 </Command>

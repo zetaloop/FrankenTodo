@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { Trash2, X, Plus } from "lucide-react";
+import { Trash2, X, Plus, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +12,21 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableProjectFilter } from "./data-table-project-filter";
 import { useState } from "react";
 import { Project } from "@/lib/api/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
     projects: Project[];
     selectedProjectId: string;
     onProjectChange: (projectId: string) => void;
+    onCreateProject?: () => void;
+    onEditProject?: () => void;
+    onDeleteProject?: () => void;
 }
 
 export function DataTableToolbar<TData>({
@@ -25,9 +34,13 @@ export function DataTableToolbar<TData>({
     projects,
     selectedProjectId,
     onProjectChange,
+    onCreateProject,
+    onEditProject,
+    onDeleteProject,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const selectedProject = projects.find(p => p.id === selectedProjectId);
 
     return (
         <div className="flex items-center justify-between">
@@ -36,7 +49,28 @@ export function DataTableToolbar<TData>({
                     projects={projects}
                     value={selectedProjectId}
                     onChange={onProjectChange}
+                    onCreateProject={onCreateProject}
                 />
+                {selectedProjectId && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className="h-8 w-8">
+                                <Settings className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={onEditProject}>
+                                编辑项目
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                                onClick={onDeleteProject}
+                                className="text-destructive"
+                            >
+                                删除项目
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
                 <Input
                     placeholder="搜索任务..."
                     value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
