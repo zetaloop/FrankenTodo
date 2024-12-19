@@ -76,11 +76,11 @@ export function DataTable<TData, TValue>({
     const target = e.target as HTMLElement
     const cell = target.closest('td')
     
-    // 如果点击了多选框本身或其他按钮,不做任何处理
-    if (target.closest('input[type="checkbox"]') || target.closest('button')) {
+    // 如果点击了多选框本身,不做任何处理
+    if (target.closest('input[type="checkbox"]')) {
       return
     }
-    
+
     // 检查是否点击了第一列或第二列(多选框列和编号列)的单元格区域
     const isFirstOrSecondCell = cell && (
       cell === cell.parentElement?.firstElementChild || 
@@ -91,7 +91,14 @@ export function DataTable<TData, TValue>({
       row.toggleSelected(!row.getIsSelected())
       return
     }
+
+    // 检查是否点击了最后一列(操作列)
+    const isLastCell = cell && cell === cell.parentElement?.lastElementChild
+    if (isLastCell) {
+      return
+    }
     
+    // 只有点击中间的内容列时才触发编辑
     setSelectedTask(row.original)
     setOpenDialog(true)
   }

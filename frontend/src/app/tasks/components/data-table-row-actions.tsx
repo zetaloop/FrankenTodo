@@ -63,8 +63,18 @@ export function DataTableRowActions<TData>({
                         <span className="sr-only">更多操作</span>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[160px]">
-                    <DropdownMenuItem>复制</DropdownMenuItem>
+                <DropdownMenuContent 
+                    align="end" 
+                    className="w-[160px]"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                    }}
+                >
+                    <DropdownMenuItem onSelect={(e) => {
+                        console.log("复制", task)
+                    }}>
+                        复制
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
