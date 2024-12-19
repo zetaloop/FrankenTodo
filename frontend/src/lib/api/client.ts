@@ -17,9 +17,9 @@ export async function fetchApi(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<any> {
-  const headers = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   }
 
   const token = localStorage.getItem('access_token')

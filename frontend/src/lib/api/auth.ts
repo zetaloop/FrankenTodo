@@ -1,12 +1,5 @@
 import { fetchApi } from './client'
-import type { User } from './types'
-
-export interface LoginResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
-  user: User
-}
+import type { User, LoginResponse } from './types'
 
 export const authApi = {
   async register(data: {
