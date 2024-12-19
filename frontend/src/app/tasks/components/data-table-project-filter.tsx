@@ -12,32 +12,24 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { Project } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { Circle, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
-const projects = [
-    {
-        value: "fd9b02ca-5ac9-40c6-b756-ead6786675ae",
-        label: "FrankenTodo 任务管理系统",
-    },
-    {
-        value: "62da762d-715b-4c15-a8e7-4c53fd83bea3",
-        label: "天气控制器",
-    },
-] as const;
-
 interface DataTableProjectFilterProps {
-    value: string;
-    onChange: (value: string) => void;
+    projects: Project[]
+    value: string
+    onChange: (value: string) => void
 }
 
 export function DataTableProjectFilter({
+    projects,
     value,
     onChange,
 }: DataTableProjectFilterProps) {
-    const [open, setOpen] = React.useState(false);
-    const selectedProject = projects.find((project) => project.value === value);
+    const [open, setOpen] = React.useState(false)
+    const selectedProject = projects.find((project) => project.id === value)
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -53,35 +45,35 @@ export function DataTableProjectFilter({
                         "truncate",
                         !selectedProject && "text-muted-foreground"
                     )}>
-                        {selectedProject?.label ?? "选择项目"}
+                        {selectedProject?.name ?? "选择项目"}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[150px] lg:w-[250px] p-0" align="start">
                 <Command>
-                    <CommandInput placeholder="项目" />
+                    <CommandInput placeholder="搜索项目..." />
                     <CommandList>
-                        <CommandEmpty>没有结果</CommandEmpty>
+                        <CommandEmpty>没有找到项目</CommandEmpty>
                         <CommandGroup>
                             {projects.map((project) => (
                                 <CommandItem
-                                    key={project.value}
+                                    key={project.id}
                                     onSelect={() => {
-                                        onChange(project.value === value ? "" : project.value);
-                                        setOpen(false);
+                                        onChange(project.id === value ? "" : project.id)
+                                        setOpen(false)
                                     }}
                                     className="flex items-center gap-2"
                                 >
                                     <Circle
                                         className={cn(
                                             "h-2 w-2",
-                                            value === project.value
+                                            value === project.id
                                                 ? "fill-current"
                                                 : "fill-transparent"
                                         )}
                                     />
-                                    <span className="truncate">{project.label}</span>
+                                    <span className="truncate">{project.name}</span>
                                 </CommandItem>
                             ))}
                         </CommandGroup>
@@ -89,5 +81,5 @@ export function DataTableProjectFilter({
                 </Command>
             </PopoverContent>
         </Popover>
-    );
+    )
 } 

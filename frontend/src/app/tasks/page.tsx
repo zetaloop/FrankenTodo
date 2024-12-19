@@ -1,45 +1,53 @@
-import { promises as fs } from "fs"
-import path from "path"
-import Image from "next/image"
-import { z } from "zod"
+'use client'
 
+import { useEffect, useState } from "react"
+import { api } from "@/lib/api"
+import type { Project, Task } from "@/lib/api/types"
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
-import { taskSchema } from "./data/schema"
 
-// Simulate a database read for tasks.
-async function getTasks() {
-  const data = await fs.readFile(
-    path.join(process.cwd(), "src/app/tasks/data/tasks.json")
-  )
+export default function TaskPage() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("")
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const tasks = JSON.parse(data.toString())
+  // 获取项目列表
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { projects } = await api.projects.getAll()
+        setProjects(projects)
+        // 如果有项目,默认选择第一个
+        if (projects.length > 0) {
+          setSelectedProjectId(projects[0].id)
+        }
+      } catch (error) {
+        console.error("获取项目列表失败:", error)
+      }
+    }
+    fetchProjects()
+  }, [])
 
-  return z.array(taskSchema).parse(tasks)
-}
-
-export default async function TaskPage() {
-  const tasks = await getTasks()
+  // 当选择的项目改变时,获取该项目的任务
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true)
+      try {
+        const { tasks } = await api.tasks.getAll(selectedProjectId || '')
+        setTasks(tasks)
+      } catch (error) {
+        console.error("获取任务列表失败:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTasks()
+  }, [selectedProjectId])
 
   return (
     <>
-      <div className="md:hidden">
-        <Image
-          src="/examples/tasks-light.png"
-          width={1280}
-          height={998}
-          alt="Playground"
-          className="block dark:hidden"
-        />
-        <Image
-          src="/examples/tasks-dark.png"
-          width={1280}
-          height={998}
-          alt="Playground"
-          className="hidden dark:block"
-        />
-      </div>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
@@ -52,7 +60,17 @@ export default async function TaskPage() {
             <UserNav />
           </div>
         </div>
-        <DataTable data={tasks} columns={columns} />
+        {loading ? (
+          <div>加载中...</div>
+        ) : (
+          <DataTable 
+            data={tasks} 
+            columns={columns} 
+            projects={projects}
+            selectedProjectId={selectedProjectId}
+            onProjectChange={setSelectedProjectId}
+          />
+        )}
       </div>
     </>
   )

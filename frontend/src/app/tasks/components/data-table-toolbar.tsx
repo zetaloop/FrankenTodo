@@ -11,24 +11,31 @@ import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableProjectFilter } from "./data-table-project-filter";
 import { useState } from "react";
+import { Project } from "@/lib/api/types";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
+    projects: Project[];
+    selectedProjectId: string;
+    onProjectChange: (projectId: string) => void;
 }
 
 export function DataTableToolbar<TData>({
     table,
+    projects,
+    selectedProjectId,
+    onProjectChange,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
-    const [selectedProject, setSelectedProject] = useState("all");
     const selectedRows = table.getFilteredSelectedRowModel().rows;
 
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
                 <DataTableProjectFilter
-                    value={selectedProject}
-                    onChange={setSelectedProject}
+                    projects={projects}
+                    value={selectedProjectId}
+                    onChange={onProjectChange}
                 />
                 <Input
                     placeholder="搜索任务..."

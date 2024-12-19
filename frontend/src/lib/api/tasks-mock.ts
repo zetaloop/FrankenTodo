@@ -1,13 +1,21 @@
 import type { Task } from './types'
 import mockTasks from '@/app/tasks/data/tasks.json'
 
-// 为每个任务添加缺失的字段
-const enrichedTasks = mockTasks.map(task => ({
-  ...task,
-  description: `这是任务 ${task.id} 的描述`,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString()
-}))
+// 为不同项目创建不同的任务列表
+const projectTasks: Record<string, Task[]> = {
+  'fd9b02ca-5ac9-40c6-b756-ead6786675ae': mockTasks.slice(0, 50).map(task => ({
+    ...task,
+    description: `这是 FrankenTodo 项目中的任务 ${task.id}`,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  })),
+  '62da762d-715b-4c15-a8e7-4c53fd83bea3': mockTasks.slice(50, 100).map(task => ({
+    ...task,
+    description: `这是天气控制器项目中的任务 ${task.id}`,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }))
+}
 
 interface CreateTaskData {
   title: string
@@ -19,7 +27,13 @@ interface CreateTaskData {
 
 export const tasksApiMock = {
   async getAll(projectId: string): Promise<{ tasks: Task[] }> {
-    return { tasks: enrichedTasks }
+    // 如果没有选择项目,返回空数组
+    if (!projectId) {
+      return { tasks: [] }
+    }
+    // 根据项目 ID 返回对应的任务列表
+    const tasks = projectTasks[projectId] || []
+    return { tasks }
   },
 
   async create(projectId: string, data: CreateTaskData): Promise<Task> {
@@ -46,7 +60,7 @@ export const tasksApiMock = {
   },
 
   async getById(projectId: string, taskId: string): Promise<Task> {
-    const task = enrichedTasks.find(t => t.id === taskId)
+    const task = projectTasks[projectId]?.find(t => t.id === taskId)
     if (!task) throw new Error('Task not found')
     return task
   },
