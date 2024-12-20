@@ -6,12 +6,17 @@ import type { Project, Task } from "@/lib/api/types"
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
+import { ProjectDialog } from "./components/project-dialog"
 
 export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>("")
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false)
+  const [projectDialogMode, setProjectDialogMode] = useState<"create" | "edit">("create")
+  const [selectedProject, setSelectedProject] = useState<Project | undefined>()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // 获取项目列表
   useEffect(() => {
@@ -46,32 +51,18 @@ export default function TaskPage() {
     fetchTasks()
   }, [selectedProjectId])
 
-  const handleCreateProject = async () => {
-    try {
-      const newProject = await api.projects.create({
-        name: "新项目",
-        description: "项目描述"
-      })
-      setProjects(prev => [...prev, newProject])
-      setSelectedProjectId(newProject.id)
-    } catch (error) {
-      console.error("创建项目失败:", error)
-    }
+  const handleCreateProject = () => {
+    setProjectDialogMode("create")
+    setSelectedProject(undefined)
+    setProjectDialogOpen(true)
   }
 
-  const handleEditProject = async () => {
+  const handleEditProject = () => {
     if (!selectedProjectId) return
-    try {
-      const updatedProject = await api.projects.update(selectedProjectId, {
-        name: "更新的项目名称",
-        description: "更新的项目描述"
-      })
-      setProjects(prev => 
-        prev.map(p => p.id === updatedProject.id ? updatedProject : p)
-      )
-    } catch (error) {
-      console.error("更新项目失败:", error)
-    }
+    const project = projects.find(p => p.id === selectedProjectId)
+    setSelectedProject(project)
+    setProjectDialogMode("edit")
+    setProjectDialogOpen(true)
   }
 
   const handleDeleteProject = async () => {
@@ -82,6 +73,23 @@ export default function TaskPage() {
       setSelectedProjectId("")
     } catch (error) {
       console.error("删除项目失败:", error)
+    }
+  }
+
+  const handleProjectSubmit = async (data: { name: string; description: string }) => {
+    try {
+      if (projectDialogMode === "create") {
+        const newProject = await api.projects.create(data)
+        setProjects(prev => [...prev, newProject])
+        setSelectedProjectId(newProject.id)
+      } else {
+        const updatedProject = await api.projects.update(selectedProjectId, data)
+        setProjects(prev => 
+          prev.map(p => p.id === updatedProject.id ? updatedProject : p)
+        )
+      }
+    } catch (error) {
+      console.error("操作项目失败:", error)
     }
   }
 
@@ -114,6 +122,13 @@ export default function TaskPage() {
           />
         )}
       </div>
+      <ProjectDialog
+        project={selectedProject}
+        open={projectDialogOpen}
+        onOpenChange={setProjectDialogOpen}
+        onSubmit={handleProjectSubmit}
+        mode={projectDialogMode}
+      />
     </>
   )
 }

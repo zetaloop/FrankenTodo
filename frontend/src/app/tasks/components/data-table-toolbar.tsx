@@ -18,6 +18,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
@@ -41,6 +51,7 @@ export function DataTableToolbar<TData>({
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const selectedProject = projects.find(p => p.id === selectedProjectId);
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false)
 
     return (
         <div className="flex items-center justify-between">
@@ -52,18 +63,18 @@ export function DataTableToolbar<TData>({
                     onCreateProject={onCreateProject}
                 />
                 {selectedProjectId && (
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon" className="h-8 w-8">
                                 <Settings className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={onEditProject}>
+                            <DropdownMenuItem onSelect={onEditProject}>
                                 编辑项目
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                                onClick={onDeleteProject}
+                                onSelect={() => setShowDeleteAlert(true)}
                                 className="text-destructive"
                             >
                                 删除项目
@@ -131,6 +142,29 @@ export function DataTableToolbar<TData>({
                 )}
             </div>
             <DataTableViewOptions table={table} />
+
+            <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除项目？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            此操作不可撤销。删除项目将会同时删除项目下的所有任务。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                onDeleteProject()
+                                setShowDeleteAlert(false)
+                            }}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            删除
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

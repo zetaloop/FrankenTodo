@@ -38,6 +38,9 @@ interface DataTableProps<TData, TValue> {
   projects: Project[]
   selectedProjectId: string
   onProjectChange: (projectId: string) => void
+  onCreateProject: () => void
+  onEditProject: () => void
+  onDeleteProject: () => void
 }
 
 export function DataTable<TData, TValue>({
@@ -46,6 +49,9 @@ export function DataTable<TData, TValue>({
   projects,
   selectedProjectId,
   onProjectChange,
+  onCreateProject,
+  onEditProject,
+  onDeleteProject,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -117,6 +123,9 @@ export function DataTable<TData, TValue>({
         projects={projects}
         selectedProjectId={selectedProjectId}
         onProjectChange={onProjectChange}
+        onCreateProject={onCreateProject}
+        onEditProject={onEditProject}
+        onDeleteProject={onDeleteProject}
       />
       <div className="rounded-md border">
         <Table>
