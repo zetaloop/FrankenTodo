@@ -7,6 +7,7 @@ import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
 import { ProjectDialog } from "./components/project-dialog"
+import { TaskDialog } from "./components/task-dialog"
 
 export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -17,6 +18,9 @@ export default function TaskPage() {
   const [projectDialogMode, setProjectDialogMode] = useState<"create" | "edit">("create")
   const [selectedProject, setSelectedProject] = useState<Project | undefined>()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
+  const [taskDialogMode, setTaskDialogMode] = useState<"create" | "view" | "edit">("create")
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>()
 
   // 获取项目列表
   useEffect(() => {
@@ -93,6 +97,50 @@ export default function TaskPage() {
     }
   }
 
+  const handleCreateTask = () => {
+    setTaskDialogMode("create")
+    setSelectedTask(undefined)
+    setTaskDialogOpen(true)
+  }
+
+  const handleEditTask = (task: Task) => {
+    setSelectedTask(task)
+    setTaskDialogMode("edit")
+    setTaskDialogOpen(true)
+  }
+
+  const handleDeleteTask = async (task: Task) => {
+    try {
+      await api.tasks.delete(selectedProjectId, task.id)
+      setTasks(prev => prev.filter(t => t.id !== task.id))
+    } catch (error) {
+      console.error("删除任务失败:", error)
+    }
+  }
+
+  const handleTaskSubmit = async (data: {
+    title: string
+    description: string
+    status: string
+    priority: string
+    label: string
+  }) => {
+    try {
+      if (taskDialogMode === "create") {
+        const newTask = await api.tasks.create(selectedProjectId, data)
+        setTasks(prev => [...prev, newTask])
+      } else {
+        // 编辑模式
+        const updatedTask = await api.tasks.update(selectedProjectId, selectedTask!.id, data)
+        setTasks(prev => 
+          prev.map(t => t.id === updatedTask.id ? updatedTask : t)
+        )
+      }
+    } catch (error) {
+      console.error("操作任务失败:", error)
+    }
+  }
+
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -119,6 +167,15 @@ export default function TaskPage() {
             onCreateProject={handleCreateProject}
             onEditProject={handleEditProject}
             onDeleteProject={handleDeleteProject}
+            onCreateTask={handleCreateTask}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+            onUpdateTask={async (task, data) => {
+              const updatedTask = await api.tasks.update(selectedProjectId, task.id, data)
+              setTasks(prev => 
+                prev.map(t => t.id === updatedTask.id ? updatedTask : t)
+              )
+            }}
           />
         )}
       </div>
@@ -128,6 +185,16 @@ export default function TaskPage() {
         onOpenChange={setProjectDialogOpen}
         onSubmit={handleProjectSubmit}
         mode={projectDialogMode}
+      />
+      <TaskDialog
+        task={selectedTask}
+        open={taskDialogOpen}
+        projectId={selectedProjectId}
+        onOpenChange={setTaskDialogOpen}
+        onSubmit={handleTaskSubmit}
+        mode={taskDialogMode}
+        onDelete={selectedTask ? () => handleDeleteTask(selectedTask) : undefined}
+        onEdit={selectedTask ? () => setTaskDialogMode("edit") : undefined}
       />
     </>
   )

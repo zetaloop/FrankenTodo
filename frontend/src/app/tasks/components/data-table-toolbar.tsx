@@ -37,6 +37,7 @@ interface DataTableToolbarProps<TData> {
     onCreateProject?: () => void;
     onEditProject?: () => void;
     onDeleteProject?: () => void;
+    onCreateTask?: () => void;
 }
 
 export function DataTableToolbar<TData>({
@@ -47,6 +48,7 @@ export function DataTableToolbar<TData>({
     onCreateProject,
     onEditProject,
     onDeleteProject,
+    onCreateTask,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -71,7 +73,7 @@ export function DataTableToolbar<TData>({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onSelect={onEditProject}>
-                                编辑项目
+                                编���项目
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                                 onSelect={() => setShowDeleteAlert(true)}
@@ -108,10 +110,8 @@ export function DataTableToolbar<TData>({
                     variant="default"
                     size="sm"
                     className="h-8"
-                    onClick={() => {
-                        // 这里添加创建任务的逻辑
-                        console.log("创建新任务");
-                    }}
+                    onClick={onCreateTask}
+                    disabled={!selectedProjectId}
                 >
                     <Plus className="h-4 w-4" />
                     创建任务

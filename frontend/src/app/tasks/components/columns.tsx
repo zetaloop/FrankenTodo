@@ -133,6 +133,23 @@ export const columns: ColumnDef<Task>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => <DataTableRowActions row={row} />,
+        cell: ({ row, table }) => {
+            const props = (table.options.meta as any) || {}
+            return (
+                <DataTableRowActions 
+                    row={row} 
+                    onEdit={() => {
+                        if (props.onEditTask) {
+                            props.onEditTask(row.original)
+                        }
+                    }}
+                    onDelete={async () => {
+                        if (props.onDeleteTask) {
+                            await props.onDeleteTask(row.original)
+                        }
+                    }}
+                />
+            )
+        },
     },
 ];

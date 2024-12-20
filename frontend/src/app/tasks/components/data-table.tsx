@@ -28,7 +28,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
-import { TaskDetailDialog } from "./task-detail-dialog"
+import { TaskDialog } from "./task-dialog"
 import { Task } from "../data/schema"
 import { Project } from "@/lib/api/types"
 import { ProjectEmptyState } from "./project-empty-state"
@@ -43,6 +43,16 @@ interface DataTableProps<TData, TValue> {
   onCreateProject: () => void
   onEditProject: () => void
   onDeleteProject: () => void
+  onCreateTask: () => void
+  onEditTask: (task: Task) => void
+  onDeleteTask: (task: Task) => Promise<void>
+  onUpdateTask: (task: Task, data: {
+    title: string
+    description: string
+    status: string
+    priority: string
+    label: string
+  }) => Promise<void>
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +64,10 @@ export function DataTable<TData, TValue>({
   onCreateProject,
   onEditProject,
   onDeleteProject,
+  onCreateTask,
+  onEditTask,
+  onDeleteTask,
+  onUpdateTask,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -62,8 +76,9 @@ export function DataTable<TData, TValue>({
     []
   )
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [selectedTask, setSelectedTask] = React.useState<TData | null>(null)
-  const [openDialog, setOpenDialog] = React.useState(false)
+  const [selectedTask, setSelectedTask] = React.useState<Task | null>(null)
+  const [dialogOpen, setDialogOpen] = React.useState(false)
+  const [dialogMode, setDialogMode] = React.useState<"create" | "view" | "edit">("view")
 
   const table = useReactTable({
     data,
@@ -73,6 +88,14 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+    },
+    meta: {
+      onEditTask: (task: Task) => {
+        setSelectedTask(task)
+        setDialogMode("edit")
+        setDialogOpen(true)
+      },
+      onDeleteTask,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -113,9 +136,22 @@ export function DataTable<TData, TValue>({
       return
     }
     
-    // 只有点击中间的内容列时才触发编辑
-    setSelectedTask(row.original)
-    setOpenDialog(true)
+    // 只有点击中间的内容列时才触发查看
+    setSelectedTask(row.original as Task)
+    setDialogMode("view")
+    setDialogOpen(true)
+  }
+
+  const handleTaskSubmit = async (data: {
+    title: string
+    description: string
+    status: string
+    priority: string
+    label: string
+  }) => {
+    if (selectedTask) {
+      await onUpdateTask(selectedTask, data)
+    }
   }
 
   return (
@@ -128,17 +164,16 @@ export function DataTable<TData, TValue>({
         onCreateProject={onCreateProject}
         onEditProject={onEditProject}
         onDeleteProject={onDeleteProject}
+        onCreateTask={onCreateTask}
       />
       {!selectedProjectId ? (
         <ProjectEmptyState 
           onCreateProject={onCreateProject}
           onOpenProjectSelect={() => {
-            // 获取项目选择器的触发按钮元素
             const projectSelectTrigger = document.querySelector(
               '[aria-label="选择项目"]'
             ) as HTMLButtonElement
             
-            // 如果找到了触发按钮，模拟点击来打开项目选择器
             if (projectSelectTrigger) {
               projectSelectTrigger.click()
             }
@@ -188,10 +223,7 @@ export function DataTable<TData, TValue>({
                     <TableCell colSpan={columns.length} className="p-0 border-0">
                       <TaskEmptyState 
                         isFiltered={table.getState().columnFilters.length > 0} 
-                        onCreateTask={() => {
-                          // 这里添加创建任务的逻辑
-                          console.log("创建新任务")
-                        }}
+                        onCreateTask={onCreateTask}
                       />
                     </TableCell>
                   </TableRow>
@@ -202,10 +234,17 @@ export function DataTable<TData, TValue>({
           <DataTablePagination table={table} />
         </>
       )}
-      <TaskDetailDialog
-        task={selectedTask as Task}
-        open={openDialog}
-        onOpenChange={setOpenDialog}
+      <TaskDialog
+        task={selectedTask || undefined}
+        open={dialogOpen}
+        projectId={selectedProjectId}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleTaskSubmit}
+        mode={dialogMode}
+        onDelete={selectedTask ? () => onDeleteTask(selectedTask) : undefined}
+        onEdit={selectedTask ? () => {
+          setDialogMode("edit")
+        } : undefined}
       />
     </div>
   )

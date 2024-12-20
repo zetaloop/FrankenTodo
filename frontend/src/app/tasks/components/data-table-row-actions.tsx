@@ -22,10 +22,14 @@ import { taskSchema } from "../data/schema";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>;
+    onEdit?: (task: TData) => void;
+    onDelete?: (task: TData) => Promise<void>;
 }
 
 export function DataTableRowActions<TData>({
     row,
+    onEdit,
+    onDelete,
 }: DataTableRowActionsProps<TData>) {
     const task = taskSchema.parse(row.original);
 
@@ -35,8 +39,11 @@ export function DataTableRowActions<TData>({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => {
-                    console.log("编辑", task)
+                onClick={(e) => {
+                    e.stopPropagation()
+                    if (onEdit) {
+                        onEdit(row.original)
+                    }
                 }}
             >
                 <Pencil className="h-4 w-4" />
@@ -46,8 +53,11 @@ export function DataTableRowActions<TData>({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => {
-                    console.log("删除", task)
+                onClick={async (e) => {
+                    e.stopPropagation()
+                    if (onDelete) {
+                        await onDelete(row.original)
+                    }
                 }}
             >
                 <Trash2 className="h-4 w-4" />
@@ -58,6 +68,7 @@ export function DataTableRowActions<TData>({
                     <Button
                         variant="ghost"
                         className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">更多操作</span>
