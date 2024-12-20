@@ -130,7 +130,20 @@ export function DataTable<TData, TValue>({
         onDeleteProject={onDeleteProject}
       />
       {!selectedProjectId ? (
-        <ProjectEmptyState onCreateProject={onCreateProject} />
+        <ProjectEmptyState 
+          onCreateProject={onCreateProject}
+          onOpenProjectSelect={() => {
+            // 获取项目选择器的触发按钮元素
+            const projectSelectTrigger = document.querySelector(
+              '[aria-label="选择项目"]'
+            ) as HTMLButtonElement
+            
+            // 如果找到了触发按钮，模拟点击来打开项目选择器
+            if (projectSelectTrigger) {
+              projectSelectTrigger.click()
+            }
+          }}
+        />
       ) : (
         <>
           <div className="rounded-md border">
