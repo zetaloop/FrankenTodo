@@ -32,6 +32,7 @@ import { TaskDetailDialog } from "./task-detail-dialog"
 import { Task } from "../data/schema"
 import { Project } from "@/lib/api/types"
 import { ProjectEmptyState } from "./project-empty-state"
+import { TaskEmptyState } from "./task-empty-state"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -171,11 +172,14 @@ export function DataTable<TData, TValue>({
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      没有任务
+                    <TableCell colSpan={columns.length} className="p-0 border-0">
+                      <TaskEmptyState 
+                        isFiltered={table.getState().columnFilters.length > 0} 
+                        onCreateTask={() => {
+                          // 这里添加创建任务的逻辑
+                          console.log("创建新任务")
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 )}
