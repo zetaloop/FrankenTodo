@@ -54,6 +54,7 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const totalFilteredRows = table.getFilteredRowModel().rows;
     const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false)
     const [showDeleteTasksAlert, setShowDeleteTasksAlert] = useState(false)

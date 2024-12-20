@@ -16,15 +16,15 @@ export const columns: ColumnDef<Task>[] = [
         header: ({ table }) => (
             <div 
                 className="cursor-pointer" 
-                onClick={() => table.toggleAllPageRowsSelected()}
+                onClick={() => table.toggleAllRowsSelected()}
             >
                 <Checkbox
                     checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                        table.getIsAllRowsSelected() ||
+                        (table.getIsSomeRowsSelected() && "indeterminate")
                     }
                     onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
+                        table.toggleAllRowsSelected(!!value)
                     }
                     aria-label="全选"
                     className="translate-y-[2px]"
