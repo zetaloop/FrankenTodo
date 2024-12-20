@@ -46,6 +46,7 @@ interface DataTableProps<TData, TValue> {
   onCreateTask: () => void
   onEditTask: (task: Task) => void
   onDeleteTask: (task: Task) => Promise<void>
+  onDeleteTasks: (tasks: Task[]) => Promise<void>
   onUpdateTask: (task: Task, data: {
     title: string
     description: string
@@ -67,6 +68,7 @@ export function DataTable<TData, TValue>({
   onCreateTask,
   onEditTask,
   onDeleteTask,
+  onDeleteTasks,
   onUpdateTask,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
@@ -165,6 +167,7 @@ export function DataTable<TData, TValue>({
         onEditProject={onEditProject}
         onDeleteProject={onDeleteProject}
         onCreateTask={onCreateTask}
+        onDeleteTasks={onDeleteTasks}
       />
       {!selectedProjectId ? (
         <ProjectEmptyState 

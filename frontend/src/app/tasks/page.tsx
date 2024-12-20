@@ -141,6 +141,15 @@ export default function TaskPage() {
     }
   }
 
+  const handleDeleteTasks = async (tasks: Task[]) => {
+    try {
+      await api.tasks.batchDelete(selectedProjectId, tasks.map(t => t.id))
+      setTasks(prev => prev.filter(t => !tasks.find(dt => dt.id === t.id)))
+    } catch (error) {
+      console.error("删除任务失败:", error)
+    }
+  }
+
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -170,6 +179,7 @@ export default function TaskPage() {
             onCreateTask={handleCreateTask}
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
+            onDeleteTasks={handleDeleteTasks}
             onUpdateTask={async (task, data) => {
               const updatedTask = await api.tasks.update(selectedProjectId, task.id, data)
               setTasks(prev => 

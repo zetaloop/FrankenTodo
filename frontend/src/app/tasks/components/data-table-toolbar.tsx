@@ -38,6 +38,7 @@ interface DataTableToolbarProps<TData> {
     onEditProject?: () => void;
     onDeleteProject?: () => void;
     onCreateTask?: () => void;
+    onDeleteTasks: (tasks: TData[]) => Promise<void>;
 }
 
 export function DataTableToolbar<TData>({
@@ -49,11 +50,13 @@ export function DataTableToolbar<TData>({
     onEditProject,
     onDeleteProject,
     onCreateTask,
+    onDeleteTasks,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+    const [showDeleteTasksAlert, setShowDeleteTasksAlert] = useState(false)
 
     return (
         <div className="flex items-center justify-between">
@@ -73,7 +76,7 @@ export function DataTableToolbar<TData>({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onSelect={onEditProject}>
-                                编���项目
+                                编辑项目
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                                 onSelect={() => setShowDeleteAlert(true)}
@@ -121,10 +124,7 @@ export function DataTableToolbar<TData>({
                         variant="destructive"
                         size="sm"
                         className="h-8"
-                        onClick={() => {
-                            // 这里添加删除选中任务的逻辑
-                            console.log("删除选中的任务", selectedRows);
-                        }}
+                        onClick={() => setShowDeleteTasksAlert(true)}
                     >
                         <Trash2 className="h-4 w-4" />
                         删除任务 ({selectedRows.length})
@@ -157,6 +157,29 @@ export function DataTableToolbar<TData>({
                             onClick={() => {
                                 onDeleteProject()
                                 setShowDeleteAlert(false)
+                            }}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            删除
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={showDeleteTasksAlert} onOpenChange={setShowDeleteTasksAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除选中的任务？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            此操作不可撤销。将会删除 {selectedRows.length} 个任务。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={async () => {
+                                await onDeleteTasks(selectedRows.map(row => row.original))
+                                setShowDeleteTasksAlert(false)
                             }}
                             className="bg-destructive hover:bg-destructive/90"
                         >
