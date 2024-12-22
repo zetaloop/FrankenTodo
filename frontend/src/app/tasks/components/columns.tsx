@@ -1,16 +1,42 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-
-import { labels, priorities, statuses } from "../data/data";
+import { priorities, statuses } from "../data/data";
 import { Task } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { api } from "@/lib/api";
+import { useEffect, useState } from "react";
+import type { Label } from "@/lib/api/types";
 
-export const columns: ColumnDef<Task>[] = [
+export function useLabels(projectId: string) {
+  const [labels, setLabels] = useState<Label[]>([]);
+
+  useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        const response = await api.labels.getAll(projectId);
+        setLabels(response.labels);
+      } catch (error) {
+        console.error("获取标签列表失败:", error);
+      }
+    };
+    fetchLabels();
+  }, [projectId]);
+
+  return labels;
+}
+
+interface ColumnsProps {
+  projectId: string;
+}
+
+export function createColumns({ projectId }: ColumnsProps): ColumnDef<Task>[] {
+  const labels = useLabels(projectId);
+
+  return [
     {
         id: "select",
         header: ({ table }) => (
@@ -65,7 +91,7 @@ export const columns: ColumnDef<Task>[] = [
         cell: ({ row }) => {
             const taskLabels = row.original.labels.map(labelValue => 
                 labels.find(l => l.value === labelValue)
-            ).filter((l): l is typeof labels[0] => Boolean(l));
+            ).filter((l): l is Label => Boolean(l));
 
             return (
                 <div className="flex space-x-2 max-w-[40vw]">
@@ -158,4 +184,5 @@ export const columns: ColumnDef<Task>[] = [
             )
         },
     },
-];
+  ];
+}

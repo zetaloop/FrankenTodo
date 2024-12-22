@@ -22,7 +22,7 @@ interface CreateTaskData {
   description: string
   status: string
   priority: string
-  label: string
+  labels: string[]
 }
 
 export const tasksApiMock = {

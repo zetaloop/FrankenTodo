@@ -34,9 +34,9 @@ import { Project } from "@/lib/api/types"
 import { ProjectEmptyState } from "./project-empty-state"
 import { TaskEmptyState } from "./task-empty-state"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+interface DataTableProps {
+  columns: ColumnDef<Task>[]
+  data: Task[]
   projects: Project[]
   selectedProjectId: string
   onProjectChange: (projectId: string) => void
@@ -52,11 +52,11 @@ interface DataTableProps<TData, TValue> {
     description: string
     status: string
     priority: string
-    label: string
+    labels: string[]
   }) => Promise<void>
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable({
   columns,
   data,
   projects,
@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
   onDeleteTask,
   onDeleteTasks,
   onUpdateTask,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -112,7 +112,7 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  const handleRowClick = (e: React.MouseEvent, row: Row<TData>) => {
+  const handleRowClick = (e: React.MouseEvent, row: Row<Task>) => {
     const target = e.target as HTMLElement
     const cell = target.closest('td')
     
@@ -139,7 +139,7 @@ export function DataTable<TData, TValue>({
     }
     
     // 只有点击中间的内容列时才触发查看
-    setSelectedTask(row.original as Task)
+    setSelectedTask(row.original)
     setDialogMode("view")
     setDialogOpen(true)
   }
@@ -149,7 +149,7 @@ export function DataTable<TData, TValue>({
     description: string
     status: string
     priority: string
-    label: string
+    labels: string[]
   }) => {
     if (selectedTask) {
       await onUpdateTask(selectedTask, data)
