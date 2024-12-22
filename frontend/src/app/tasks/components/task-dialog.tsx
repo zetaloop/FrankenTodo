@@ -156,7 +156,9 @@ export function TaskDialog({
                   {labels.length > 0 ? (
                     <div className="flex items-start gap-2">
                       <Tag className="h-4 w-4 shrink-0 mt-1" />
-                      <span className="whitespace-normal">{labels.join(", ")}</span>
+                      <span className="whitespace-normal max-w-[250px] break-all">
+                        {labels.join(", ")}
+                      </span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground">暂无标签</span>
@@ -282,7 +284,7 @@ export function TaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         {renderContent()}
       </DialogContent>
     </Dialog>
