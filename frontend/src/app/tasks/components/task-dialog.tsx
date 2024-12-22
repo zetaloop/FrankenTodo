@@ -224,7 +224,7 @@ export function TaskDialog({
               </TabsList>
             </Tabs>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 items-start">
             <div className="grid gap-2">
               <Label>标签</Label>
               <TaskLabelSelect 

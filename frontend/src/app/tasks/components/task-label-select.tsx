@@ -103,8 +103,8 @@ export function TaskLabelSelect({
   return (
     <>
       <div className="relative w-full">
-        <div className="flex items-center gap-2 w-full min-h-10 rounded-md border border-input bg-background px-3 py-2">
-          <div className="flex-1 flex flex-wrap gap-1">
+        <div className="grid grid-cols-[1fr_auto] items-center gap-2 w-full min-h-10 rounded-md border border-input bg-background px-3 py-2">
+          <div className="flex-1 flex flex-wrap gap-1 min-w-0">
             {Array.from(selectedLabels).map(labelValue => {
               const label = labels.find(l => l.value === labelValue)
               if (!label) return null
@@ -112,11 +112,11 @@ export function TaskLabelSelect({
                 <Badge 
                   key={label.value} 
                   variant="secondary"
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 max-w-full"
                 >
-                  {label.label}
+                  <span className="truncate">{label.label}</span>
                   <X 
-                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                    className="h-3 w-3 shrink-0 cursor-pointer hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleSelect(label.value)
