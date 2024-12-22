@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { labels } from "../data/data"
+import { labels as defaultLabels } from "../data/data"
 import {
   Dialog,
   DialogContent,
@@ -23,21 +23,41 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { api } from "@/lib/api"
+import { toast } from "@/hooks/use-toast"
+import type { Label as LabelType } from "@/lib/api/types"
 
 interface TaskLabelSelectProps {
   value: string
   onChange: (value: string) => void
+  projectId: string
 }
 
 export function TaskLabelSelect({
   value,
   onChange,
+  projectId,
 }: TaskLabelSelectProps) {
   const [selectedLabels, setSelectedLabels] = React.useState<Set<string>>(
     new Set(value ? [value] : [])
   )
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [newLabelName, setNewLabelName] = React.useState("")
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [labels, setLabels] = React.useState<LabelType[]>(defaultLabels)
+
+  const fetchLabels = React.useCallback(async () => {
+    try {
+      const response = await api.labels.getAll(projectId)
+      setLabels(response.labels)
+    } catch (error) {
+      console.error("获取标签列表失败:", error)
+    }
+  }, [projectId])
+
+  React.useEffect(() => {
+    fetchLabels()
+  }, [fetchLabels])
 
   const handleSelect = (labelValue: string) => {
     const newSelectedLabels = new Set(selectedLabels)
@@ -50,11 +70,34 @@ export function TaskLabelSelect({
     onChange(Array.from(newSelectedLabels)[0] || "")
   }
 
-  const handleCreateLabel = () => {
-    // TODO: 实现创建标签的逻辑
-    console.log("创建新标签:", newLabelName)
-    setNewLabelName("")
-    setIsCreateDialogOpen(false)
+  const handleCreateLabel = async () => {
+    try {
+      setIsSubmitting(true)
+      const newLabel = await api.labels.create(projectId, {
+        value: newLabelName.toLowerCase().replace(/\s+/g, '-'),
+        label: newLabelName,
+        description: ""
+      })
+      toast({
+        title: "创建成功",
+        description: `标签 "${newLabelName}" 已创建`
+      })
+      // 刷新标签列表
+      await fetchLabels()
+      // 选中新创建的标签
+      handleSelect(newLabel.value)
+      setNewLabelName("")
+      setIsCreateDialogOpen(false)
+    } catch (error) {
+      console.error("创建标签失败:", error)
+      toast({
+        title: "创建失败",
+        description: "创建标签时出现错误，请重试",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -157,9 +200,9 @@ export function TaskLabelSelect({
             </Button>
             <Button 
               onClick={handleCreateLabel}
-              disabled={!newLabelName.trim()}
+              disabled={!newLabelName.trim() || isSubmitting}
             >
-              创建
+              {isSubmitting ? "创建中..." : "创建"}
             </Button>
           </DialogFooter>
         </DialogContent>
