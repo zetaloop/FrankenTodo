@@ -72,21 +72,6 @@ export const projectsApiMock = {
     }
   },
 
-  async partialUpdate(
-    projectId: string,
-    data: Partial<{
-      name: string
-      description: string
-    }>
-  ): Promise<Project> {
-    const project = await this.getById(projectId)
-    return {
-      ...project,
-      ...data,
-      updated_at: new Date().toISOString()
-    }
-  },
-
   async delete(projectId: string): Promise<void> {
     // 模拟删除操作
     return Promise.resolve()

@@ -78,19 +78,6 @@ export const tasksApiMock = {
     }
   },
 
-  async partialUpdate(
-    projectId: string,
-    taskId: string,
-    data: Partial<CreateTaskData>
-  ): Promise<Task> {
-    const task = await this.getById(projectId, taskId)
-    return {
-      ...task,
-      ...data,
-      updated_at: new Date().toISOString()
-    }
-  },
-
   async delete(projectId: string, taskId: string): Promise<void> {
     return Promise.resolve()
   },

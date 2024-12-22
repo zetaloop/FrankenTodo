@@ -46,17 +46,6 @@ export const tasksApi = {
     })
   },
 
-  async partialUpdate(
-    projectId: string,
-    taskId: string,
-    data: Partial<CreateTaskData>
-  ): Promise<Task> {
-    return fetchApi(`/projects/${projectId}/tasks/${taskId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    })
-  },
-
   async delete(projectId: string, taskId: string): Promise<void> {
     return fetchApi(`/projects/${projectId}/tasks/${taskId}`, {
       method: 'DELETE',
