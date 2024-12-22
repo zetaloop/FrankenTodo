@@ -188,6 +188,7 @@ export function TaskLabelSelect({
               <Label htmlFor="name">标签名称</Label>
               <Input
                 id="name"
+                autoComplete="disable"
                 value={newLabelName}
                 onChange={(e) => setNewLabelName(e.target.value)}
                 placeholder="输入标签名称..."
