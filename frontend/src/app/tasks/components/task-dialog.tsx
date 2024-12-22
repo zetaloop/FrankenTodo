@@ -122,15 +122,15 @@ export function TaskDialog({
             </div>
 
             <div className="flex items-center">
-              <div className="flex-1 flex gap-8">
+              <div className="flex-1 flex gap-8 whitespace-nowrap items-start">
                 <div className="grid gap-2">
                   <Label>状态</Label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start gap-2">
                     {(() => {
                       const status_item = statuses.find(s => s.value === status);
                       if (status_item?.icon) {
                         const Icon = status_item.icon;
-                        return <Icon className="h-4 w-4" />;
+                        return <Icon className="h-4 w-4 mt-1" />;
                       }
                     })()}
                     <span>{statuses.find(s => s.value === status)?.label}</span>
@@ -138,38 +138,38 @@ export function TaskDialog({
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>标签</Label>
-                  {labels.length > 0 ? (
-                    <div className="flex items-center gap-2">
-                      <Tag className="h-4 w-4" />
-                      <span>{labels.join(", ")}</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">暂无标签</span>
-                  )}
-                </div>
-
-                <div className="grid gap-2">
                   <Label>优先级</Label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start gap-2">
                     {(() => {
                       const priority_item = priorities.find(p => p.value === priority);
                       if (priority_item?.icon) {
                         const Icon = priority_item.icon;
-                        return <Icon className="h-4 w-4" />;
+                        return <Icon className="h-4 w-4 mt-1" />;
                       }
                     })()}
                     <span>{priorities.find(p => p.value === priority)?.label}</span>
                   </div>
                 </div>
+
+                <div className="grid gap-2">
+                  <Label>标签</Label>
+                  {labels.length > 0 ? (
+                    <div className="flex items-start gap-2">
+                      <Tag className="h-4 w-4 shrink-0 mt-1" />
+                      <span className="whitespace-normal">{labels.join(", ")}</span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">暂无标签</span>
+                  )}
+                </div>
               </div>
 
               {onEdit && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   onClick={onEdit}
-                  className="h-8 w-8 ml-4"
+                  className="h-10 w-10 ml-4"
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -224,7 +224,7 @@ export function TaskDialog({
               </TabsList>
             </Tabs>
           </div>
-          <div className="grid grid-cols-2 gap-4 items-start">
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label>标签</Label>
               <TaskLabelSelect 

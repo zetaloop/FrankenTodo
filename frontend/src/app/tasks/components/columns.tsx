@@ -74,7 +74,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
 
             return (
                 <div className="flex space-x-2 max-w-[40vw]">
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 whitespace-nowrap">
                         {taskLabels.map(label => (
                             <Badge key={label.value} variant="outline">
                                 {label.label}
