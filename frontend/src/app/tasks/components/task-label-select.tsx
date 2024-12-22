@@ -1,25 +1,28 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
+import { Check, ChevronsUpDown, Plus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { labels } from "../data/data"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 interface TaskLabelSelectProps {
   value: string
@@ -30,104 +33,137 @@ export function TaskLabelSelect({
   value,
   onChange,
 }: TaskLabelSelectProps) {
-  const [open, setOpen] = React.useState(false)
   const [selectedLabels, setSelectedLabels] = React.useState<Set<string>>(
     new Set(value ? [value] : [])
   )
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
+  const [newLabelName, setNewLabelName] = React.useState("")
+
+  const handleSelect = (labelValue: string) => {
+    const newSelectedLabels = new Set(selectedLabels)
+    if (newSelectedLabels.has(labelValue)) {
+      newSelectedLabels.delete(labelValue)
+    } else {
+      newSelectedLabels.add(labelValue)
+    }
+    setSelectedLabels(newSelectedLabels)
+    onChange(Array.from(newSelectedLabels)[0] || "")
+  }
+
+  const handleCreateLabel = () => {
+    // TODO: 实现创建标签的逻辑
+    console.log("创建新标签:", newLabelName)
+    setNewLabelName("")
+    setIsCreateDialogOpen(false)
+  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          aria-label="选择标签"
-          className="w-full justify-between min-h-10 h-auto"
-        >
-          <div className="flex gap-1 flex-wrap">
-            {selectedLabels.size > 0 ? (
-              Array.from(selectedLabels).map((label) => {
-                const labelData = labels.find((l) => l.value === label)
-                return (
-                  <Badge 
-                    key={label} 
-                    variant="secondary"
-                    className="mr-1"
-                  >
-                    {labelData?.label}
-                  </Badge>
-                )
-              })
-            ) : (
+    <>
+      <div className="relative w-full">
+        <div className="flex items-center gap-2 w-full min-h-10 rounded-md border border-input bg-background px-3 py-2">
+          <div className="flex-1 flex flex-wrap gap-1">
+            {Array.from(selectedLabels).map(labelValue => {
+              const label = labels.find(l => l.value === labelValue)
+              if (!label) return null
+              return (
+                <Badge 
+                  key={label.value} 
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {label.label}
+                  <X 
+                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSelect(label.value)
+                    }}
+                  />
+                </Badge>
+              )
+            })}
+            {selectedLabels.size === 0 && (
               <span className="text-muted-foreground">选择标签...</span>
             )}
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-        <Command className="w-full">
-          <CommandInput placeholder="搜索标签..." />
-          <CommandList>
-            <CommandEmpty>
-              <div className="flex items-center justify-between px-2 py-1.5">
-                <span>未找到标签</span>
-                <Button
-                  variant="outline"
+          <div className="flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
                   size="sm"
-                  onClick={() => {
-                    console.log("创建新标签")
-                  }}
+                  className="h-8 w-8 p-0"
                 >
-                  <Plus className="mr-2 h-4 w-4" />
-                  创建
+                  <ChevronsUpDown className="h-4 w-4" />
                 </Button>
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {labels.map((label) => (
-                <CommandItem
-                  key={label.value}
-                  onSelect={() => {
-                    const newSelectedLabels = new Set(selectedLabels)
-                    if (newSelectedLabels.has(label.value)) {
-                      newSelectedLabels.delete(label.value)
-                    } else {
-                      newSelectedLabels.add(label.value)
-                    }
-                    setSelectedLabels(newSelectedLabels)
-                    onChange(Array.from(newSelectedLabels)[0] || "")
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedLabels.has(label.value) 
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {label.label}
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup>
-              <CommandItem
-                onSelect={() => {
-                  setSelectedLabels(new Set())
-                  onChange("")
-                }}
-              >
-                清除选择
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-[200px]">
+                <DropdownMenuGroup>
+                  {labels.map((label) => (
+                    <DropdownMenuItem
+                      key={label.value}
+                      onSelect={(e) => {
+                        e.preventDefault()
+                        handleSelect(label.value)
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4">
+                          {selectedLabels.has(label.value) && (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </div>
+                        {label.label}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setIsCreateDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>创建新标签</DialogTitle>
+            <DialogDescription>
+              添加一个新的标签来分类你的任务
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">标签名称</Label>
+              <Input
+                id="name"
+                value={newLabelName}
+                onChange={(e) => setNewLabelName(e.target.value)}
+                placeholder="输入标签名称..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              取消
+            </Button>
+            <Button 
+              onClick={handleCreateLabel}
+              disabled={!newLabelName.trim()}
+            >
+              创建
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
