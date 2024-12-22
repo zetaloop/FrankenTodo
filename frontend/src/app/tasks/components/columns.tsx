@@ -68,7 +68,7 @@ export const columns: ColumnDef<Task>[] = [
             ).filter((l): l is typeof labels[0] => Boolean(l));
 
             return (
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 max-w-[40vw]">
                     <div className="flex gap-1">
                         {taskLabels.map(label => (
                             <Badge key={label.value} variant="outline">
@@ -76,7 +76,7 @@ export const columns: ColumnDef<Task>[] = [
                             </Badge>
                         ))}
                     </div>
-                    <span className="max-w-[500px] truncate font-medium">
+                    <span className="truncate font-medium">
                         {row.getValue("title")}
                     </span>
                 </div>
