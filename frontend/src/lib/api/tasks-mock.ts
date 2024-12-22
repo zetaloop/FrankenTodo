@@ -70,12 +70,19 @@ export const tasksApiMock = {
     taskId: string,
     data: CreateTaskData
   ): Promise<Task> {
-    const task = await this.getById(projectId, taskId)
-    return {
-      ...task,
+    const taskIndex = projectTasks[projectId]?.findIndex(t => t.id === taskId)
+    if (taskIndex === -1 || taskIndex === undefined) throw new Error('Task not found')
+    
+    const updatedTask = {
+      ...projectTasks[projectId][taskIndex],
       ...data,
       updated_at: new Date().toISOString()
     }
+    
+    // 更新内存中的任务数据
+    projectTasks[projectId][taskIndex] = updatedTask
+    
+    return updatedTask
   },
 
   async delete(projectId: string, taskId: string): Promise<void> {
