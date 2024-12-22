@@ -63,16 +63,22 @@ export const columns: ColumnDef<Task>[] = [
             <DataTableColumnHeader column={column} title="标题" />
         ),
         cell: ({ row }) => {
-            const label = labels.find(
-                (label) => label.value === row.original.label
-            );
+            const taskLabels = row.original.labels.map(labelValue => 
+                labels.find(l => l.value === labelValue)
+            ).filter((l): l is typeof labels[0] => Boolean(l));
 
             return (
                 <div className="flex space-x-2">
-                    {label && <Badge variant="outline">{label.label}</Badge>}
                     <span className="max-w-[500px] truncate font-medium">
                         {row.getValue("title")}
                     </span>
+                    <div className="flex gap-1">
+                        {taskLabels.map(label => (
+                            <Badge key={label.value} variant="outline">
+                                {label.label}
+                            </Badge>
+                        ))}
+                    </div>
                 </div>
             );
         },

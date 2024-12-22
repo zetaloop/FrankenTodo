@@ -27,7 +27,7 @@ interface TaskDialogProps {
     description: string
     status: string
     priority: string
-    label: string
+    labels: string[]
   }) => Promise<void>
   mode: "create" | "view" | "edit"
   onDelete?: () => Promise<void>
@@ -48,7 +48,7 @@ export function TaskDialog({
   const [description, setDescription] = useState(task?.description || "")
   const [status, setStatus] = useState(task?.status || "todo")
   const [priority, setPriority] = useState(task?.priority || "medium")
-  const [label, setLabel] = useState(task?.label || "")
+  const [labels, setLabels] = useState<string[]>(task?.labels || [])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [isEditingDescription, setIsEditingDescription] = useState(false)
@@ -60,13 +60,13 @@ export function TaskDialog({
         setDescription(task.description || "")
         setStatus(task.status)
         setPriority(task.priority)
-        setLabel(task.label || "")
+        setLabels(task.labels || [])
       } else {
         setTitle("")
         setDescription("")
         setStatus("todo")
         setPriority("medium")
-        setLabel("")
+        setLabels([])
       }
       setIsEditingTitle(false)
       setIsEditingDescription(false)
@@ -78,7 +78,7 @@ export function TaskDialog({
     setDescription("")
     setStatus("todo")
     setPriority("medium")
-    setLabel("")
+    setLabels([])
     setIsSubmitting(false)
     onOpenChange(false)
   }
@@ -91,7 +91,7 @@ export function TaskDialog({
         description,
         status,
         priority,
-        label
+        labels
       })
       handleClose()
     } catch (error) {
@@ -139,10 +139,10 @@ export function TaskDialog({
 
                 <div className="grid gap-2">
                   <Label>标签</Label>
-                  {label ? (
+                  {labels.length > 0 ? (
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4" />
-                      <span>{label}</span>
+                      <span>{labels.join(", ")}</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground">暂无标签</span>
@@ -228,8 +228,9 @@ export function TaskDialog({
             <div className="grid gap-2">
               <Label>标签</Label>
               <TaskLabelSelect 
-                value={label}
-                onChange={setLabel}
+                value={labels}
+                onChange={setLabels}
+                projectId={projectId}
               />
             </div>
             <div className="grid gap-2">

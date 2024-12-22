@@ -28,8 +28,8 @@ import { toast } from "@/hooks/use-toast"
 import type { Label as LabelType } from "@/lib/api/types"
 
 interface TaskLabelSelectProps {
-  value: string
-  onChange: (value: string) => void
+  value: string[]
+  onChange: (value: string[]) => void
   projectId: string
 }
 
@@ -39,7 +39,7 @@ export function TaskLabelSelect({
   projectId,
 }: TaskLabelSelectProps) {
   const [selectedLabels, setSelectedLabels] = React.useState<Set<string>>(
-    new Set(value ? [value] : [])
+    new Set(value)
   )
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [newLabelName, setNewLabelName] = React.useState("")
@@ -67,7 +67,7 @@ export function TaskLabelSelect({
       newSelectedLabels.add(labelValue)
     }
     setSelectedLabels(newSelectedLabels)
-    onChange(Array.from(newSelectedLabels)[0] || "")
+    onChange(Array.from(newSelectedLabels))
   }
 
   const handleCreateLabel = async () => {

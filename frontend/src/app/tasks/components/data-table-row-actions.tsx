@@ -90,7 +90,7 @@ export function DataTableRowActions<TData>({
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
-                            <DropdownMenuRadioGroup value={task.label}>
+                            <DropdownMenuRadioGroup value={task.labels[0] || ""}>
                                 {labels.map((label) => (
                                     <DropdownMenuRadioItem
                                         key={label.value}

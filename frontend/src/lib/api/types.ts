@@ -33,7 +33,7 @@ export type Task = {
   description: string
   status: string
   priority: string
-  label: string
+  labels: string[]
 } & BaseModel
 
 export type Label = {
