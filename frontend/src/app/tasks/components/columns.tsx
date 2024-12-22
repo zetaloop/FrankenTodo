@@ -7,35 +7,14 @@ import { priorities, statuses } from "../data/data";
 import { Task } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
 import type { Label } from "@/lib/api/types";
-
-export function useLabels(projectId: string) {
-  const [labels, setLabels] = useState<Label[]>([]);
-
-  useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const response = await api.labels.getAll(projectId);
-        setLabels(response.labels);
-      } catch (error) {
-        console.error("获取标签列表失败:", error);
-      }
-    };
-    fetchLabels();
-  }, [projectId]);
-
-  return labels;
-}
 
 interface ColumnsProps {
   projectId: string;
+  labels: Label[];
 }
 
-export function createColumns({ projectId }: ColumnsProps): ColumnDef<Task>[] {
-  const labels = useLabels(projectId);
-
+export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Task>[] {
   return [
     {
         id: "select",

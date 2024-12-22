@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { api } from "@/lib/api"
-import type { Project, Task } from "@/lib/api/types"
-import { columns } from "./components/columns"
+import type { Project, Task, Label } from "@/lib/api/types"
+import { createColumns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
 import { ProjectDialog } from "./components/project-dialog"
@@ -13,6 +13,7 @@ export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string>("")
   const [tasks, setTasks] = useState<Task[]>([])
+  const [labels, setLabels] = useState<Label[]>([])
   const [loading, setLoading] = useState(true)
   const [projectDialogOpen, setProjectDialogOpen] = useState(false)
   const [projectDialogMode, setProjectDialogMode] = useState<"create" | "edit">("create")
@@ -39,20 +40,24 @@ export default function TaskPage() {
     fetchProjects()
   }, [])
 
-  // 当选择的项目改变时,获取该项目的任务
+  // 当选择的项目改变时,获取该项目的任务和标签
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchData = async () => {
       setLoading(true)
       try {
-        const { tasks } = await api.tasks.getAll(selectedProjectId || '')
-        setTasks(tasks)
+        const [tasksResponse, labelsResponse] = await Promise.all([
+          api.tasks.getAll(selectedProjectId || ''),
+          api.labels.getAll(selectedProjectId || '')
+        ])
+        setTasks(tasksResponse.tasks)
+        setLabels(labelsResponse.labels)
       } catch (error) {
-        console.error("获取任务列表失败:", error)
+        console.error("获取数据失败:", error)
       } finally {
         setLoading(false)
       }
     }
-    fetchTasks()
+    fetchData()
   }, [selectedProjectId])
 
   const handleCreateProject = () => {
@@ -123,7 +128,7 @@ export default function TaskPage() {
     description: string
     status: string
     priority: string
-    label: string
+    labels: string[]
   }) => {
     try {
       if (taskDialogMode === "create") {
@@ -167,9 +172,9 @@ export default function TaskPage() {
         {loading ? (
           <div>加载中...</div>
         ) : (
-          <DataTable 
-            data={tasks} 
-            columns={columns} 
+          <DataTable
+            data={tasks}
+            columns={createColumns({ projectId: selectedProjectId, labels })}
             projects={projects}
             selectedProjectId={selectedProjectId}
             onProjectChange={setSelectedProjectId}
