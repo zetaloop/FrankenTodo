@@ -1,22 +1,49 @@
 package build.loop.todo.exception;
 
-import lombok.Data;
-import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ErrorResponse {
-    private String code;
-    private String message;
-    private Map<String, String> details;
+    private Error error;
 
-    public ErrorResponse(String code, String message) {
-        this.code = code;
-        this.message = message;
+    @Getter
+    @Setter
+    public static class Error {
+        private String code;
+        private String message;
+        private ErrorDetails details;
     }
 
-    public ErrorResponse(String code, String message, Map<String, String> details) {
-        this.code = code;
-        this.message = message;
-        this.details = details;
+    @Getter
+    @Setter
+    public static class ErrorDetails {
+        private String field;
+        private String reason;
+    }
+
+    public static ErrorResponse of(String code, String message) {
+        ErrorResponse response = new ErrorResponse();
+        Error error = new Error();
+        error.setCode(code);
+        error.setMessage(message);
+        response.setError(error);
+        return response;
+    }
+
+    public static ErrorResponse of(String code, String message, String field, String reason) {
+        ErrorResponse response = new ErrorResponse();
+        Error error = new Error();
+        error.setCode(code);
+        error.setMessage(message);
+        
+        ErrorDetails details = new ErrorDetails();
+        details.setField(field);
+        details.setReason(reason);
+        error.setDetails(details);
+        
+        response.setError(error);
+        return response;
     }
 } 
