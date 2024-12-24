@@ -61,6 +61,32 @@ public class TaskController {
         return ResponseEntity.ok(taskService.update(projectId, taskId, task));
     }
 
+    @PatchMapping("/{taskId}/status")
+    public ResponseEntity<Task> updateTaskStatus(
+        @PathVariable String projectId,
+        @PathVariable String taskId,
+        @RequestBody Map<String, String> request
+    ) {
+        String status = request.get("status");
+        taskService.updateTaskStatus(projectId, taskId, status);
+        return taskService.findById(taskId)
+            .map(ResponseEntity::ok)
+            .orElseThrow(() -> new IllegalStateException("Task not found"));
+    }
+
+    @PatchMapping("/{taskId}/priority")
+    public ResponseEntity<Task> updateTaskPriority(
+        @PathVariable String projectId,
+        @PathVariable String taskId,
+        @RequestBody Map<String, String> request
+    ) {
+        String priority = request.get("priority");
+        taskService.updateTaskPriority(projectId, taskId, priority);
+        return taskService.findById(taskId)
+            .map(ResponseEntity::ok)
+            .orElseThrow(() -> new IllegalStateException("Task not found"));
+    }
+
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(
         @PathVariable String projectId,
