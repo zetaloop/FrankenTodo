@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { Trash2, X, Plus, Settings } from "lucide-react";
+import { Trash2, X, Plus, Settings, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,26 +78,34 @@ export function DataTableToolbar<TData>({
                     onChange={onProjectChange}
                     onCreateProject={onCreateProject}
                 />
-                {selectedProjectId && (
-                    <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon" className="h-8 w-8">
-                                <Settings className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={onEditProject}>
-                                编辑项目
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                                onSelect={() => setShowDeleteAlert(true)}
-                                className="text-destructive"
-                            >
-                                删除项目
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                )}
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon" className="h-8 w-8">
+                            <Settings className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onSelect={onCreateProject} className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            新建项目
+                        </DropdownMenuItem>
+                        {selectedProjectId && (
+                            <>
+                                <DropdownMenuItem onSelect={onEditProject} className="gap-2">
+                                    <Pencil className="h-4 w-4" />
+                                    编辑项目
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onSelect={() => setShowDeleteAlert(true)}
+                                    className="text-destructive gap-2"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    删除项目
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Input
                     placeholder="搜索任务..."
                     value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}

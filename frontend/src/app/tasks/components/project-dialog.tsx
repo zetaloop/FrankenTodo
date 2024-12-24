@@ -69,7 +69,7 @@ export function ProjectDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "创建新项目" : "编辑项目"}
+            {mode === "create" ? "新建项目" : "编辑项目"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create" 

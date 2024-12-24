@@ -16,7 +16,7 @@ export function ProjectEmptyState({
         <FolderOpen className="h-10 w-10 text-muted-foreground" />
         <h3 className="mt-4 text-lg font-semibold">没有选择项目</h3>
         <p className="mb-4 mt-2 text-sm text-muted-foreground">
-          请选择一个项目，或者创建新项目来开始管理任务。
+          请选择一个项目，或者创建一个新项目来开始管理任务。
         </p>
         <div className="flex gap-4">
           <Button variant="outline" onClick={onOpenProjectSelect}>
@@ -24,7 +24,7 @@ export function ProjectEmptyState({
           </Button>
           <Button onClick={onCreateProject}>
             <Plus className="mr-2 h-4 w-4" />
-            创建新项目
+            新建项目
           </Button>
         </div>
       </div>
