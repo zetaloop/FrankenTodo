@@ -57,30 +57,26 @@ export function DataTableLabelFilter<TData, TValue>({
     const [newLabelName, setNewLabelName] = React.useState("")
     const [isSubmitting, setIsSubmitting] = React.useState(false)
 
-    const getLabelCount = (value: string) => {
+    const getLabelCount = (label: string) => {
         if (!column) return 0
         if (column.id === 'labels') {
             let count = 0
             column.getFacetedRowModel().rows.forEach(row => {
                 const labels = row.getValue<string[]>('labels')
-                if (labels?.includes(value)) {
+                if (labels?.includes(label)) {
                     count++
                 }
             })
             return count
         }
-        return facets?.get(value)
+        return facets?.get(label)
     }
 
     const handleCreateLabel = async () => {
         if (!newLabelName.trim()) return
         try {
             setIsSubmitting(true)
-            const newLabel = await api.labels.create(projectId, {
-                value: newLabelName.toLowerCase().replace(/\s+/g, '-'),
-                label: newLabelName,
-                description: ""
-            })
+            await api.labels.create(projectId, newLabelName)
             toast({
                 title: "创建成功",
                 description: `标签 "${newLabelName}" 已创建`
@@ -104,8 +100,8 @@ export function DataTableLabelFilter<TData, TValue>({
         if (!column) return
         try {
             await Promise.all(
-                Array.from(selectedValues).map(value =>
-                    api.labels.delete(projectId, value)
+                Array.from(selectedValues).map(label =>
+                    api.labels.delete(projectId, label)
                 )
             )
             column.setFilterValue(undefined)
@@ -158,15 +154,15 @@ export function DataTableLabelFilter<TData, TValue>({
                                     ) : (
                                         labels
                                             .filter((label) =>
-                                                selectedValues.has(label.value)
+                                                selectedValues.has(label)
                                             )
                                             .map((label) => (
                                                 <Badge
                                                     variant="secondary"
-                                                    key={label.value}
+                                                    key={label}
                                                     className="rounded-sm px-1 font-normal"
                                                 >
-                                                    {label.label}
+                                                    {label}
                                                 </Badge>
                                             ))
                                     )}
@@ -182,23 +178,17 @@ export function DataTableLabelFilter<TData, TValue>({
                             <CommandEmpty>没有结果</CommandEmpty>
                             <CommandGroup>
                                 {labels.map((label) => {
-                                    const isSelected = selectedValues.has(
-                                        label.value
-                                    )
-                                    const count = getLabelCount(label.value)
+                                    const isSelected = selectedValues.has(label)
+                                    const count = getLabelCount(label)
                                     return (
                                         <CommandItem
-                                            key={label.value}
+                                            key={label}
                                             onSelect={() => {
                                                 if (!column) return
                                                 if (isSelected) {
-                                                    selectedValues.delete(
-                                                        label.value
-                                                    )
+                                                    selectedValues.delete(label)
                                                 } else {
-                                                    selectedValues.add(
-                                                        label.value
-                                                    )
+                                                    selectedValues.add(label)
                                                 }
                                                 const filterValues =
                                                     Array.from(selectedValues)
@@ -219,7 +209,7 @@ export function DataTableLabelFilter<TData, TValue>({
                                             >
                                                 <Check className="h-4 w-4" />
                                             </div>
-                                            <span>{label.label}</span>
+                                            <span>{label}</span>
                                             {typeof count !== 'undefined' && (
                                                 <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
                                                     {count}

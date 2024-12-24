@@ -6,33 +6,15 @@ export const labelsApi = {
     return fetchApi(`/projects/${projectId}/labels`)
   },
 
-  async create(projectId: string, data: {
-    value: string
-    label: string
-    description?: string
-  }): Promise<Label> {
+  async create(projectId: string, label: string): Promise<Label> {
     return fetchApi(`/projects/${projectId}/labels`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ label }),
     })
   },
 
-  async update(
-    projectId: string,
-    value: string,
-    data: {
-      label: string
-      description?: string
-    }
-  ): Promise<Label> {
-    return fetchApi(`/projects/${projectId}/labels/${value}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    })
-  },
-
-  async delete(projectId: string, value: string): Promise<void> {
-    return fetchApi(`/projects/${projectId}/labels/${value}`, {
+  async delete(projectId: string, label: string): Promise<void> {
+    return fetchApi(`/projects/${projectId}/labels/${encodeURIComponent(label)}`, {
       method: 'DELETE',
     })
   }

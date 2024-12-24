@@ -25,7 +25,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { api } from "@/lib/api"
 import { toast } from "@/hooks/use-toast"
-import type { Label as LabelType } from "@/lib/api/types"
 
 interface TaskLabelSelectProps {
   value: string[]
@@ -44,7 +43,7 @@ export function TaskLabelSelect({
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [newLabelName, setNewLabelName] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [labels, setLabels] = React.useState<LabelType[]>(defaultLabels)
+  const [labels, setLabels] = React.useState<string[]>(defaultLabels)
 
   const fetchLabels = React.useCallback(async () => {
     try {
@@ -59,12 +58,12 @@ export function TaskLabelSelect({
     fetchLabels()
   }, [fetchLabels])
 
-  const handleSelect = (labelValue: string) => {
+  const handleSelect = (label: string) => {
     const newSelectedLabels = new Set(selectedLabels)
-    if (newSelectedLabels.has(labelValue)) {
-      newSelectedLabels.delete(labelValue)
+    if (newSelectedLabels.has(label)) {
+      newSelectedLabels.delete(label)
     } else {
-      newSelectedLabels.add(labelValue)
+      newSelectedLabels.add(label)
     }
     setSelectedLabels(newSelectedLabels)
     onChange(Array.from(newSelectedLabels))
@@ -73,11 +72,7 @@ export function TaskLabelSelect({
   const handleCreateLabel = async () => {
     try {
       setIsSubmitting(true)
-      const newLabel = await api.labels.create(projectId, {
-        value: newLabelName.toLowerCase().replace(/\s+/g, '-'),
-        label: newLabelName,
-        description: ""
-      })
+      const newLabel = await api.labels.create(projectId, newLabelName)
       toast({
         title: "创建成功",
         description: `标签 "${newLabelName}" 已创建`
@@ -85,7 +80,7 @@ export function TaskLabelSelect({
       // 刷新标签列表
       await fetchLabels()
       // 选中新创建的标签
-      handleSelect(newLabel.value)
+      handleSelect(newLabel)
       setNewLabelName("")
       setIsCreateDialogOpen(false)
     } catch (error) {
@@ -106,20 +101,20 @@ export function TaskLabelSelect({
         <div className="grid grid-cols-[1fr_auto] items-center gap-2 w-full min-h-10 rounded-md border border-input bg-background px-3 py-2">
           <div className="flex-1 flex flex-wrap gap-1 min-w-0">
             {Array.from(selectedLabels).map(labelValue => {
-              const label = labels.find(l => l.value === labelValue)
+              const label = labels.find(l => l === labelValue)
               if (!label) return null
               return (
                 <Badge 
-                  key={label.value} 
+                  key={label} 
                   variant="secondary"
                   className="flex items-center gap-1 max-w-full"
                 >
-                  <span className="truncate">{label.label}</span>
+                  <span className="truncate">{label}</span>
                   <X 
                     className="h-3 w-3 shrink-0 cursor-pointer hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleSelect(label.value)
+                      handleSelect(label)
                     }}
                   />
                 </Badge>
@@ -144,19 +139,19 @@ export function TaskLabelSelect({
                 <DropdownMenuGroup>
                   {labels.map((label) => (
                     <DropdownMenuItem
-                      key={label.value}
+                      key={label}
                       onSelect={(e) => {
                         e.preventDefault()
-                        handleSelect(label.value)
+                        handleSelect(label)
                       }}
                     >
                       <div className="flex items-center gap-2">
                         <div className="h-4 w-4">
-                          {selectedLabels.has(label.value) && (
+                          {selectedLabels.has(label) && (
                             <Check className="h-4 w-4" />
                           )}
                         </div>
-                        {label.label}
+                        {label}
                       </div>
                     </DropdownMenuItem>
                   ))}

@@ -68,20 +68,18 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             <DataTableColumnHeader column={column} title="标题" />
         ),
         cell: ({ row }) => {
-            const taskLabels = row.original.labels.map(labelValue => 
-                labels.find(l => l.value === labelValue)
-            ).filter((l): l is Label => Boolean(l));
+            const taskLabels = row.original.labels;
 
             return (
                 <div className="flex items-center max-w-[40vw] min-w-0">
                     <div className="flex gap-1 overflow-hidden whitespace-nowrap">
                         {taskLabels.map(label => (
                             <Badge 
-                                key={label.value} 
+                                key={label} 
                                 variant="outline" 
                                 className="truncate max-w-[150px] whitespace-nowrap"
                             >
-                                {label.label}
+                                {label}
                             </Badge>
                         ))}
                     </div>

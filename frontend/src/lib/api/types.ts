@@ -36,11 +36,7 @@ export type Task = {
   labels: string[]
 } & BaseModel
 
-export type Label = {
-  value: string
-  label: string
-  description?: string
-}
+export type Label = string
 
 export type UserSettings = {
   theme: string
