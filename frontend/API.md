@@ -413,16 +413,9 @@
 ```json
 {
   "labels": [
-    {
-      "value": "bug",
-      "label": "Bug",
-      "description": "问题或缺陷"
-    },
-    {
-      "value": "feature",
-      "label": "Feature",
-      "description": "新功能"
-    }
+    "Bug",
+    "Feature",
+    "Documentation"
   ]
 }
 ```
@@ -433,42 +426,17 @@
 - **请求体**:
 ```json
 {
-  "value": "string",     // 标签的唯一标识符，通常是小写字母和连字符组成
-  "label": "string",     // 标签的显示名称
-  "description": "string"  // 可选，标签的描述文本
+  "label": "string"  // 标签名称，例如 "Bug"、"Feature" 等
 }
 ```
 - **响应示例** (201 Created):
 ```json
-{
-  "value": "enhancement",
-  "label": "Enhancement",
-  "description": "改进建议"
-}
-```
-
-#### 更新项目标签
-- **PUT** `/projects/{projectId}/labels/{value}`
-- **描述**: 更新特定项目下的标签
-- **请求体**:
-```json
-{
-  "label": "string",     // 标签的新显示名称
-  "description": "string"  // 可选，标签的新描述文本
-}
-```
-- **响应示例**:
-```json
-{
-  "value": "enhancement",  // value 不可修改
-  "label": "改进",
-  "description": "更新后的描述"
-}
+"Enhancement"  // 返回创建的标签名称
 ```
 
 #### 删除项目标签
-- **DELETE** `/projects/{projectId}/labels/{value}`
-- **描述**: 删除特定项目下的标签
+- **DELETE** `/projects/{projectId}/labels/{label}`
+- **描述**: 删除指定项目下的标签。删除标签时会同时从所有任务中移除该标签。
 - **响应**: 204 No Content
 
 ### 用户相关 API
