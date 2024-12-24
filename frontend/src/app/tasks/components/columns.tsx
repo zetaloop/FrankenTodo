@@ -98,14 +98,8 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             <DataTableColumnHeader column={column} title="状态" />
         ),
         cell: ({ row }) => {
-            const status = statuses.find(
-                (status) => status.value === row.getValue("status")
-            );
-
-            if (!status) {
-                return null;
-            }
-
+            const status = statuses.find((s) => s.value === row.getValue("status"))
+            if (!status) return null
             return (
                 <div className="flex w-[100px] items-center">
                     {status.icon && (
@@ -113,11 +107,13 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
                     )}
                     <span>{status.label}</span>
                 </div>
-            );
+            )
         },
-        filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
-        },
+        sortingFn: (rowA, rowB) => {
+            const statusA = statuses.find(s => s.value === rowA.getValue("status"))
+            const statusB = statuses.find(s => s.value === rowB.getValue("status"))
+            return (statusA?.weight ?? 0) - (statusB?.weight ?? 0)
+        }
     },
     {
         accessorKey: "priority",
@@ -125,14 +121,8 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             <DataTableColumnHeader column={column} title="优先级" />
         ),
         cell: ({ row }) => {
-            const priority = priorities.find(
-                (priority) => priority.value === row.getValue("priority")
-            );
-
-            if (!priority) {
-                return null;
-            }
-
+            const priority = priorities.find((p) => p.value === row.getValue("priority"))
+            if (!priority) return null
             return (
                 <div className="flex items-center">
                     {priority.icon && (
@@ -140,11 +130,13 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
                     )}
                     <span>{priority.label}</span>
                 </div>
-            );
+            )
         },
-        filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
-        },
+        sortingFn: (rowA, rowB) => {
+            const priorityA = priorities.find(p => p.value === rowA.getValue("priority"))
+            const priorityB = priorities.find(p => p.value === rowB.getValue("priority"))
+            return (priorityA?.weight ?? 0) - (priorityB?.weight ?? 0)
+        }
     },
     {
         id: "labels",
