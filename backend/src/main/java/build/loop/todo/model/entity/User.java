@@ -31,4 +31,7 @@ public class User extends BaseEntity {
     @NotBlank
     @Size(min = 6)
     private String password;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserSettings settings;
 } 
