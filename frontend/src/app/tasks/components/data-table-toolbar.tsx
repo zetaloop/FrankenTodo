@@ -62,14 +62,18 @@ export function DataTableToolbar<TData>({
     const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false)
     const [showDeleteTasksAlert, setShowDeleteTasksAlert] = useState(false)
-    const [labels, setLabels] = useState<{ value: string; label: string }[]>([])
+    const [labels, setLabels] = useState<string[]>([])
 
     useEffect(() => {
         if (selectedProjectId) {
             api.labels.getAll(selectedProjectId).then(response => {
                 setLabels(response.labels)
             })
+        } else {
+            setLabels([])
         }
+        // 重置所有筛选器
+        table.resetColumnFilters()
     }, [selectedProjectId])
 
     return (
@@ -109,75 +113,78 @@ export function DataTableToolbar<TData>({
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Input
-                    placeholder="搜索任务..."
-                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("title")?.setFilterValue(event.target.value)
-                    }
-                    className="h-8 w-[150px] lg:w-[250px]"
-                />
-                {table.getColumn("status") && (
-                    <DataTableFacetedFilter
-                        column={table.getColumn("status")}
-                        title="状态"
-                        options={statuses}
-                    />
-                )}
-                {table.getColumn("priority") && (
-                    <DataTableFacetedFilter
-                        column={table.getColumn("priority")}
-                        title="优先级"
-                        options={priorities}
-                    />
-                )}
                 {selectedProjectId && (
-                    <DataTableLabelFilter
-                        column={table.getAllColumns().find(col => col.id === "labels")}
-                        title="标签"
-                        labels={labels}
-                        projectId={selectedProjectId}
-                        onLabelsChange={() => {
-                            api.labels.getAll(selectedProjectId).then(response => {
-                                setLabels(response.labels)
-                            })
-                        }}
-                        onTasksChange={onRefreshData}
-                    />
-                )}
-                <Button
-                    variant="default"
-                    size="sm"
-                    className="h-8"
-                    onClick={onCreateTask}
-                    disabled={!selectedProjectId}
-                >
-                    <Plus className="h-4 w-4" />
-                    创建任务
-                </Button>
-                {selectedRows.length > 0 && (
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        className="h-8"
-                        onClick={() => setShowDeleteTasksAlert(true)}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                        删除任务 ({selectedRows.length})
-                    </Button>
-                )}
-                {isFiltered && (
-                    <Button
-                        variant="ghost"
-                        onClick={() => table.resetColumnFilters()}
-                        className="h-8 px-2 lg:px-3"
-                    >
-                        清除筛选
-                        <X className="ml-2 h-4 w-4" />
-                    </Button>
+                    <>
+                        <Input
+                            placeholder="搜索任务..."
+                            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+                            onChange={(event) =>
+                                table.getColumn("title")?.setFilterValue(event.target.value)
+                            }
+                            className="h-8 w-[150px] lg:w-[250px]"
+                        />
+                        {table.getColumn("status") && (
+                            <DataTableFacetedFilter
+                                column={table.getColumn("status")}
+                                title="状态"
+                                options={statuses}
+                            />
+                        )}
+                        {table.getColumn("priority") && (
+                            <DataTableFacetedFilter
+                                column={table.getColumn("priority")}
+                                title="优先级"
+                                options={priorities}
+                            />
+                        )}
+                        <DataTableLabelFilter
+                            column={table.getAllColumns().find(col => col.id === "labels")}
+                            title="标签"
+                            labels={labels}
+                            projectId={selectedProjectId}
+                            onLabelsChange={() => {
+                                if (selectedProjectId) {
+                                    api.labels.getAll(selectedProjectId).then(response => {
+                                        setLabels(response.labels)
+                                    })
+                                }
+                            }}
+                            onTasksChange={onRefreshData}
+                        />
+                        {isFiltered && (
+                            <Button
+                                variant="ghost"
+                                onClick={() => table.resetColumnFilters()}
+                                className="h-8 px-2 lg:px-3"
+                            >
+                                清除筛选
+                                <X className="ml-2 h-4 w-4" />
+                            </Button>
+                        )}
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="h-8"
+                            onClick={onCreateTask}
+                        >
+                            <Plus className="h-4 w-4" />
+                            创建任务
+                        </Button>
+                        {selectedRows.length > 0 && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="h-8"
+                                onClick={() => setShowDeleteTasksAlert(true)}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                删除任务 ({selectedRows.length})
+                            </Button>
+                        )}
+                    </>
                 )}
             </div>
-            <DataTableViewOptions table={table} />
+            {selectedProjectId && <DataTableViewOptions table={table} />}
 
             <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
                 <AlertDialogContent>
