@@ -111,6 +111,10 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             const statusA = statuses.find(s => s.value === rowA.getValue("status"))
             const statusB = statuses.find(s => s.value === rowB.getValue("status"))
             return (statusA?.weight ?? 0) - (statusB?.weight ?? 0)
+        },
+        filterFn: (row, id, value: string[]) => {
+            const status = row.getValue<string>(id)
+            return value.includes(status)
         }
     },
     {
@@ -134,6 +138,10 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             const priorityA = priorities.find(p => p.value === rowA.getValue("priority"))
             const priorityB = priorities.find(p => p.value === rowB.getValue("priority"))
             return (priorityA?.weight ?? 0) - (priorityB?.weight ?? 0)
+        },
+        filterFn: (row, id, value: string[]) => {
+            const priority = row.getValue<string>(id)
+            return value.includes(priority)
         }
     },
     {
