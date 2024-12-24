@@ -10,7 +10,7 @@ import { DataTableViewOptions } from "@/app/tasks/components/data-table-view-opt
 import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableProjectFilter } from "./data-table-project-filter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Project } from "@/lib/api/types";
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { api } from "@/lib/api";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
@@ -58,6 +59,15 @@ export function DataTableToolbar<TData>({
     const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false)
     const [showDeleteTasksAlert, setShowDeleteTasksAlert] = useState(false)
+    const [labels, setLabels] = useState<{ value: string; label: string }[]>([])
+
+    useEffect(() => {
+        if (selectedProjectId) {
+            api.labels.getAll(selectedProjectId).then(response => {
+                setLabels(response.labels)
+            })
+        }
+    }, [selectedProjectId])
 
     return (
         <div className="flex items-center justify-between">
@@ -108,6 +118,13 @@ export function DataTableToolbar<TData>({
                         column={table.getColumn("priority")}
                         title="优先级"
                         options={priorities}
+                    />
+                )}
+                {selectedProjectId && labels.length > 0 && (
+                    <DataTableFacetedFilter
+                        column={table.getAllColumns().find(col => col.id === "labels")!}
+                        title="标签"
+                        options={labels}
                     />
                 )}
                 <Button

@@ -147,6 +147,15 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
         },
     },
     {
+        id: "labels",
+        accessorKey: "labels",
+        enableHiding: false,
+        filterFn: (row, id, value: string[]) => {
+            const rowLabels = row.getValue<string[]>(id)
+            return value.some(val => rowLabels.includes(val))
+        },
+    },
+    {
         id: "actions",
         cell: ({ row, table }) => {
             const props = (table.options.meta as any) || {}
