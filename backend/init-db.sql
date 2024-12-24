@@ -1,0 +1,8 @@
+-- 创建数据库
+CREATE DATABASE todo;
+
+-- 创建用户
+CREATE USER todo WITH PASSWORD 'todo123';
+
+-- 授权
+GRANT ALL PRIVILEGES ON DATABASE todo TO todo; 

@@ -16,7 +16,7 @@ spring:
   
   # JPA 配置
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.opengauss.dialect.OGDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -40,7 +40,7 @@ jwt:
 # 跨域配置
 cors:
   allowed-origins: http://localhost:3000
-  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
   allowed-headers: Authorization,Content-Type
   allow-credentials: true
   max-age: 3600 
