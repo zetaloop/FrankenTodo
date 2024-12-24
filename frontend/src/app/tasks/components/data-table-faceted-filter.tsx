@@ -39,6 +39,20 @@ export function DataTableFacetedFilter<TData, TValue>({
     const facets = column?.getFacetedUniqueValues();
     const selectedValues = new Set(column?.getFilterValue() as string[]);
 
+    const getLabelCount = (value: string) => {
+        if (column?.id === 'labels') {
+            let count = 0;
+            column.getFacetedRowModel().rows.forEach(row => {
+                const labels = row.getValue<string[]>('labels');
+                if (labels?.includes(value)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        return facets?.get(value);
+    };
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -99,6 +113,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                                 const isSelected = selectedValues.has(
                                     option.value
                                 );
+                                const count = getLabelCount(option.value);
                                 return (
                                     <CommandItem
                                         key={option.value}
@@ -135,9 +150,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                                             <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                                         )}
                                         <span>{option.label}</span>
-                                        {facets?.get(option.value) && (
+                                        {typeof count !== 'undefined' && (
                                             <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                                                {facets.get(option.value)}
+                                                {count}
                                             </span>
                                         )}
                                     </CommandItem>
