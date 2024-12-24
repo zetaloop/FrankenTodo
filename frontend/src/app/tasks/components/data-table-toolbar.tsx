@@ -204,7 +204,9 @@ export function DataTableToolbar<TData>({
                         <AlertDialogCancel>取消</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={async () => {
-                                await onDeleteTasks(selectedRows.map(row => row.original))
+                                const selectedTasks = selectedRows.map(row => row.original)
+                                await onDeleteTasks(selectedTasks)
+                                table.resetRowSelection()
                                 setShowDeleteTasksAlert(false)
                             }}
                             className="bg-destructive hover:bg-destructive/90"

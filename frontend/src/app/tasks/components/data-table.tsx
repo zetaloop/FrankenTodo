@@ -93,6 +93,8 @@ export function DataTable({
       rowSelection,
       columnFilters,
     },
+    enableMultiRowSelection: true,
+    getRowId: (row) => row.id,
     meta: {
       onEditTask: (task: Task) => {
         setSelectedTask(task)
@@ -155,6 +157,7 @@ export function DataTable({
   }) => {
     if (selectedTask) {
       await onUpdateTask(selectedTask, data)
+      setRowSelection({})
     }
   }
 
