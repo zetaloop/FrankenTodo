@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { Project } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
-import { Circle, ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronRight, ChevronsUpDown, Plus } from "lucide-react";
 import * as React from "react";
 
 interface DataTableProjectFilterProps {
@@ -68,14 +68,11 @@ export function DataTableProjectFilter({
                                     }}
                                     className="flex items-center gap-2"
                                 >
-                                    <Circle
-                                        className={cn(
-                                            "h-2 w-2",
-                                            value === project.id
-                                                ? "fill-current"
-                                                : "fill-transparent"
+                                    <div className="w-4 flex items-center justify-center">
+                                        {value === project.id && (
+                                            <ChevronRight className="h-2 w-2 text-primary" />
                                         )}
-                                    />
+                                    </div>
                                     <span className="truncate">{project.name}</span>
                                 </CommandItem>
                             ))}
