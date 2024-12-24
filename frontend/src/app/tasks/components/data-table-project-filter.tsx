@@ -60,26 +60,30 @@ export function DataTableProjectFilter({
                     <CommandInput placeholder="搜索项目..." />
                     <CommandList>
                         <CommandEmpty>没有找到项目</CommandEmpty>
-                        <CommandGroup>
-                            {projects.map((project) => (
-                                <CommandItem
-                                    key={project.id}
-                                    onSelect={() => {
-                                        onChange(project.id === value ? "" : project.id)
-                                        setOpen(false)
-                                    }}
-                                    className="flex items-center gap-2"
-                                >
-                                    <div className="w-4 flex items-center justify-center">
-                                        {value === project.id && (
-                                            <ChevronRight className="h-2 w-2 text-primary" />
-                                        )}
-                                    </div>
-                                    <span className="truncate">{project.name}</span>
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                        <CommandSeparator />
+                        {projects.length > 0 && (
+                            <>
+                                <CommandGroup>
+                                    {projects.map((project) => (
+                                        <CommandItem
+                                            key={project.id}
+                                            onSelect={() => {
+                                                onChange(project.id === value ? "" : project.id)
+                                                setOpen(false)
+                                            }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <div className="w-4 flex items-center justify-center">
+                                                {value === project.id && (
+                                                    <ChevronRight className="h-2 w-2 text-primary" />
+                                                )}
+                                            </div>
+                                            <span className="truncate">{project.name}</span>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                                <CommandSeparator />
+                            </>
+                        )}
                         <CommandGroup>
                             <CommandItem
                                 onSelect={() => {
