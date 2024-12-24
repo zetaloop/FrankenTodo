@@ -1,49 +1,40 @@
 package build.loop.todo.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class ErrorResponse {
-    private Error error;
+    private final Error error;
+
+    public ErrorResponse(String code, String message) {
+        this.error = new Error(code, message, null);
+    }
+
+    public ErrorResponse(String code, String message, ErrorDetails details) {
+        this.error = new Error(code, message, details);
+    }
 
     @Getter
-    @Setter
     public static class Error {
-        private String code;
-        private String message;
-        private ErrorDetails details;
+        private final String code;
+        private final String message;
+        private final ErrorDetails details;
+
+        public Error(String code, String message, ErrorDetails details) {
+            this.code = code;
+            this.message = message;
+            this.details = details;
+        }
     }
 
     @Getter
-    @Setter
     public static class ErrorDetails {
-        private String field;
-        private String reason;
-    }
+        private final String field;
+        private final String reason;
 
-    public static ErrorResponse of(String code, String message) {
-        ErrorResponse response = new ErrorResponse();
-        Error error = new Error();
-        error.setCode(code);
-        error.setMessage(message);
-        response.setError(error);
-        return response;
-    }
-
-    public static ErrorResponse of(String code, String message, String field, String reason) {
-        ErrorResponse response = new ErrorResponse();
-        Error error = new Error();
-        error.setCode(code);
-        error.setMessage(message);
-        
-        ErrorDetails details = new ErrorDetails();
-        details.setField(field);
-        details.setReason(reason);
-        error.setDetails(details);
-        
-        response.setError(error);
-        return response;
+        public ErrorDetails(String field, String reason) {
+            this.field = field;
+            this.reason = reason;
+        }
     }
 } 
