@@ -93,10 +93,10 @@ export function DataTableRowActions<TData>({
                             <DropdownMenuRadioGroup value={task.labels[0] || ""}>
                                 {labels.map((label) => (
                                     <DropdownMenuRadioItem
-                                        key={label.value}
-                                        value={label.value}
+                                        key={label}
+                                        value={label}
                                     >
-                                        {label.label}
+                                        {label}
                                     </DropdownMenuRadioItem>
                                 ))}
                             </DropdownMenuRadioGroup>
