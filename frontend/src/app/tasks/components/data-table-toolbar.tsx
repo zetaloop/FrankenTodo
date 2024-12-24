@@ -91,7 +91,7 @@ export function DataTableToolbar<TData>({
                             <Settings className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="start">
                         <DropdownMenuItem onSelect={onCreateProject} className="gap-2">
                             <Plus className="h-4 w-4" />
                             新建项目

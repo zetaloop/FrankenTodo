@@ -54,7 +54,9 @@ export function DataTableProjectFilter({
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[150px] lg:w-[250px] p-0" align="start">
-                <Command>
+                <Command 
+                    defaultValue={selectedProject?.name}
+                >
                     <CommandInput placeholder="搜索项目..." />
                     <CommandList>
                         <CommandEmpty>没有找到项目</CommandEmpty>
