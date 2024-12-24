@@ -1,5 +1,6 @@
 import type { Label } from './types'
 import { labels as defaultLabels } from '@/app/tasks/data/data'
+import { projectTasks } from './tasks-mock'
 
 // 使用内存存储每个项目的标签列表
 const projectLabels: Record<string, Label[]> = {
@@ -29,7 +30,17 @@ export const labelsApiMock = {
     if (projectLabels[projectId]) {
       const index = projectLabels[projectId].findIndex(l => l === label)
       if (index !== -1) {
+        // 删除标签
         projectLabels[projectId].splice(index, 1)
+
+        // 更新所有任务中的标签
+        if (projectTasks[projectId]) {
+          projectTasks[projectId] = projectTasks[projectId].map(task => ({
+            ...task,
+            labels: task.labels.filter((l: string) => l !== label),
+            updated_at: new Date().toISOString()
+          }))
+        }
       }
     }
     return Promise.resolve()

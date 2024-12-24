@@ -42,6 +42,7 @@ interface DataTableLabelFilterProps<TData, TValue> {
     labels: Label[]
     projectId: string
     onLabelsChange: () => void
+    onTasksChange?: () => void
 }
 
 export function DataTableLabelFilter<TData, TValue>({
@@ -50,6 +51,7 @@ export function DataTableLabelFilter<TData, TValue>({
     labels,
     projectId,
     onLabelsChange,
+    onTasksChange,
 }: DataTableLabelFilterProps<TData, TValue>) {
     const facets = column?.getFacetedUniqueValues()
     const selectedValues = new Set(column?.getFilterValue() as string[])
@@ -106,6 +108,9 @@ export function DataTableLabelFilter<TData, TValue>({
             )
             column.setFilterValue(undefined)
             onLabelsChange()
+            if (onTasksChange) {
+                onTasksChange()
+            }
             toast({
                 title: "删除成功",
                 description: `已删除 ${selectedValues.size} 个标签`

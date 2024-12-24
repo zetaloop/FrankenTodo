@@ -54,6 +54,7 @@ interface DataTableProps {
     priority: string
     labels: string[]
   }) => Promise<void>
+  onRefreshData: () => Promise<void>
 }
 
 export function DataTable({
@@ -70,6 +71,7 @@ export function DataTable({
   onDeleteTask,
   onDeleteTasks,
   onUpdateTask,
+  onRefreshData,
 }: DataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -173,6 +175,7 @@ export function DataTable({
         onDeleteProject={onDeleteProject}
         onCreateTask={onCreateTask}
         onDeleteTasks={onDeleteTasks}
+        onRefreshData={onRefreshData}
       />
       {!selectedProjectId ? (
         <ProjectEmptyState 

@@ -57,8 +57,27 @@ export default function TaskPage() {
         setLoading(false)
       }
     }
-    fetchData()
+    if (selectedProjectId) {
+      fetchData()
+    }
   }, [selectedProjectId])
+
+  const handleRefreshData = async () => {
+    if (!selectedProjectId) return
+    setLoading(true)
+    try {
+      const [tasksResponse, labelsResponse] = await Promise.all([
+        api.tasks.getAll(selectedProjectId),
+        api.labels.getAll(selectedProjectId)
+      ])
+      setTasks(tasksResponse.tasks)
+      setLabels(labelsResponse.labels)
+    } catch (error) {
+      console.error("刷新数据失败:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleCreateProject = () => {
     setProjectDialogMode("create")
@@ -185,12 +204,8 @@ export default function TaskPage() {
             onEditTask={handleEditTask}
             onDeleteTask={handleDeleteTask}
             onDeleteTasks={handleDeleteTasks}
-            onUpdateTask={async (task, data) => {
-              const updatedTask = await api.tasks.update(selectedProjectId, task.id, data)
-              setTasks(prev => 
-                prev.map(t => t.id === updatedTask.id ? updatedTask : t)
-              )
-            }}
+            onUpdateTask={handleTaskSubmit}
+            onRefreshData={handleRefreshData}
           />
         )}
       </div>

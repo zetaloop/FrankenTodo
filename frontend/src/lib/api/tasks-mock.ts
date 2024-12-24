@@ -2,7 +2,7 @@ import type { Task } from './types'
 import mockTasks from '@/app/tasks/data/tasks.json'
 
 // 为不同项目创建不同的任务列表
-const projectTasks: Record<string, Task[]> = {
+export const projectTasks: Record<string, Task[]> = {
   'fd9b02ca-5ac9-40c6-b756-ead6786675ae': mockTasks.slice(0, 50).map(task => ({
     ...task,
     description: `这是 FrankenTodo 项目中的任务 ${task.id}`,

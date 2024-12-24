@@ -41,6 +41,7 @@ interface DataTableToolbarProps<TData> {
     onDeleteProject?: () => void;
     onCreateTask?: () => void;
     onDeleteTasks: (tasks: TData[]) => Promise<void>;
+    onRefreshData?: () => Promise<void>;
 }
 
 export function DataTableToolbar<TData>({
@@ -53,6 +54,7 @@ export function DataTableToolbar<TData>({
     onDeleteProject,
     onCreateTask,
     onDeleteTasks,
+    onRefreshData,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -139,6 +141,11 @@ export function DataTableToolbar<TData>({
                             api.labels.getAll(selectedProjectId).then(response => {
                                 setLabels(response.labels)
                             })
+                        }}
+                        onTasksChange={async () => {
+                            if (onRefreshData) {
+                                await onRefreshData()
+                            }
                         }}
                     />
                 )}
