@@ -10,9 +10,9 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: org.opengauss.Driver
-    url: jdbc:opengauss://localhost:5432/todo_db
-    username: your_username
-    password: your_password
+    url: jdbc:opengauss://localhost:5432/todo
+    username: todo
+    password: todo123
   
   # JPA 配置
   jpa:
@@ -33,8 +33,9 @@ spring:
 
 # JWT 配置
 jwt:
-  secret: your_jwt_secret_key_here_please_change_in_production
-  expiration: 86400000 # 24 小时
+  secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-token-generation-and-verification}
+  expiration: ${JWT_EXPIRATION:3600}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400}
 
 # 跨域配置
 cors:
@@ -43,3 +44,9 @@ cors:
   allowed-headers: Authorization,Content-Type
   allow-credentials: true
   max-age: 3600 
+
+logging:
+  level:
+    root: INFO
+    build.loop.todo: DEBUG
+    org.springframework.security: DEBUG 

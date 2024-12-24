@@ -1,62 +1,83 @@
 package build.loop.todo.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException e) {
-        ErrorResponse error = new ErrorResponse(
-            "RESOURCE_NOT_FOUND",
-            e.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
-        ErrorResponse error = new ErrorResponse(
-            "INVALID_PARAMETER",
-            e.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException e) {
-        ErrorResponse error = new ErrorResponse(
-            "CONFLICT",
-            e.getMessage()
-        );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", Map.of(
+            "code", "INVALID_STATE",
+            "message", ex.getMessage()
+        ));
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", Map.of(
+            "code", "INVALID_CREDENTIALS",
+            "message", "Invalid email or password"
+        ));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> details = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            details.put(fieldName, errorMessage);
+        });
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", Map.of(
+            "code", "VALIDATION_FAILED",
+            "message", "Validation failed",
+            "details", details
+        ));
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
-        ErrorResponse error = new ErrorResponse(
-            "INVALID_PARAMETER",
-            "请求参数验证失败",
-            new ErrorResponse.ErrorDetails(
-                e.getConstraintViolations().iterator().next().getPropertyPath().toString(),
-                e.getMessage()
-            )
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Map<String, Object>> handleConstraintViolationException(ConstraintViolationException ex) {
+        Map<String, String> details = new HashMap<>();
+        ex.getConstraintViolations().forEach(violation -> {
+            String fieldName = violation.getPropertyPath().toString();
+            String errorMessage = violation.getMessage();
+            details.put(fieldName, errorMessage);
+        });
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", Map.of(
+            "code", "VALIDATION_FAILED",
+            "message", "Validation failed",
+            "details", details
+        ));
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneral(Exception e) {
-        ErrorResponse error = new ErrorResponse(
-            "INTERNAL_ERROR",
-            "服务器内部错误"
-        );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", Map.of(
+            "code", "INTERNAL_ERROR",
+            "message", "An internal error occurred"
+        ));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 } 
