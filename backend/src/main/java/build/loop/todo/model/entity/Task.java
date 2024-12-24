@@ -9,8 +9,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -25,6 +25,7 @@ public class Task extends BaseEntity {
     @NotBlank
     private String title;
 
+    @NotBlank
     @Size(max = 500)
     private String description;
 
@@ -56,10 +57,10 @@ public class Task extends BaseEntity {
         return priority;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "label")
-    private Set<String> labels = new HashSet<>();
+    private List<String> labels = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
