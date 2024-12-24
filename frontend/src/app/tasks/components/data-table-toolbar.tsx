@@ -10,6 +10,7 @@ import { DataTableViewOptions } from "@/app/tasks/components/data-table-view-opt
 import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableProjectFilter } from "./data-table-project-filter";
+import { DataTableLabelFilter } from "./data-table-label-filter";
 import { useState, useEffect } from "react";
 import { Project } from "@/lib/api/types";
 import {
@@ -129,10 +130,16 @@ export function DataTableToolbar<TData>({
                     />
                 )}
                 {selectedProjectId && labels.length > 0 && (
-                    <DataTableFacetedFilter
-                        column={table.getAllColumns().find(col => col.id === "labels")!}
+                    <DataTableLabelFilter
+                        column={table.getAllColumns().find(col => col.id === "labels")}
                         title="标签"
-                        options={labels}
+                        labels={labels}
+                        projectId={selectedProjectId}
+                        onLabelsChange={() => {
+                            api.labels.getAll(selectedProjectId).then(response => {
+                                setLabels(response.labels)
+                            })
+                        }}
                     />
                 )}
                 <Button
