@@ -131,7 +131,7 @@ export function DataTableToolbar<TData>({
                         options={priorities}
                     />
                 )}
-                {selectedProjectId && labels.length > 0 && (
+                {selectedProjectId && (
                     <DataTableLabelFilter
                         column={table.getAllColumns().find(col => col.id === "labels")}
                         title="标签"
@@ -142,11 +142,7 @@ export function DataTableToolbar<TData>({
                                 setLabels(response.labels)
                             })
                         }}
-                        onTasksChange={async () => {
-                            if (onRefreshData) {
-                                await onRefreshData()
-                            }
-                        }}
+                        onTasksChange={onRefreshData}
                     />
                 )}
                 <Button

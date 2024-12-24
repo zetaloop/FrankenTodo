@@ -181,50 +181,54 @@ export function DataTableLabelFilter<TData, TValue>({
                         <CommandInput placeholder={title} />
                         <CommandList>
                             <CommandEmpty>没有结果</CommandEmpty>
-                            <CommandGroup>
-                                {labels.map((label) => {
-                                    const isSelected = selectedValues.has(label)
-                                    const count = getLabelCount(label)
-                                    return (
-                                        <CommandItem
-                                            key={label}
-                                            onSelect={() => {
-                                                if (!column) return
-                                                if (isSelected) {
-                                                    selectedValues.delete(label)
-                                                } else {
-                                                    selectedValues.add(label)
-                                                }
-                                                const filterValues =
-                                                    Array.from(selectedValues)
-                                                column.setFilterValue(
-                                                    filterValues.length
-                                                        ? filterValues
-                                                        : undefined
-                                                )
-                                            }}
-                                        >
-                                            <div
-                                                className={cn(
-                                                    "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                                    isSelected
-                                                        ? "bg-primary text-primary-foreground"
-                                                        : "opacity-50 [&_svg]:invisible"
-                                                )}
-                                            >
-                                                <Check className="h-4 w-4" />
-                                            </div>
-                                            <span>{label}</span>
-                                            {typeof count !== 'undefined' && (
-                                                <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                                                    {count}
-                                                </span>
-                                            )}
-                                        </CommandItem>
-                                    )
-                                })}
-                            </CommandGroup>
-                            <CommandSeparator />
+                            {labels.length > 0 && (
+                                <>
+                                    <CommandGroup>
+                                        {labels.map((label) => {
+                                            const isSelected = selectedValues.has(label)
+                                            const count = getLabelCount(label)
+                                            return (
+                                                <CommandItem
+                                                    key={label}
+                                                    onSelect={() => {
+                                                        if (!column) return
+                                                        if (isSelected) {
+                                                            selectedValues.delete(label)
+                                                        } else {
+                                                            selectedValues.add(label)
+                                                        }
+                                                        const filterValues =
+                                                            Array.from(selectedValues)
+                                                        column.setFilterValue(
+                                                            filterValues.length
+                                                                ? filterValues
+                                                                : undefined
+                                                        )
+                                                    }}
+                                                >
+                                                    <div
+                                                        className={cn(
+                                                            "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                            isSelected
+                                                                ? "bg-primary text-primary-foreground"
+                                                                : "opacity-50 [&_svg]:invisible"
+                                                        )}
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </div>
+                                                    <span>{label}</span>
+                                                    {typeof count !== 'undefined' && (
+                                                        <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                                                            {count}
+                                                        </span>
+                                                    )}
+                                                </CommandItem>
+                                            )
+                                        })}
+                                    </CommandGroup>
+                                    <CommandSeparator />
+                                </>
+                            )}
                             <CommandGroup>
                                 <CommandItem
                                     onSelect={() => setCreateDialogOpen(true)}
