@@ -19,7 +19,6 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtService {
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JwtService.class);
     private final JwtConfig jwtConfig;
 
     public String generateToken(User user) {

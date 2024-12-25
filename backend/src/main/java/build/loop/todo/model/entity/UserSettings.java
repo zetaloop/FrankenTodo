@@ -3,10 +3,12 @@ package build.loop.todo.model.entity;
 import build.loop.todo.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "user_settings")
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class UserSettings extends BaseEntity {
     
     @Id

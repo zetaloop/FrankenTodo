@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "tasks")
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Task extends BaseEntity {
     
     @Id
