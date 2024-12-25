@@ -76,6 +76,13 @@ export function DataTableToolbar<TData>({
         table.resetColumnFilters()
     }, [selectedProjectId])
 
+    const handleDeleteProject = () => {
+        if (onDeleteProject) {
+            onDeleteProject();
+        }
+        setShowDeleteAlert(false);
+    };
+
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
@@ -197,10 +204,7 @@ export function DataTableToolbar<TData>({
                     <AlertDialogFooter>
                         <AlertDialogCancel>取消</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={() => {
-                                onDeleteProject()
-                                setShowDeleteAlert(false)
-                            }}
+                            onClick={handleDeleteProject}
                             className="bg-destructive hover:bg-destructive/90"
                         >
                             删除
