@@ -12,12 +12,11 @@ import lombok.Setter;
 public class UserSettings extends BaseEntity {
     
     @Id
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)

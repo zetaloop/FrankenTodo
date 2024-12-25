@@ -31,6 +31,8 @@ public class UserServiceImpl implements UserService {
         // 创建默认用户设置
         UserSettings settings = new UserSettings();
         settings.setUser(savedUser);
+        settings.setTheme("light");
+        settings.setNotificationsEnabled(true);
         userSettingsRepository.save(settings);
         return savedUser;
     }
@@ -84,7 +86,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserSettings getUserSettings(String userId) {
-        return userSettingsRepository.findByUserId(userId)
+        return userSettingsRepository.findByUser_Id(userId)
             .orElseThrow(() -> new EntityNotFoundException("User settings not found for user: " + userId));
     }
 
@@ -92,7 +94,6 @@ public class UserServiceImpl implements UserService {
     public UserSettings updateUserSettings(String userId, UserSettings settings) {
         UserSettings existingSettings = getUserSettings(userId);
         existingSettings.setTheme(settings.getTheme());
-        existingSettings.setLanguage(settings.getLanguage());
         existingSettings.setNotificationsEnabled(settings.isNotificationsEnabled());
         return userSettingsRepository.save(existingSettings);
     }

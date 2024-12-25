@@ -5,6 +5,7 @@ import build.loop.todo.model.dto.LoginResponse;
 import build.loop.todo.model.dto.RegisterRequest;
 import build.loop.todo.model.entity.User;
 import build.loop.todo.repository.UserRepository;
+import build.loop.todo.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,7 +69,9 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        if (!jwtService.validateToken(refreshToken, user)) {
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        if (!jwtService.validateToken(refreshToken, userDetails)) {
             throw new IllegalStateException("Invalid refresh token");
         }
 
