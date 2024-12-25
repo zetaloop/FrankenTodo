@@ -47,7 +47,13 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     @JsonIgnore
     public String getUsername() {
-        return email;
+        return username;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getPassword() {
+        return password;
     }
 
     @Override
