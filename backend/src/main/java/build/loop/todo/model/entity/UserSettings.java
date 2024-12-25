@@ -19,9 +19,7 @@ public class UserSettings extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
     private String theme = "light";
 
-    @Column(name = "notifications_enabled", nullable = false)
     private boolean notificationsEnabled = true;
 } 

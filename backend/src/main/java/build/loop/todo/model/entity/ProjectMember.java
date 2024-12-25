@@ -22,7 +22,7 @@ public class ProjectMember extends BaseEntity {
     @JsonIgnore
     private Project project;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
@@ -39,7 +39,7 @@ public class ProjectMember extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectRole role;
+    private ProjectRole role = ProjectRole.MEMBER;
 
     @JsonProperty("role")
     public String getRoleValue() {
