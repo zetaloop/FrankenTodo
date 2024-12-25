@@ -23,7 +23,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity implements UserDetails {
     @NotBlank
-    @Size(min = 3, max = 50)
+    @Size(min = 2, max = 50)
     @Column(unique = true)
     private String username;
 
