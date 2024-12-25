@@ -114,7 +114,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public BatchDeleteResponse deleteByIds(String projectId, List<String> taskIds) {
-        Project project = projectRepository.findById(projectId)
+        // 验证项目存在
+        projectRepository.findById(projectId)
             .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
             
         List<Task> tasks = taskRepository.findAllById(taskIds);

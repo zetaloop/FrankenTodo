@@ -2,9 +2,9 @@ package build.loop.todo.service;
 
 import build.loop.todo.config.JwtConfig;
 import build.loop.todo.model.entity.User;
+import build.loop.todo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +25,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
         return createToken(claims, user.getEmail(), jwtConfig.getExpiration());
     }
 
@@ -32,6 +33,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
         return createToken(claims, user.getEmail(), jwtConfig.getRefreshExpiration());
     }
 
@@ -45,7 +47,7 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -84,13 +86,16 @@ public class JwtService {
         Claims claims = extractAllClaims(token);
         User user = new User();
         user.setId((String) claims.get("id"));
-        user.setEmail(claims.get("sub", String.class));
-        user.setUsername(claims.get("username", String.class));
+        user.setEmail(claims.getSubject());
+        user.setUsername((String) claims.get("username"));
         return user;
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        if (!(userDetails instanceof CustomUserDetails customUserDetails)) {
+            return false;
+        }
+        final String tokenEmail = extractEmail(token);
+        return (tokenEmail.equals(customUserDetails.getEmail()) && !isTokenExpired(token));
     }
 } 

@@ -65,7 +65,7 @@ public class AuthService {
 
     @Transactional
     public LoginResponse refresh(String refreshToken) {
-        String email = jwtService.extractUsername(refreshToken);
+        String email = jwtService.extractEmail(refreshToken);
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalStateException("User not found"));
 

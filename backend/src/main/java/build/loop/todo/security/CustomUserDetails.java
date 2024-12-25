@@ -12,8 +12,8 @@ import java.util.Collections;
 @Getter
 public class CustomUserDetails implements UserDetails {
     private final String id;
-    private final String username;
-    private final String email;
+    private final String username;  // 用户显示名称
+    private final String email;     // 用户登录标识符
     private final String password;
 
     public CustomUserDetails(User user) {
@@ -35,7 +35,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email; // 使用 email 作为用户名
+        return username;  // 与User类保持一致,返回username而不是email
+    }
+
+    /**
+     * 获取用户邮箱,可用作登录标识符
+     */
+    public String getEmail() {
+        return email;
     }
 
     @Override
