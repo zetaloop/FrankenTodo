@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +41,14 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String subject, Long expiration) {
+        long currentTimeSeconds = Instant.now().getEpochSecond();
+        long expirationTimeSeconds = currentTimeSeconds + expiration;
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .issuedAt(Date.from(Instant.ofEpochSecond(currentTimeSeconds)))
+                .expiration(Date.from(Instant.ofEpochSecond(expirationTimeSeconds)))
                 .signWith(jwtConfig.key())
                 .compact();
     }

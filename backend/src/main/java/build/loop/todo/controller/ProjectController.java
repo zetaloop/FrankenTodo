@@ -9,6 +9,7 @@ import build.loop.todo.model.dto.LabelListResponse;
 import build.loop.todo.model.dto.BatchDeleteResponse;
 import build.loop.todo.service.ProjectService;
 import build.loop.todo.service.UserService;
+import build.loop.todo.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<ProjectListResponse> getAllProjects(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.findByUsername(userDetails.getUsername())
+        User user = userService.findByEmail(((CustomUserDetails) userDetails).getEmail())
             .orElseThrow(() -> new IllegalStateException("User not found"));
         List<Project> projects = projectService.findAllByUser(user);
         return ResponseEntity.ok(ProjectListResponse.of(projects));
@@ -39,7 +40,7 @@ public class ProjectController {
         @AuthenticationPrincipal UserDetails userDetails,
         @RequestBody Project project
     ) {
-        User user = userService.findByUsername(userDetails.getUsername())
+        User user = userService.findByEmail(((CustomUserDetails) userDetails).getEmail())
             .orElseThrow(() -> new IllegalStateException("User not found"));
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(projectService.create(project, user));
