@@ -12,11 +12,11 @@ spring:
     driver-class-name: org.opengauss.Driver
     url: jdbc:opengauss://localhost:5432/todo
     username: todo
-    password: todo123
+    password: todo@123
   
   # JPA 配置
   jpa:
-    database-platform: org.opengauss.dialect.OGDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
