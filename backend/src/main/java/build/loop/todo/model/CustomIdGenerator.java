@@ -3,7 +3,6 @@ package build.loop.todo.model;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.factory.spi.CustomIdGeneratorCreationContext;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
