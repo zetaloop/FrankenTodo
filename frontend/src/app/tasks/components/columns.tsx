@@ -14,6 +14,7 @@ interface ColumnsProps {
   labels: Label[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Task>[] {
   return [
     {
@@ -156,6 +157,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
     {
         id: "actions",
         cell: ({ row, table }) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const props = (table.options.meta as any) || {}
             return (
                 <DataTableRowActions 

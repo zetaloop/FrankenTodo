@@ -81,7 +81,7 @@ export function DataTableRowActions<TData>({
                         e.stopPropagation()
                     }}
                 >
-                    <DropdownMenuItem onSelect={(e) => {
+                    <DropdownMenuItem onSelect={() => {
                         console.log("复制", task)
                     }}>
                         复制

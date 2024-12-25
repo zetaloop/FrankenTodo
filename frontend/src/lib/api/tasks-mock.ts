@@ -85,10 +85,12 @@ export const tasksApiMock = {
     return updatedTask
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async delete(projectId: string, taskId: string): Promise<void> {
     return Promise.resolve()
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async batchDelete(
     projectId: string,
     taskIds: string[]

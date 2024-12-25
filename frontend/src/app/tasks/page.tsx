@@ -18,7 +18,6 @@ export default function TaskPage() {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false)
   const [projectDialogMode, setProjectDialogMode] = useState<"create" | "edit">("create")
   const [selectedProject, setSelectedProject] = useState<Project | undefined>()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [taskDialogOpen, setTaskDialogOpen] = useState(false)
   const [taskDialogMode, setTaskDialogMode] = useState<"create" | "view" | "edit">("create")
   const [selectedTask, setSelectedTask] = useState<Task | undefined>()

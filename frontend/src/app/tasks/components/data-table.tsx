@@ -67,6 +67,7 @@ export function DataTable({
   onEditProject,
   onDeleteProject,
   onCreateTask,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEditTask,
   onDeleteTask,
   onDeleteTasks,

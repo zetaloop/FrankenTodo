@@ -72,8 +72,8 @@ export const projectsApiMock = {
     }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async delete(projectId: string): Promise<void> {
-    // 模拟删除操作
     return Promise.resolve()
   },
 
@@ -81,10 +81,12 @@ export const projectsApiMock = {
     return { deleted_count: projectIds.length }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getMembers(projectId: string): Promise<{ members: ProjectMember[] }> {
     return { members: mockMembers }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async addMember(
     projectId: string,
     data: {
@@ -101,6 +103,7 @@ export const projectsApiMock = {
     return newMember
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async removeMember(projectId: string, userId: string): Promise<void> {
     return Promise.resolve()
   }

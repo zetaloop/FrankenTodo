@@ -50,8 +50,6 @@ export function TaskDialog({
   const [priority, setPriority] = useState(task?.priority || "medium")
   const [labels, setLabels] = useState<string[]>(task?.labels || [])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isEditingTitle, setIsEditingTitle] = useState(false)
-  const [isEditingDescription, setIsEditingDescription] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -68,8 +66,7 @@ export function TaskDialog({
         setPriority("medium")
         setLabels([])
       }
-      setIsEditingTitle(false)
-      setIsEditingDescription(false)
+      setIsSubmitting(false)
     }
   }, [task, open])
 

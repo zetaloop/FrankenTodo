@@ -58,8 +58,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    const totalFilteredRows = table.getFilteredRowModel().rows;
-    const selectedProject = projects.find(p => p.id === selectedProjectId);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false)
     const [showDeleteTasksAlert, setShowDeleteTasksAlert] = useState(false)
     const [labels, setLabels] = useState<string[]>([])
@@ -74,7 +72,7 @@ export function DataTableToolbar<TData>({
         }
         // 重置所有筛选器
         table.resetColumnFilters()
-    }, [selectedProjectId])
+    }, [selectedProjectId, table])
 
     const handleDeleteProject = () => {
         if (onDeleteProject) {

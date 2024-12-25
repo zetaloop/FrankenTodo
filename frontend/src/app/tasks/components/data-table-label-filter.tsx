@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
-import { Check, Filter, Plus, Trash2, X } from "lucide-react"
+import { Check, Filter, Plus, Trash2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"

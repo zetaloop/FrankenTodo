@@ -23,6 +23,7 @@ export const authApiMock = {
     }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async login(data: {
     email: string
     password: string

@@ -42,6 +42,7 @@ export const userApiMock = {
     }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async changePassword(data: {
     current_password: string
     new_password: string
