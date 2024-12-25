@@ -39,7 +39,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/*.js", "/*.css", "/assets/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/_next/**", "/static/**", "/", "/index.html", "/*.js", "/*.css", "/assets/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
