@@ -4,13 +4,11 @@ import build.loop.todo.model.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
 @Table(name = "project_members")
-@Getter
-@Setter
+@Data
 public class ProjectMember extends BaseEntity {
     
     @Id
