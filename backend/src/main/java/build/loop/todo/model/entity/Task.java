@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +20,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Task extends BaseEntity {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-
     @NotBlank
     private String title;
 
