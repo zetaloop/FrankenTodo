@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,20 +11,33 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading, checkAuth } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const lastPathRef = useRef(pathname)
+  const checkingRef = useRef(false)
 
   // 路由变化时重新检查认证状态
   useEffect(() => {
-    if (!isLoading) {
-      checkAuth()
+    if (isLoading || checkingRef.current) return
+    
+    // 只在路径真正变化时才检查
+    if (pathname !== lastPathRef.current) {
+      lastPathRef.current = pathname
+      checkingRef.current = true
+      checkAuth().finally(() => {
+        checkingRef.current = false
+      })
     }
   }, [pathname, checkAuth, isLoading])
 
+  // 根据认证状态进行路由重定向
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading || checkingRef.current) return
 
-    if (!user && !publicPaths.includes(pathname)) {
+    const isPublicPath = publicPaths.includes(pathname)
+    if (!user && !isPublicPath) {
+      lastPathRef.current = "/login"
       router.push("/login")
-    } else if (user && publicPaths.includes(pathname)) {
+    } else if (user && isPublicPath) {
+      lastPathRef.current = "/"
       router.push("/")
     }
   }, [user, isLoading, pathname, router])
