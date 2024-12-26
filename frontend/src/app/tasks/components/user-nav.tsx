@@ -9,8 +9,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 
 export function UserNav() {
+    const { user, logout } = useAuth();
+    
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -41,7 +44,7 @@ export function UserNav() {
                     <DropdownMenuItem>设置</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>退出登录</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>退出登录</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
