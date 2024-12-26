@@ -36,12 +36,14 @@ export function useAuth() {
       // 验证 token 是否过期
       const response = await api.auth.refreshToken()
       localStorage.setItem("access_token", response.access_token)
-      // TODO: 获取用户信息
-      // const user = await api.user.getCurrent()
-      // setState({ user, isLoading: false, error: null })
+      
+      // 获取用户信息
+      const user = await api.user.getCurrentUser()
+      setState({ user, isLoading: false, error: null })
     } catch (error) {
       localStorage.removeItem("access_token")
       setState({ user: null, isLoading: false, error: null })
+      router.push("/login")
     }
   }
 
@@ -51,8 +53,11 @@ export function useAuth() {
       setState(prev => ({ ...prev, isLoading: true, error: null }))
       const response = await api.auth.login({ email, password })
       localStorage.setItem("access_token", response.access_token)
+      
+      // 获取用户信息
+      const user = await api.user.getCurrentUser()
       setState({
-        user: response.user,
+        user,
         isLoading: false,
         error: null,
       })
@@ -71,7 +76,7 @@ export function useAuth() {
   const register = async (username: string, email: string, password: string) => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }))
-      const user = await api.auth.register({ username, email, password })
+      await api.auth.register({ username, email, password })
       // 注册成功后自动登录
       await login(email, password)
     } catch (error: any) {
@@ -91,7 +96,7 @@ export function useAuth() {
     } finally {
       localStorage.removeItem("access_token")
       setState({ user: null, isLoading: false, error: null })
-      router.push("/auth/login")
+      router.push("/login")
     }
   }
 
