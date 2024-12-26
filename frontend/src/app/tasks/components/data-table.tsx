@@ -34,6 +34,7 @@ import { Project } from "@/lib/api/types"
 import { ProjectEmptyState } from "./project-empty-state"
 import { TaskEmptyState } from "./task-empty-state"
 import { ProjectErrorState } from "./project-error-state"
+import { DataTableSkeleton } from "./data-table-skeleton"
 
 interface DataTableProps {
   columns: ColumnDef<Task>[]
@@ -41,6 +42,7 @@ interface DataTableProps {
   projects: Project[]
   selectedProjectId: string
   error?: boolean
+  loading?: boolean
   onRetry: () => void
   onProjectChange: (projectId: string) => void
   onCreateProject: () => void
@@ -66,6 +68,7 @@ export function DataTable({
   projects,
   selectedProjectId,
   error,
+  loading,
   onRetry,
   onProjectChange,
   onCreateProject,
@@ -186,6 +189,8 @@ export function DataTable({
       />
       {error ? (
         <ProjectErrorState onRetry={onRetry} />
+      ) : loading ? (
+        <DataTableSkeleton />
       ) : !selectedProjectId ? (
         <ProjectEmptyState 
           onCreateProject={onCreateProject}

@@ -8,7 +8,6 @@ import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
 import { ProjectDialog } from "./components/project-dialog"
 import { TaskDialog } from "./components/task-dialog"
-import { DataTableSkeleton } from "./components/data-table-skeleton"
 
 export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -50,7 +49,6 @@ export default function TaskPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!selectedProjectId) {
-        setLoading(false) // 如果没有选中的项目，直接设置 loading 为 false
         return
       }
       setLoading(true)
@@ -216,28 +214,25 @@ export default function TaskPage() {
             <UserNav />
           </div>
         </div>
-        {loading ? (
-          <DataTableSkeleton />
-        ) : (
-          <DataTable
-            data={tasks}
-            columns={createColumns({ projectId: selectedProjectId, labels })}
-            projects={projects}
-            selectedProjectId={selectedProjectId}
-            error={error}
-            onRetry={handleRetry}
-            onProjectChange={setSelectedProjectId}
-            onCreateProject={handleCreateProject}
-            onEditProject={handleEditProject}
-            onDeleteProject={handleDeleteProject}
-            onCreateTask={handleCreateTask}
-            onEditTask={handleEditTask}
-            onDeleteTask={handleDeleteTask}
-            onDeleteTasks={handleDeleteTasks}
-            onUpdateTask={handleTaskSubmit}
-            onRefreshData={handleRefreshData}
-          />
-        )}
+        <DataTable
+          data={tasks}
+          columns={createColumns({ projectId: selectedProjectId, labels })}
+          projects={projects}
+          selectedProjectId={selectedProjectId}
+          error={error}
+          loading={loading}
+          onRetry={handleRetry}
+          onProjectChange={setSelectedProjectId}
+          onCreateProject={handleCreateProject}
+          onEditProject={handleEditProject}
+          onDeleteProject={handleDeleteProject}
+          onCreateTask={handleCreateTask}
+          onEditTask={handleEditTask}
+          onDeleteTask={handleDeleteTask}
+          onDeleteTasks={handleDeleteTasks}
+          onUpdateTask={handleTaskSubmit}
+          onRefreshData={handleRefreshData}
+        />
       </div>
       <ProjectDialog
         project={selectedProject}
