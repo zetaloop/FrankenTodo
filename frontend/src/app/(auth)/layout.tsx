@@ -32,9 +32,9 @@ export default function AuthLayout({
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              &ldquo;最好的待办事项管理工具，帮助你更好地组织工作和生活。&rdquo;
+              &ldquo;祝你玩得开心。&rdquo;
             </p>
-            <footer className="text-sm">FrankenTodo 团队</footer>
+            <footer className="text-sm">Zetaloop</footer>
           </blockquote>
         </div>
       </div>
