@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const publicPaths = ["/login", "/register"]
 
@@ -12,25 +13,42 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!isLoading && !user && !publicPaths.includes(pathname)) {
+    if (isLoading) return
+
+    if (!user && !publicPaths.includes(pathname)) {
       router.push("/login")
+    } else if (user && publicPaths.includes(pathname)) {
+      router.push("/")
     }
   }, [user, isLoading, pathname, router])
 
-  // 如果正在加载，显示加载状态
   if (isLoading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+        {/* 顶部区域骨架 */}
+        <div className="flex items-center justify-between space-y-2">
+          <div className="space-y-1">
+            <Skeleton className="h-8 w-[200px]" />
+            <Skeleton className="h-4 w-[300px]" />
+          </div>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+        
+        {/* 内容区域骨架 */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-1 items-center space-x-2">
+              <Skeleton className="h-8 w-[250px]" />
+              <Skeleton className="h-8 w-8" />
+            </div>
+          </div>
+          <div className="rounded-md border">
+            <Skeleton className="h-[450px] w-full" />
+          </div>
+        </div>
       </div>
     )
   }
 
-  // 如果是公开路径或者用户已登录，显示内容
-  if (publicPaths.includes(pathname) || user) {
-    return <>{children}</>
-  }
-
-  // 其他情况（比如未登录且不是公开路径）不显示任何内容
-  return null
+  return <>{children}</>
 } 
