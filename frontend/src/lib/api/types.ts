@@ -1,22 +1,27 @@
 // API 响应和请求的类型定义
 
-export type ErrorResponse = {
-  error: {
-    code: string
-    message: string
-    details?: {
-      field?: string
-      reason?: string
-    }
-  }
-}
-
-export type User = {
+export interface User {
   id: string
   username: string
   email: string
   created_at: string
   updated_at?: string
+}
+
+export interface LoginResponse {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  expiresIn: number
+  user: User
+}
+
+export interface ErrorResponse {
+  error: {
+    code: string
+    message: string
+    details?: Record<string, string>
+  }
 }
 
 export type Project = {
@@ -54,11 +59,4 @@ export type ProjectMember = {
 export type BaseModel = {
   created_at: string
   updated_at?: string
-}
-
-export type LoginResponse = {
-  access_token: string
-  token_type: string
-  expires_in: number
-  user: User
 } 

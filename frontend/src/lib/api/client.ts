@@ -22,7 +22,7 @@ export async function fetchApi<T>(
     ...(options.headers as Record<string, string>),
   }
 
-  const token = localStorage.getItem('access_token')
+  const token = localStorage.getItem('accessToken')
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }

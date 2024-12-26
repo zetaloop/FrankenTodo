@@ -3,12 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { api } from "@/lib/api"
-
-interface User {
-  id: string
-  username: string
-  email: string
-}
+import type { User } from "@/lib/api/types"
 
 interface AuthState {
   user: User | null
@@ -26,7 +21,7 @@ export function useAuth() {
 
   // 检查认证状态
   const checkAuth = async () => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("accessToken")
     if (!token) {
       setState(prev => ({ ...prev, isLoading: false }))
       return
@@ -35,13 +30,13 @@ export function useAuth() {
     try {
       // 验证 token 是否过期
       const response = await api.auth.refreshToken()
-      localStorage.setItem("access_token", response.access_token)
+      localStorage.setItem("accessToken", response.accessToken)
       
       // 获取用户信息
       const user = await api.user.getCurrentUser()
       setState({ user, isLoading: false, error: null })
     } catch (error) {
-      localStorage.removeItem("access_token")
+      localStorage.removeItem("accessToken")
       setState({ user: null, isLoading: false, error: null })
       router.push("/login")
     }
@@ -52,12 +47,10 @@ export function useAuth() {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }))
       const response = await api.auth.login({ email, password })
-      localStorage.setItem("access_token", response.access_token)
+      localStorage.setItem("accessToken", response.accessToken)
       
-      // 获取用户信息
-      const user = await api.user.getCurrentUser()
       setState({
-        user,
+        user: response.user,
         isLoading: false,
         error: null,
       })
@@ -94,7 +87,7 @@ export function useAuth() {
     try {
       await api.auth.logout()
     } finally {
-      localStorage.removeItem("access_token")
+      localStorage.removeItem("accessToken")
       setState({ user: null, isLoading: false, error: null })
       router.push("/login")
     }
