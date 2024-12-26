@@ -8,6 +8,7 @@ import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
 import { ProjectDialog } from "./components/project-dialog"
 import { TaskDialog } from "./components/task-dialog"
+import { DataTableSkeleton } from "./components/data-table-skeleton"
 
 export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -216,7 +217,7 @@ export default function TaskPage() {
           </div>
         </div>
         {loading ? (
-          <div>加载中...</div>
+          <DataTableSkeleton />
         ) : (
           <DataTable
             data={tasks}
