@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthGuard } from "@/components/auth-guard";
+// import { DebugRouterProvider } from "@/providers/debug-router-provider";
 
 export const metadata: Metadata = {
   title: "任务清单",
@@ -17,11 +18,13 @@ export default function RootLayout({
       <body
         className={`antialiased min-h-screen flex flex-col`}
       >
-        <AuthGuard>
-          <main className="flex-1">
-            {children}
-          </main>
-        </AuthGuard>
+        {/* <DebugRouterProvider> */}
+          <AuthGuard>
+            <main className="flex-1">
+              {children}
+            </main>
+          </AuthGuard>
+        {/* </DebugRouterProvider> */}
       </body>
     </html>
   );
