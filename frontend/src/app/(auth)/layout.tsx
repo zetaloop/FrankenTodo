@@ -32,7 +32,7 @@ export default function AuthLayout({
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              &ldquo;祝你玩得开心。&rdquo;
+              &ldquo;理好进度，也别忘了玩得开心。&rdquo;
             </p>
             <footer className="text-sm">Zetaloop</footer>
           </blockquote>
