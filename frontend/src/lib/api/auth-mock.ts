@@ -1,4 +1,4 @@
-import type { User } from './types'
+import type { User, LoginResponse } from './types'
 
 const mockUser: User = {
   id: "user-123",
@@ -27,16 +27,12 @@ export const authApiMock = {
   async login(data: {
     email: string
     password: string
-  }): Promise<{
-    access_token: string
-    token_type: string
-    expires_in: number
-    user: User
-  }> {
+  }): Promise<LoginResponse> {
     return {
-      access_token: "mock_access_token",
-      token_type: "Bearer",
-      expires_in: 3600,
+      accessToken: "mock_access_token",
+      refreshToken: "mock_refresh_token",
+      tokenType: "Bearer",
+      expiresIn: 3600,
       user: mockUser
     }
   },
@@ -45,15 +41,13 @@ export const authApiMock = {
     return Promise.resolve()
   },
 
-  async refreshToken(): Promise<{
-    access_token: string
-    token_type: string
-    expires_in: number
-  }> {
+  async refreshToken(): Promise<LoginResponse> {
     return {
-      access_token: "mock_refreshed_token",
-      token_type: "Bearer",
-      expires_in: 3600
+      accessToken: "mock_refreshed_token",
+      refreshToken: "mock_refreshed_refresh_token",
+      tokenType: "Bearer",
+      expiresIn: 3600,
+      user: mockUser
     }
   }
 } 
