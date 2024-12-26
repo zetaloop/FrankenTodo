@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -11,7 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { api } from "@/lib/api"
+import { useAuth } from "@/hooks/use-auth"
 
 interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   mode: "login" | "register"
@@ -33,7 +32,7 @@ const registerSchema = loginSchema.extend({
 })
 
 export function AuthForm({ mode, className, ...props }: AuthFormProps) {
-  const router = useRouter()
+  const { login, register } = useAuth()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<string>("")
 
@@ -53,12 +52,11 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
     try {
       if (mode === "login") {
         const { email, password } = values
-        await api.auth.login({ email, password })
+        await login(email, password)
       } else {
         const { email, password, username } = values
-        await api.auth.register({ email, password, username })
+        await register(username, email, password)
       }
-      router.push("/tasks")
     } catch (error: Error | unknown) {
       setError(error instanceof Error ? error.message : "发生错误，请重试")
     } finally {

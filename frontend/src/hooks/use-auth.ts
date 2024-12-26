@@ -21,16 +21,11 @@ export function useAuth() {
 
   // 检查认证状态
   const checkAuth = useCallback(async () => {
-    const token = api.auth.getAccessToken()
-    if (!token) {
-      setState(prev => ({ ...prev, isLoading: false }))
-      return
-    }
-
     try {
-      // 如果 token 快过期，先刷新
-      if (api.auth.isTokenExpired()) {
-        await api.auth.refreshToken()
+      const token = api.auth.getAccessToken()
+      if (!token || api.auth.isTokenExpired()) {
+        setState(prev => ({ ...prev, isLoading: false }))
+        return
       }
       
       // 获取用户信息
@@ -39,9 +34,8 @@ export function useAuth() {
     } catch {
       api.auth.clearTokenInfo()
       setState({ user: null, isLoading: false, error: null })
-      router.push("/login")
     }
-  }, [router])
+  }, [])
 
   // 登录
   const login = async (email: string, password: string) => {
@@ -53,7 +47,7 @@ export function useAuth() {
         isLoading: false,
         error: null,
       })
-      router.push("/tasks")
+      router.push("/")
     } catch (error: Error | unknown) {
       setState(prev => ({
         ...prev,
