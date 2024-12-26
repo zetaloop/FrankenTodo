@@ -19,8 +19,8 @@ export function UserNav() {
                     className="relative h-8 w-8 rounded-full"
                 >
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src="/avatar.png" alt="戏晴" />
-                        <AvatarFallback>Lu</AvatarFallback>
+                        <AvatarImage src="/avatar.png" alt={user?.username} />
+                        <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
@@ -28,10 +28,10 @@ export function UserNav() {
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                            戏晴
+                            {user?.username}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                            lumen@example.com
+                            {user?.email}
                         </p>
                     </div>
                 </DropdownMenuLabel>
