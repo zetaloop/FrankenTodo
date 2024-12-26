@@ -59,8 +59,8 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
         await api.auth.register({ email, password, username })
       }
       router.push("/tasks")
-    } catch (error: any) {
-      setError(error.message || "发生错误，请重试")
+    } catch (error: Error | unknown) {
+      setError(error instanceof Error ? error.message : "发生错误，请重试")
     } finally {
       setIsLoading(false)
     }

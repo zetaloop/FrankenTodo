@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { api } from "@/lib/api"
 import type { User } from "@/lib/api/types"
 
@@ -20,7 +20,7 @@ export function useAuth() {
   })
 
   // 检查认证状态
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     const token = api.auth.getAccessToken()
     if (!token) {
       setState(prev => ({ ...prev, isLoading: false }))
@@ -36,12 +36,12 @@ export function useAuth() {
       // 获取用户信息
       const user = await api.user.getCurrentUser()
       setState({ user, isLoading: false, error: null })
-    } catch (error) {
+    } catch {
       api.auth.clearTokenInfo()
       setState({ user: null, isLoading: false, error: null })
       router.push("/login")
     }
-  }
+  }, [router])
 
   // 登录
   const login = async (email: string, password: string) => {
@@ -54,11 +54,11 @@ export function useAuth() {
         error: null,
       })
       router.push("/tasks")
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message || "登录失败",
+        error: error instanceof Error ? error.message : "登录失败",
       }))
       throw error
     }
@@ -71,11 +71,11 @@ export function useAuth() {
       await api.auth.register({ username, email, password })
       // 注册成功后自动登录
       await login(email, password)
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message || "注册失败",
+        error: error instanceof Error ? error.message : "注册失败",
       }))
       throw error
     }
@@ -94,7 +94,7 @@ export function useAuth() {
   // 组件加载时检查认证状态
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
   return {
     user: state.user,
