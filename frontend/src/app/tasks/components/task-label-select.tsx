@@ -136,24 +136,30 @@ export function TaskLabelSelect({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-[200px]">
                 <DropdownMenuGroup>
-                  {labels.map((label) => (
-                    <DropdownMenuItem
-                      key={label}
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        handleSelect(label)
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="h-4 w-4">
-                          {selectedLabels.has(label) && (
-                            <Check className="h-4 w-4" />
-                          )}
+                  {labels.length > 0 ? (
+                    labels.map((label) => (
+                      <DropdownMenuItem
+                        key={label}
+                        onSelect={(e) => {
+                          e.preventDefault()
+                          handleSelect(label)
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4">
+                            {selectedLabels.has(label) && (
+                              <Check className="h-4 w-4" />
+                            )}
+                          </div>
+                          {label}
                         </div>
-                        {label}
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <div className="py-3 px-2 text-sm text-muted-foreground text-center">
+                      没有标签
+                    </div>
+                  )}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
