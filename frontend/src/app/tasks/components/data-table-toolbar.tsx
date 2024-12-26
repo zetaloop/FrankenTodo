@@ -35,6 +35,7 @@ interface DataTableToolbarProps<TData> {
     table: Table<TData>;
     projects: Project[];
     selectedProjectId: string;
+    error?: boolean;
     onProjectChange: (projectId: string) => void;
     onCreateProject?: () => void;
     onEditProject?: () => void;
@@ -48,6 +49,7 @@ export function DataTableToolbar<TData>({
     table,
     projects,
     selectedProjectId,
+    error,
     onProjectChange,
     onCreateProject,
     onEditProject,
@@ -89,10 +91,16 @@ export function DataTableToolbar<TData>({
                     value={selectedProjectId}
                     onChange={onProjectChange}
                     onCreateProject={onCreateProject}
+                    disabled={error}
                 />
                 <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon" className="h-8 w-8">
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            disabled={error}
+                        >
                             <Settings className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>

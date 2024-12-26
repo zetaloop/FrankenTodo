@@ -23,6 +23,7 @@ interface DataTableProjectFilterProps {
     value: string
     onChange: (value: string) => void
     onCreateProject?: () => void
+    disabled?: boolean
 }
 
 export function DataTableProjectFilter({
@@ -30,6 +31,7 @@ export function DataTableProjectFilter({
     value,
     onChange,
     onCreateProject,
+    disabled,
 }: DataTableProjectFilterProps) {
     const [open, setOpen] = React.useState(false)
     const selectedProject = projects.find((project) => project.id === value)
@@ -43,6 +45,7 @@ export function DataTableProjectFilter({
                     aria-expanded={open}
                     aria-label="选择项目"
                     className="h-8 w-[150px] lg:w-[250px] justify-between"
+                    disabled={disabled}
                 >
                     <span className={cn(
                         "truncate",

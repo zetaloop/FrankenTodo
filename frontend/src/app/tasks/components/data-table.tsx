@@ -175,6 +175,7 @@ export function DataTable({
         table={table}
         projects={projects}
         selectedProjectId={selectedProjectId}
+        error={error}
         onProjectChange={onProjectChange}
         onCreateProject={onCreateProject}
         onEditProject={onEditProject}
