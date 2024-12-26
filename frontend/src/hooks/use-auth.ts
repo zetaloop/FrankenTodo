@@ -21,22 +21,23 @@ export function useAuth() {
 
   // 检查认证状态
   const checkAuth = async () => {
-    const token = localStorage.getItem("accessToken")
+    const token = api.auth.getAccessToken()
     if (!token) {
       setState(prev => ({ ...prev, isLoading: false }))
       return
     }
 
     try {
-      // 验证 token 是否过期
-      const response = await api.auth.refreshToken()
-      localStorage.setItem("accessToken", response.accessToken)
+      // 如果 token 快过期，先刷新
+      if (api.auth.isTokenExpired()) {
+        await api.auth.refreshToken()
+      }
       
       // 获取用户信息
       const user = await api.user.getCurrentUser()
       setState({ user, isLoading: false, error: null })
     } catch (error) {
-      localStorage.removeItem("accessToken")
+      api.auth.clearTokenInfo()
       setState({ user: null, isLoading: false, error: null })
       router.push("/login")
     }
@@ -47,8 +48,6 @@ export function useAuth() {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }))
       const response = await api.auth.login({ email, password })
-      localStorage.setItem("accessToken", response.accessToken)
-      
       setState({
         user: response.user,
         isLoading: false,
@@ -87,7 +86,6 @@ export function useAuth() {
     try {
       await api.auth.logout()
     } finally {
-      localStorage.removeItem("accessToken")
       setState({ user: null, isLoading: false, error: null })
       router.push("/login")
     }
