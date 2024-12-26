@@ -2,6 +2,7 @@ package build.loop.todo.model.entity;
 
 import build.loop.todo.model.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,11 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     @JsonIgnore
     public String getUsername() {
+        return username;
+    }
+
+    @JsonProperty("username")
+    public String getUserDisplayName() {
         return username;
     }
 
