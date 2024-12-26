@@ -37,17 +37,32 @@ export function useAuth() {
     }
   }, [])
 
+  // 同步检查认证状态（不发送请求）
+  const checkAuthSync = useCallback(() => {
+    const token = api.auth.getAccessToken()
+    return token && !api.auth.isTokenExpired()
+  }, [])
+
   // 登录
   const login = async (email: string, password: string) => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }))
-      const response = await api.auth.login({ email, password })
-      setState({
-        user: response.user,
-        isLoading: false,
-        error: null,
-      })
-      router.push("/")
+      await api.auth.login({ email, password })
+      
+      // 确保 token 已写入
+      if (!checkAuthSync()) {
+        throw new Error("登录失败：无法获取认证信息")
+      }
+      
+      // 获取用户信息
+      await checkAuth()
+      
+      // 再次确认认证状态
+      if (checkAuthSync()) {
+        router.push("/")
+      } else {
+        throw new Error("登录失败：认证状态无效")
+      }
     } catch (error: Error | unknown) {
       setState(prev => ({
         ...prev,
@@ -97,5 +112,6 @@ export function useAuth() {
     login,
     register,
     logout,
+    checkAuth,
   }
 } 

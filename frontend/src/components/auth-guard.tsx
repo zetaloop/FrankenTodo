@@ -8,9 +8,16 @@ import { Skeleton } from "@/components/ui/skeleton"
 const publicPaths = ["/login", "/register"]
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth()
+  const { user, isLoading, checkAuth } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+
+  // 路由变化时重新检查认证状态
+  useEffect(() => {
+    if (!isLoading) {
+      checkAuth()
+    }
+  }, [pathname, checkAuth, isLoading])
 
   useEffect(() => {
     if (isLoading) return
