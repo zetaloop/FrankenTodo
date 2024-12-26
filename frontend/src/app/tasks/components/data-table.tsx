@@ -33,12 +33,15 @@ import { Task } from "../data/schema"
 import { Project } from "@/lib/api/types"
 import { ProjectEmptyState } from "./project-empty-state"
 import { TaskEmptyState } from "./task-empty-state"
+import { ProjectErrorState } from "./project-error-state"
 
 interface DataTableProps {
   columns: ColumnDef<Task>[]
   data: Task[]
   projects: Project[]
   selectedProjectId: string
+  error?: boolean
+  onRetry: () => void
   onProjectChange: (projectId: string) => void
   onCreateProject: () => void
   onEditProject: () => void
@@ -62,6 +65,8 @@ export function DataTable({
   data,
   projects,
   selectedProjectId,
+  error,
+  onRetry,
   onProjectChange,
   onCreateProject,
   onEditProject,
@@ -178,7 +183,9 @@ export function DataTable({
         onDeleteTasks={onDeleteTasks}
         onRefreshData={onRefreshData}
       />
-      {!selectedProjectId ? (
+      {error ? (
+        <ProjectErrorState onRetry={onRetry} />
+      ) : !selectedProjectId ? (
         <ProjectEmptyState 
           onCreateProject={onCreateProject}
           onOpenProjectSelect={() => {
@@ -225,6 +232,7 @@ export function DataTable({
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
+                            
                           )}
                         </TableCell>
                       ))}

@@ -15,6 +15,7 @@ export default function TaskPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [labels, setLabels] = useState<Label[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<boolean>(false)
   const [projectDialogOpen, setProjectDialogOpen] = useState(false)
   const [projectDialogMode, setProjectDialogMode] = useState<"create" | "edit">("create")
   const [selectedProject, setSelectedProject] = useState<Project | undefined>()
@@ -25,6 +26,8 @@ export default function TaskPage() {
   // 获取项目列表
   useEffect(() => {
     const fetchProjects = async () => {
+      setLoading(true)
+      setError(false)
       try {
         const { projects } = await api.projects.getAll()
         setProjects(projects)
@@ -34,6 +37,9 @@ export default function TaskPage() {
         }
       } catch (error) {
         console.error("获取项目列表失败:", error)
+        setError(true)
+      } finally {
+        setLoading(false)
       }
     }
     fetchProjects()
@@ -42,11 +48,15 @@ export default function TaskPage() {
   // 当选择的项目改变时,获取该项目的任务和标签
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedProjectId) {
+        setLoading(false) // 如果没有选中的项目，直接设置 loading 为 false
+        return
+      }
       setLoading(true)
       try {
         const [tasksResponse, labelsResponse] = await Promise.all([
-          api.tasks.getAll(selectedProjectId || ''),
-          api.labels.getAll(selectedProjectId || '')
+          api.tasks.getAll(selectedProjectId),
+          api.labels.getAll(selectedProjectId)
         ])
         setTasks(tasksResponse.tasks)
         setLabels(labelsResponse.labels)
@@ -56,9 +66,7 @@ export default function TaskPage() {
         setLoading(false)
       }
     }
-    if (selectedProjectId) {
-      fetchData()
-    }
+    fetchData()
   }, [selectedProjectId])
 
   const handleRefreshData = async () => {
@@ -173,6 +181,26 @@ export default function TaskPage() {
     }
   }
 
+  const handleRetry = () => {
+    const fetchProjects = async () => {
+      setLoading(true)
+      setError(false)
+      try {
+        const { projects } = await api.projects.getAll()
+        setProjects(projects)
+        if (projects.length > 0) {
+          setSelectedProjectId(projects[0].id)
+        }
+      } catch (error) {
+        console.error("获取项目列表失败:", error)
+        setError(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProjects()
+  }
+
   return (
     <>
       <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -195,6 +223,8 @@ export default function TaskPage() {
             columns={createColumns({ projectId: selectedProjectId, labels })}
             projects={projects}
             selectedProjectId={selectedProjectId}
+            error={error}
+            onRetry={handleRetry}
             onProjectChange={setSelectedProjectId}
             onCreateProject={handleCreateProject}
             onEditProject={handleEditProject}
