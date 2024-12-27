@@ -16,25 +16,25 @@ export function DataTableSkeleton() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40px]">
+              <TableHead className="w-[40px] h-10">
                 <Skeleton className="h-4 w-4" />
               </TableHead>
-              <TableHead className="w-[100px]">
+              <TableHead className="w-[100px] h-10">
                 <Skeleton className="h-4 w-[60px]" />
               </TableHead>
-              <TableHead>
+              <TableHead className="h-10">
                 <Skeleton className="h-4 w-[200px]" />
               </TableHead>
-              <TableHead>
+              <TableHead className="h-10">
                 <Skeleton className="h-4 w-[100px]" />
               </TableHead>
-              <TableHead>
+              <TableHead className="h-10">
                 <Skeleton className="h-4 w-[100px]" />
               </TableHead>
-              <TableHead>
+              <TableHead className="h-10">
                 <Skeleton className="h-4 w-[100px]" />
               </TableHead>
-              <TableHead className="w-[100px]">
+              <TableHead className="w-[100px] h-10">
                 <Skeleton className="h-4 w-[60px]" />
               </TableHead>
             </TableRow>
@@ -42,25 +42,25 @@ export function DataTableSkeleton() {
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-4" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[60px]" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[200px]" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[100px]" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[100px]" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[100px]" />
                 </TableCell>
-                <TableCell>
+                <TableCell className="h-[53px]">
                   <Skeleton className="h-4 w-[60px]" />
                 </TableCell>
               </TableRow>
