@@ -24,13 +24,16 @@ export function useAuth() {
   const checkAuth = useCallback(async () => {
     try {
       const token = api.auth.getAccessToken()
-      if (!token) {
+      const refreshToken = api.auth.getRefreshToken()
+
+      // 如果连 refresh token 都没有,说明确实未登录
+      if (!token && !refreshToken) {
         setState(prev => ({ ...prev, isLoading: false }))
         return
       }
 
-      // 如果 token 过期,尝试刷新
-      if (api.auth.isTokenExpired()) {
+      // 如果 access token 过期或不存在,尝试使用 refresh token
+      if (!token || api.auth.isTokenExpired()) {
         try {
           await api.auth.refreshToken()
         } catch {
