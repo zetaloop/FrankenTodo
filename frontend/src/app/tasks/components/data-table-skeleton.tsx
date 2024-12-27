@@ -11,14 +11,6 @@ import {
 export function DataTableSkeleton() {
   return (
     <div className="space-y-4">
-      {/* 工具栏骨架屏 */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-1 items-center space-x-2">
-          <Skeleton className="h-8 w-[250px]" /> {/* 项目选择器 */}
-          <Skeleton className="h-8 w-8" /> {/* 设置按钮 */}
-        </div>
-      </div>
-
       {/* 表格骨架屏 */}
       <div className="rounded-md border">
         <Table>

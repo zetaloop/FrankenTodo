@@ -179,6 +179,7 @@ export function DataTable({
         projects={projects}
         selectedProjectId={selectedProjectId}
         error={error}
+        loading={loading}
         onProjectChange={onProjectChange}
         onCreateProject={onCreateProject}
         onEditProject={onEditProject}
@@ -238,7 +239,6 @@ export function DataTable({
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
-                            
                           )}
                         </TableCell>
                       ))}
