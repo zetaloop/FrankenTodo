@@ -56,7 +56,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project update(Project project) {
-        return projectRepository.save(project);
+        Project existingProject = projectRepository.findById(project.getId())
+            .orElseThrow(() -> new EntityNotFoundException("Project not found: " + project.getId()));
+        
+        // 只更新名称和描述
+        existingProject.setName(project.getName());
+        existingProject.setDescription(project.getDescription());
+        
+        return projectRepository.save(existingProject);
     }
 
     @Override
