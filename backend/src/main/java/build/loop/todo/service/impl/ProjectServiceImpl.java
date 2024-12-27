@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -143,27 +144,34 @@ public class ProjectServiceImpl implements ProjectService {
     public List<String> getProjectLabels(String projectId) {
         Project project = projectRepository.findById(projectId)
             .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
-        return taskRepository.findByProject(project).stream()
-            .flatMap(task -> task.getLabels().stream())
-            .distinct()
-            .collect(Collectors.toList());
+        return new ArrayList<>(project.getLabels());
     }
 
     @Override
     public void addProjectLabel(String projectId, String label) {
-        // 标签是动态的，不需要特别存储
-        // 它们会在任务中使用时自动创建
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
+        if (!project.getLabels().contains(label)) {
+            project.getLabels().add(label);
+            projectRepository.save(project);
+        }
     }
 
     @Override
     public void removeProjectLabel(String projectId, String label) {
-        // 从所有任务中移除该标签
         Project project = projectRepository.findById(projectId)
             .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
+        
+        // 从项目中移除标签
+        project.getLabels().remove(label);
+        projectRepository.save(project);
+        
+        // 从所有任务中移除该标签
         List<Task> tasks = taskRepository.findByProject(project);
         for (Task task : tasks) {
-            task.getLabels().remove(label);
-            taskRepository.save(task);
+            if (task.getLabels().remove(label)) {
+                taskRepository.save(task);
+            }
         }
     }
 } 

@@ -31,4 +31,9 @@ public class Project extends BaseEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ProjectMember> members = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "project_labels", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "label")
+    private List<String> labels = new ArrayList<>();
 } 

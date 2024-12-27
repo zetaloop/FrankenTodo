@@ -82,6 +82,13 @@ CREATE TABLE task_labels (
     PRIMARY KEY (task_id, label)
 );
 
+-- 创建项目标签表
+CREATE TABLE project_labels (
+    project_id VARCHAR(36) NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    label VARCHAR(50) NOT NULL,
+    PRIMARY KEY (project_id, label)
+);
+
 -- 创建更新时间触发器函数
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
