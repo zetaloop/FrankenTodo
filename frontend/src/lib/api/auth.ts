@@ -47,6 +47,30 @@ export const authApi = {
     this.clearTokenInfo()
   },
 
+  async refreshToken(): Promise<LoginResponse> {
+    const refreshToken = this.getRefreshToken()
+    if (!refreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    const response = await fetchApi<LoginResponse>('/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${refreshToken}`
+      }
+    })
+
+    // 保存新的 token 信息
+    this.saveTokenInfo({
+      accessToken: response.accessToken,
+      refreshToken: response.refreshToken,
+      tokenType: response.tokenType,
+      expiresIn: response.expiresIn,
+    })
+
+    return response
+  },
+
   saveTokenInfo(tokenInfo: TokenInfo) {
     try {
       localStorage.setItem('accessToken', tokenInfo.accessToken)
