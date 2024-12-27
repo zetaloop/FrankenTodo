@@ -32,7 +32,9 @@ export async function fetchApi<T>(
     ...(options.headers as Record<string, string>),
   }
 
-  const token = authApi.getAccessToken()
+  // 如果是刷新 token 的请求,使用 refreshToken
+  const isRefreshRequest = endpoint === '/auth/refresh'
+  const token = isRefreshRequest ? authApi.getRefreshToken() : authApi.getAccessToken()
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }

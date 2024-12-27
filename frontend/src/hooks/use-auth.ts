@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState, useCallback } from "react"
 import { api } from "@/lib/api"
 import type { User } from "@/lib/api/types"
+import { ApiError } from "@/lib/api/client"
 
 interface AuthState {
   user: User | null
@@ -23,16 +24,35 @@ export function useAuth() {
   const checkAuth = useCallback(async () => {
     try {
       const token = api.auth.getAccessToken()
-      if (!token || api.auth.isTokenExpired()) {
+      if (!token) {
         setState(prev => ({ ...prev, isLoading: false }))
         return
+      }
+
+      // 如果 token 过期,尝试刷新
+      if (api.auth.isTokenExpired()) {
+        try {
+          await api.auth.refreshToken()
+        } catch {
+          // 刷新失败,清除 token 并返回
+          api.auth.clearTokenInfo()
+          setState({ user: null, isLoading: false, error: null })
+          return
+        }
       }
       
       // 获取用户信息
       const user = await api.user.getCurrentUser()
       setState({ user, isLoading: false, error: null })
-    } catch {
-      api.auth.clearTokenInfo()
+    } catch (error) {
+      // 只有在非 401/403 错误时才清除 token
+      // 401/403 错误会在 fetchApi 中处理
+      if (error instanceof Error && error.name === 'ApiError') {
+        const apiError = error as ApiError
+        if (apiError.code !== 'UNAUTHORIZED' && apiError.code !== 'FORBIDDEN') {
+          api.auth.clearTokenInfo()
+        }
+      }
       setState({ user: null, isLoading: false, error: null })
     }
   }, [])
