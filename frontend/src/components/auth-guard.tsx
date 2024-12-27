@@ -44,9 +44,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="hidden h-full flex-1 flex-col p-8 md:flex">
         {/* 顶部区域骨架 */}
-        <div className="flex items-center justify-between space-y-2">
+        <div className="flex items-center justify-between space-y-2 mb-8">
           <div className="space-y-1">
             <Skeleton className="h-8 w-[200px]" />
             <Skeleton className="h-4 w-[300px]" />
@@ -55,13 +55,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         </div>
         
         {/* 内容区域骨架 */}
-        <div className="space-y-4">
+        <div className="space-y-4 mt-[4px]">
+          {/* 工具栏骨架 */}
           <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
               <Skeleton className="h-8 w-[250px]" />
               <Skeleton className="h-8 w-8" />
             </div>
           </div>
+          {/* 表格骨架 */}
           <div className="rounded-md border">
             <Skeleton className="h-[450px] w-full" />
           </div>
