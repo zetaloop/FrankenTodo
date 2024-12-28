@@ -49,6 +49,11 @@ public class Task extends BaseEntity {
         return status;
     }
 
+    @JsonProperty("status")
+    public void setStatusValue(String value) {
+        this.status = TaskStatus.fromValue(value);
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskPriority priority = TaskPriority.MEDIUM;
@@ -61,6 +66,11 @@ public class Task extends BaseEntity {
     @JsonIgnore
     public TaskPriority getPriority() {
         return priority;
+    }
+
+    @JsonProperty("priority")
+    public void setPriorityValue(String value) {
+        this.priority = TaskPriority.fromValue(value);
     }
 
     @ElementCollection
