@@ -22,7 +22,7 @@ public class Task extends BaseEntity {
     private String title;
 
     @Size(max = 500)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String description = "";
 
     @Enumerated(EnumType.STRING)
