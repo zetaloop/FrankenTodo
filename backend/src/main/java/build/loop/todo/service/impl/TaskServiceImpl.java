@@ -38,6 +38,9 @@ public class TaskServiceImpl implements TaskService {
         if (task.getPriority() == null) {
             task.setPriority(TaskPriority.MEDIUM);
         }
+        if (task.getDescription() == null) {
+            task.setDescription("");
+        }
         
         return taskRepository.save(task);
     }
@@ -91,7 +94,7 @@ public class TaskServiceImpl implements TaskService {
         
         // 更新任务属性
         existingTask.setTitle(task.getTitle());
-        existingTask.setDescription(task.getDescription());
+        existingTask.setDescription(task.getDescription() != null ? task.getDescription() : "");
         existingTask.setStatus(task.getStatus());
         existingTask.setPriority(task.getPriority());
         existingTask.setLabels(task.getLabels());
