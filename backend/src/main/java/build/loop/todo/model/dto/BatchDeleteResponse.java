@@ -6,11 +6,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BatchDeleteResponse {
-    private int deleted_count;
+    private int deletedCount;
 
     public static BatchDeleteResponse of(int count) {
         BatchDeleteResponse response = new BatchDeleteResponse();
-        response.setDeleted_count(count);
+        response.setDeletedCount(count);
         return response;
     }
 } 

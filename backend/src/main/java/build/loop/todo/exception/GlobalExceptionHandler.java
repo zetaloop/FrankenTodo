@@ -16,27 +16,19 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, Object>> handleIllegalStateException(IllegalStateException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", Map.of(
-            "code", "INVALID_STATE",
-            "message", ex.getMessage()
-        ));
-        return ResponseEntity.badRequest().body(body);
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex) {
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse("INVALID_STATE", ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", Map.of(
-            "code", "INVALID_CREDENTIALS",
-            "message", "Invalid email or password"
-        ));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new ErrorResponse("INVALID_CREDENTIALS", "Invalid email or password"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> details = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
@@ -44,17 +36,12 @@ public class GlobalExceptionHandler {
             details.put(fieldName, errorMessage);
         });
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", Map.of(
-            "code", "VALIDATION_FAILED",
-            "message", "Validation failed",
-            "details", details
-        ));
-        return ResponseEntity.badRequest().body(body);
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse("VALIDATION_FAILED", "Validation failed", details));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         Map<String, String> details = new HashMap<>();
         ex.getConstraintViolations().forEach(violation -> {
             String fieldName = violation.getPropertyPath().toString();
@@ -62,22 +49,13 @@ public class GlobalExceptionHandler {
             details.put(fieldName, errorMessage);
         });
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", Map.of(
-            "code", "VALIDATION_FAILED",
-            "message", "Validation failed",
-            "details", details
-        ));
-        return ResponseEntity.badRequest().body(body);
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse("VALIDATION_FAILED", "Validation failed", details));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", Map.of(
-            "code", "INTERNAL_ERROR",
-            "message", "An internal error occurred"
-        ));
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new ErrorResponse("INTERNAL_ERROR", "An internal error occurred"));
     }
 } 

@@ -1,6 +1,9 @@
 package build.loop.todo.exception;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 public class ErrorResponse {
@@ -10,7 +13,7 @@ public class ErrorResponse {
         this.error = new Error(code, message, null);
     }
 
-    public ErrorResponse(String code, String message, ErrorDetails details) {
+    public ErrorResponse(String code, String message, Map<String, String> details) {
         this.error = new Error(code, message, details);
     }
 
@@ -18,23 +21,12 @@ public class ErrorResponse {
     public static class Error {
         private final String code;
         private final String message;
-        private final ErrorDetails details;
+        private final Map<String, String> details;
 
-        public Error(String code, String message, ErrorDetails details) {
+        public Error(String code, String message, Map<String, String> details) {
             this.code = code;
             this.message = message;
             this.details = details;
-        }
-    }
-
-    @Getter
-    public static class ErrorDetails {
-        private final String field;
-        private final String reason;
-
-        public ErrorDetails(String field, String reason) {
-            this.field = field;
-            this.reason = reason;
         }
     }
 } 

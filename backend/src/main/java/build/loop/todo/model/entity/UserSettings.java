@@ -17,5 +17,6 @@ public class UserSettings extends BaseEntity {
 
     private String theme = "light";
 
+    @Column(name = "notifications_enabled")
     private boolean notificationsEnabled = true;
 } 
