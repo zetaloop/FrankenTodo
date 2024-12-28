@@ -84,18 +84,20 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
 
             return (
                 <div className="flex items-center max-w-[40vw] min-w-0">
-                    <div className="flex gap-1 overflow-hidden whitespace-nowrap">
-                        {taskLabels.map(label => (
-                            <Badge 
-                                key={label} 
-                                variant="outline" 
-                                className="truncate max-w-[150px] whitespace-nowrap"
-                            >
-                                {label}
-                            </Badge>
-                        ))}
-                    </div>
-                    <span className="truncate font-medium ml-2 flex-1">
+                    {taskLabels.length > 0 && (
+                        <div className="flex gap-1 overflow-hidden whitespace-nowrap">
+                            {taskLabels.map(label => (
+                                <Badge 
+                                    key={label} 
+                                    variant="outline" 
+                                    className="truncate max-w-[150px] whitespace-nowrap"
+                                >
+                                    {label}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+                    <span className={`truncate font-medium flex-1 ${taskLabels.length > 0 ? "ml-2" : ""}`}>
                         {row.getValue("title")}
                     </span>
                 </div>
