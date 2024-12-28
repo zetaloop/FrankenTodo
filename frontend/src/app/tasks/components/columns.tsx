@@ -59,7 +59,18 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
                 <DataTableColumnHeader column={column} title="编号" />
             </div>
         ),
-        cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+        cell: ({ row }) => {
+            const id = row.getValue("id") as string;
+            const shortId = id.slice(-8).toUpperCase();
+            return (
+                <div 
+                    className="w-[80px]" 
+                    title={id}
+                >
+                    #{shortId}
+                </div>
+            );
+        },
         enableSorting: false,
         enableHiding: false,
     },
