@@ -105,6 +105,9 @@ export function TaskDialog({
             <DialogTitle className="text-2xl font-semibold">
               {title}
             </DialogTitle>
+            <DialogDescription className="hidden">
+              查看任务的详细信息
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-6">
