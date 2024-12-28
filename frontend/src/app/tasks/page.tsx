@@ -148,7 +148,7 @@ export default function TaskPage() {
     }
   }
 
-  const handleTaskSubmit = async (data: {
+  const handleCreateTaskSubmit = async (data: {
     title: string
     description: string
     status: string
@@ -156,18 +156,25 @@ export default function TaskPage() {
     labels: string[]
   }) => {
     try {
-      if (taskDialogMode === "create") {
-        const newTask = await api.tasks.create(selectedProjectId, data)
-        setTasks(prev => [...prev, newTask])
-      } else {
-        // 编辑模式
-        const updatedTask = await api.tasks.update(selectedProjectId, selectedTask!.id, data)
-        setTasks(prev => 
-          prev.map(t => t.id === updatedTask.id ? updatedTask : t)
-        )
-      }
+      const newTask = await api.tasks.create(selectedProjectId, data)
+      setTasks(prev => [...prev, newTask])
     } catch (error) {
-      console.error("操作任务失败:", error)
+      console.error("创建任务失败:", error)
+    }
+  }
+
+  const handleUpdateTaskSubmit = async (task: Task, data: {
+    title: string
+    description: string
+    status: string
+    priority: string
+    labels: string[]
+  }) => {
+    try {
+      const updatedTask = await api.tasks.update(selectedProjectId, task.id, data)
+      setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t))
+    } catch (error) {
+      console.error("更新任务失败:", error)
     }
   }
 
@@ -230,7 +237,7 @@ export default function TaskPage() {
           onEditTask={handleEditTask}
           onDeleteTask={handleDeleteTask}
           onDeleteTasks={handleDeleteTasks}
-          onUpdateTask={handleTaskSubmit}
+          onUpdateTask={handleUpdateTaskSubmit}
           onRefreshData={handleRefreshData}
         />
       </div>
@@ -246,7 +253,7 @@ export default function TaskPage() {
         open={taskDialogOpen}
         projectId={selectedProjectId}
         onOpenChange={setTaskDialogOpen}
-        onSubmit={handleTaskSubmit}
+        onSubmit={taskDialogMode === "create" ? handleCreateTaskSubmit : (data) => handleUpdateTaskSubmit(selectedTask!, data)}
         mode={taskDialogMode}
         onDelete={selectedTask ? () => handleDeleteTask(selectedTask) : undefined}
         onEdit={selectedTask ? () => setTaskDialogMode("edit") : undefined}
