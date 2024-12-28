@@ -22,7 +22,10 @@ const columnNames: Record<string, string> = {
     id: "编号",
     title: "标题",
     status: "状态",
-    priority: "优先级"
+    priority: "优先级",
+    labels: "标签",
+    created_at: "创建时间",
+    updated_at: "更新时间"
 };
 
 export function DataTableViewOptions<TData>({
