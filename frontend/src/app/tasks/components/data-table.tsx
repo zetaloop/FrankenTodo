@@ -90,7 +90,12 @@ export function DataTable({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([
+    {
+      id: "created_at",
+      desc: true
+    }
+  ])
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null)
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [dialogMode, setDialogMode] = React.useState<"create" | "view" | "edit">("view")

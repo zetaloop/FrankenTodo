@@ -173,6 +173,37 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
         },
     },
     {
+        accessorKey: "created_at",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="创建时间" />
+        ),
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("created_at"));
+            return (
+                <div className="w-[100px] text-muted-foreground whitespace-nowrap" title={date.toLocaleString()}>
+                    {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+            );
+        },
+        sortingFn: "datetime",
+        sortDescFirst: true,
+    },
+    {
+        accessorKey: "updated_at",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="更新时间" />
+        ),
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("updated_at"));
+            return (
+                <div className="w-[100px] text-muted-foreground whitespace-nowrap" title={date.toLocaleString()}>
+                    {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+            );
+        },
+        sortingFn: "datetime",
+    },
+    {
         id: "actions",
         cell: ({ row, table }) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
