@@ -54,7 +54,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
         accessorKey: "id",
         header: ({ column, table }) => (
             <div 
-                className="cursor-pointer" 
+                className="cursor-pointer whitespace-nowrap" 
                 onClick={() => table.toggleAllPageRowsSelected()}
             >
                 <DataTableColumnHeader column={column} title="编号" />
@@ -118,7 +118,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             const status = statuses.find((s) => s.value === row.getValue("status"))
             if (!status) return null
             return (
-                <div className="flex w-[100px] items-center">
+                <div className="flex w-[100px] items-center whitespace-nowrap">
                     {status.icon && (
                         <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
@@ -145,7 +145,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             const priority = priorities.find((p) => p.value === row.getValue("priority"))
             if (!priority) return null
             return (
-                <div className="flex items-center">
+                <div className="flex items-center whitespace-nowrap">
                     {priority.icon && (
                         <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
