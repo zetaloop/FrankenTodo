@@ -1,12 +1,5 @@
 import { fetchApi } from './client'
-import type { User, LoginResponse } from './types'
-
-export interface TokenInfo {
-  accessToken: string
-  refreshToken: string
-  tokenType: string
-  expiresIn: number
-}
+import type { User, LoginResponse, TokenInfo } from './types'
 
 export const authApi = {
   async register(data: {
@@ -31,10 +24,10 @@ export const authApi = {
     
     // 保存 token 信息
     this.saveTokenInfo({
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      tokenType: response.tokenType,
-      expiresIn: response.expiresIn,
+      access_token: response.access_token,
+      refresh_token: response.refresh_token,
+      token_type: response.token_type,
+      expires_in: response.expires_in,
     })
     
     return response
@@ -62,10 +55,10 @@ export const authApi = {
 
     // 保存新的 token 信息
     this.saveTokenInfo({
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      tokenType: response.tokenType,
-      expiresIn: response.expiresIn,
+      access_token: response.access_token,
+      refresh_token: response.refresh_token,
+      token_type: response.token_type,
+      expires_in: response.expires_in,
     })
 
     return response
@@ -73,10 +66,10 @@ export const authApi = {
 
   saveTokenInfo(tokenInfo: TokenInfo) {
     try {
-      localStorage.setItem('accessToken', tokenInfo.accessToken)
-      localStorage.setItem('refreshToken', tokenInfo.refreshToken)
-      localStorage.setItem('tokenType', tokenInfo.tokenType)
-      localStorage.setItem('tokenExpiresAt', String(Date.now() + tokenInfo.expiresIn * 1000))
+      localStorage.setItem('access_token', tokenInfo.access_token)
+      localStorage.setItem('refresh_token', tokenInfo.refresh_token)
+      localStorage.setItem('token_type', tokenInfo.token_type)
+      localStorage.setItem('token_expires_at', String(Date.now() + tokenInfo.expires_in * 1000))
     } catch (error) {
       console.error('Failed to save token info:', error)
     }
@@ -84,10 +77,10 @@ export const authApi = {
 
   clearTokenInfo() {
     try {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('tokenType')
-      localStorage.removeItem('tokenExpiresAt')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('token_type')
+      localStorage.removeItem('token_expires_at')
     } catch (error) {
       console.error('Failed to clear token info:', error)
     }
@@ -95,7 +88,7 @@ export const authApi = {
 
   getAccessToken(): string | null {
     try {
-      return localStorage.getItem('accessToken')
+      return localStorage.getItem('access_token')
     } catch (error) {
       console.error('Failed to get access token:', error)
       return null
@@ -104,7 +97,7 @@ export const authApi = {
 
   getRefreshToken(): string | null {
     try {
-      return localStorage.getItem('refreshToken')
+      return localStorage.getItem('refresh_token')
     } catch (error) {
       console.error('Failed to get refresh token:', error)
       return null
@@ -113,7 +106,7 @@ export const authApi = {
 
   isTokenExpired(): boolean {
     try {
-      const expiresAt = localStorage.getItem('tokenExpiresAt')
+      const expiresAt = localStorage.getItem('token_expires_at')
       if (!expiresAt) return true
       return Date.now() > parseInt(expiresAt, 10)
     } catch (error) {
