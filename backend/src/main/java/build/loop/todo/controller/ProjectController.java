@@ -107,21 +107,25 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/labels")
-    public ResponseEntity<String> addProjectLabel(
+    public ResponseEntity<Map<String, String>> addProjectLabel(
         @PathVariable String projectId,
         @RequestBody Map<String, String> request
     ) {
         String label = request.get("label");
         projectService.addProjectLabel(projectId, label);
-        return ResponseEntity.status(HttpStatus.CREATED).body(label);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(Map.of("label", label));
     }
 
-    @DeleteMapping("/{projectId}/labels/{label}")
-    public ResponseEntity<Void> removeProjectLabel(
+    @DeleteMapping("/{projectId}/labels")
+    public ResponseEntity<Void> removeProjectLabels(
         @PathVariable String projectId,
-        @PathVariable String label
+        @RequestBody Map<String, List<String>> request
     ) {
-        projectService.removeProjectLabel(projectId, label);
+        List<String> labels = request.get("labels");
+        for (String label : labels) {
+            projectService.removeProjectLabel(projectId, label);
+        }
         return ResponseEntity.noContent().build();
     }
 } 
