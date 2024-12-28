@@ -8,6 +8,7 @@ import { Task } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import type { Label } from "@/lib/api/types";
+import { MessageSquareMore } from "lucide-react";
 
 interface ColumnsProps {
   projectId: string;
@@ -81,6 +82,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
         ),
         cell: ({ row }) => {
             const taskLabels = row.original.labels;
+            const hasDescription = row.original.description?.trim().length > 0;
 
             return (
                 <div className="flex items-center max-w-[40vw] min-w-0">
@@ -99,6 +101,9 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
                     )}
                     <span className={`truncate font-medium flex-1 ${taskLabels.length > 0 ? "ml-2" : ""}`}>
                         {row.getValue("title")}
+                        {hasDescription && (
+                            <MessageSquareMore className="inline-block ml-1 h-4 w-4 text-muted-foreground" />
+                        )}
                     </span>
                 </div>
             );
