@@ -25,6 +25,16 @@ public class Task extends BaseEntity {
     @Column(nullable = true)
     private String description = "";
 
+    @JsonProperty("description")
+    public String getDescription() {
+        return description == null ? "" : description;
+    }
+
+    @JsonIgnore
+    public void setDescription(String description) {
+        this.description = description == null ? "" : description;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status = TaskStatus.TODO;
