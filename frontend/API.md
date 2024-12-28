@@ -408,7 +408,7 @@
 
 #### 获取项目标签列表
 - **GET** `/projects/{projectId}/labels`
-- **描述**: 获取特定项目下的所有标签
+- **描述**: 获取项目的所有标签
 - **响应示例**:
 ```json
 {
@@ -420,23 +420,31 @@
 }
 ```
 
-#### 创建项目标签
+#### 添加项目标签
 - **POST** `/projects/{projectId}/labels`
-- **描述**: 在指定项目下创建新标签
+- **描述**: 添加新标签到项目
 - **请求体**:
 ```json
 {
-  "label": "string"  // 标签名称，例如 "Bug"、"Feature" 等
+  "label": "string"
 }
 ```
 - **响应示例** (201 Created):
 ```json
-"Enhancement"  // 返回创建的标签名称
+{
+  "label": "新标签"
+}
 ```
 
 #### 删除项目标签
-- **DELETE** `/projects/{projectId}/labels/{label}`
-- **描述**: 删除指定项目下的标签。删除标签时会同时从所有任务中移除该标签。
+- **DELETE** `/projects/{projectId}/labels`
+- **描述**: 从项目中删除一个或多个标签（同时会从所有任务中移除这些标签）
+- **请求体**:
+```json
+{
+  "labels": ["string"]
+}
+```
 - **响应**: 204 No Content
 
 ### 用户相关 API

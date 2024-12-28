@@ -7,15 +7,19 @@ export const labelsApi = {
   },
 
   async create(projectId: string, label: string): Promise<Label> {
-    return fetchApi(`/projects/${projectId}/labels`, {
+    const response = await fetchApi<{ label: string }>(`/projects/${projectId}/labels`, {
       method: 'POST',
       body: JSON.stringify({ label }),
     })
+    return response.label
   },
 
-  async delete(projectId: string, label: string): Promise<void> {
-    return fetchApi(`/projects/${projectId}/labels/${encodeURIComponent(label)}`, {
+  async delete(projectId: string, labels: string | string[]): Promise<void> {
+    return fetchApi(`/projects/${projectId}/labels`, {
       method: 'DELETE',
+      body: JSON.stringify({ 
+        labels: Array.isArray(labels) ? labels : [labels] 
+      }),
     })
   }
 } 

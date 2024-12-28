@@ -26,21 +26,21 @@ export const labelsApiMock = {
     return label
   },
 
-  async delete(projectId: string, label: string): Promise<void> {
+  async delete(projectId: string, labels: string | string[]): Promise<void> {
+    const labelsToDelete = Array.isArray(labels) ? labels : [labels]
     if (projectLabels[projectId]) {
-      const index = projectLabels[projectId].findIndex(l => l === label)
-      if (index !== -1) {
-        // 删除标签
-        projectLabels[projectId].splice(index, 1)
+      // 删除标签
+      projectLabels[projectId] = projectLabels[projectId].filter(
+        label => !labelsToDelete.includes(label)
+      )
 
-        // 更新所有任务中的标签
-        if (projectTasks[projectId]) {
-          projectTasks[projectId] = projectTasks[projectId].map(task => ({
-            ...task,
-            labels: task.labels.filter((l: string) => l !== label),
-            updated_at: new Date().toISOString()
-          }))
-        }
+      // 更新所有任务中的标签
+      if (projectTasks[projectId]) {
+        projectTasks[projectId] = projectTasks[projectId].map(task => ({
+          ...task,
+          labels: task.labels.filter((l: string) => !labelsToDelete.includes(l)),
+          updated_at: new Date().toISOString()
+        }))
       }
     }
     return Promise.resolve()

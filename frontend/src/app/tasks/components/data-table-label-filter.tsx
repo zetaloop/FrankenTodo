@@ -101,11 +101,7 @@ export function DataTableLabelFilter<TData, TValue>({
     const handleDeleteSelectedLabels = async () => {
         if (!column) return
         try {
-            await Promise.all(
-                Array.from(selectedValues).map(label =>
-                    api.labels.delete(projectId, label)
-                )
-            )
+            await api.labels.delete(projectId, Array.from(selectedValues))
             column.setFilterValue(undefined)
             onLabelsChange()
             if (onTasksChange) {
