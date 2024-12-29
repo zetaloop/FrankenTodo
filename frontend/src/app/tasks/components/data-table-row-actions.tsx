@@ -1,7 +1,7 @@
 "use client";
 
 import { Row } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Copy, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -22,8 +23,9 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-import { statuses } from "../data/data";
+import { priorities, statuses } from "../data/data";
 import { taskSchema } from "../data/schema";
+import { toast } from "@/hooks/use-toast";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>;
@@ -64,6 +66,48 @@ export function DataTableRowActions<TData>({
         } finally {
             setIsUpdating(false);
         }
+    };
+
+    const handleCopyText = () => {
+        const formatDate = (dateStr?: string) => {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        // 获取状态和优先级的中文名称
+        const status = statuses.find(s => s.value === task.status)?.label || task.status;
+        const priority = priorities.find(p => p.value === task.priority)?.label || task.priority;
+        
+        // 格式化标签
+        const labelText = task.labels.length > 0 
+            ? task.labels.map(label => `[${label}]`).join(' ') + ' '
+            : '';
+
+        // 格式化ID（使用与columns.tsx中相同的方法）
+        const shortId = task.id.slice(-8).toUpperCase();
+        
+        const text = `#${shortId} ${labelText}${task.title} ${status} 优先级${priority} 创建于${formatDate(task.created_at)} 更新于${formatDate(task.updated_at)}`;
+        const description = task.description?.trim() ? `\n说明：${task.description}` : '';
+        
+        navigator.clipboard.writeText(text + description).then(() => {
+            toast({
+                title: "复制成功",
+                description: "任务信息已复制到剪贴板"
+            });
+        }).catch(() => {
+            toast({
+                title: "复制失败",
+                description: "无法访问剪贴板",
+                variant: "destructive"
+            });
+        });
     };
 
     return (
@@ -114,6 +158,11 @@ export function DataTableRowActions<TData>({
                             e.stopPropagation()
                         }}
                     >
+                        <DropdownMenuItem onSelect={handleCopyText}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            复制文本
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         {statuses.map((status) => {
                             const Icon = status.icon;
                             return (
