@@ -9,12 +9,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,23 +22,26 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-import { labels } from "../data/data";
+import { statuses } from "../data/data";
 import { taskSchema } from "../data/schema";
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>;
     onEdit?: (task: TData) => void;
     onDelete?: (task: TData) => Promise<void>;
+    onStatusChange?: (task: TData, newStatus: string) => Promise<void>;
 }
 
 export function DataTableRowActions<TData>({
     row,
     onEdit,
     onDelete,
+    onStatusChange,
 }: DataTableRowActionsProps<TData>) {
     const task = taskSchema.parse(row.original);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -55,6 +52,17 @@ export function DataTableRowActions<TData>({
         } finally {
             setIsDeleting(false);
             setShowDeleteAlert(false);
+        }
+    };
+
+    const handleStatusChange = async (newStatus: string) => {
+        try {
+            setIsUpdating(true);
+            if (onStatusChange) {
+                await onStatusChange(row.original, newStatus);
+            }
+        } finally {
+            setIsUpdating(false);
         }
     };
 
@@ -93,6 +101,7 @@ export function DataTableRowActions<TData>({
                             variant="ghost"
                             className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
                             onClick={(e) => e.stopPropagation()}
+                            disabled={isUpdating}
                         >
                             <MoreHorizontal className="h-4 w-4" />
                             <span className="sr-only">更多操作</span>
@@ -105,27 +114,19 @@ export function DataTableRowActions<TData>({
                             e.stopPropagation()
                         }}
                     >
-                        <DropdownMenuItem onSelect={() => {
-                            console.log("复制", task)
-                        }}>
-                            复制
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuRadioGroup value={task.labels[0] || ""}>
-                                    {labels.map((label) => (
-                                        <DropdownMenuRadioItem
-                                            key={label}
-                                            value={label}
-                                        >
-                                            {label}
-                                        </DropdownMenuRadioItem>
-                                    ))}
-                                </DropdownMenuRadioGroup>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
+                        {statuses.map((status) => {
+                            const Icon = status.icon;
+                            return (
+                                <DropdownMenuItem
+                                    key={status.value}
+                                    disabled={task.status === status.value || isUpdating}
+                                    onSelect={() => handleStatusChange(status.value)}
+                                >
+                                    <Icon className="mr-2 h-4 w-4" />
+                                    {status.label}
+                                </DropdownMenuItem>
+                            );
+                        })}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

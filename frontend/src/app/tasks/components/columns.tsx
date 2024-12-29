@@ -221,6 +221,14 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
                             await props.onDeleteTask(row.original)
                         }
                     }}
+                    onStatusChange={async (task, newStatus) => {
+                        if (props.onUpdateTask) {
+                            await props.onUpdateTask(task, {
+                                ...task,
+                                status: newStatus
+                            })
+                        }
+                    }}
                 />
             )
         },

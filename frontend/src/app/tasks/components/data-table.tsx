@@ -118,6 +118,7 @@ export function DataTable({
         setDialogOpen(true)
       },
       onDeleteTask,
+      onUpdateTask,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
