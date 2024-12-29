@@ -53,4 +53,8 @@ Copy-Item (Join-Path $launcherDir "src-tauri/target/release/launcher.exe") (Join
 New-Item -ItemType Directory -Path (Join-Path $releaseDir "backend") | Out-Null
 Copy-Item (Join-Path $backendDir "target/todo-0.0.1-SNAPSHOT.jar") (Join-Path $releaseDir "backend")
 
+# 复制配置文件
+Write-Host "复制配置文件..."
+Copy-Item (Join-Path $backendDir "config.conf") (Join-Path $releaseDir "backend")
+
 Write-Host "打包完成！发布包位于: $releaseDir" 
