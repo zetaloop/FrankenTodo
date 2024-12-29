@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthGuard } from "@/components/auth-guard";
+import { ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 // import { DebugRouterProvider } from "@/providers/debug-router-provider";
 
 export const metadata: Metadata = {
@@ -18,13 +20,16 @@ export default function RootLayout({
       <body
         className={`antialiased min-h-screen flex flex-col`}
       >
-        {/* <DebugRouterProvider> */}
-          <AuthGuard>
-            <main className="flex-1">
-              {children}
-            </main>
-          </AuthGuard>
-        {/* </DebugRouterProvider> */}
+        <ToastProvider>
+          {/* <DebugRouterProvider> */}
+            <AuthGuard>
+              <main className="flex-1">
+                {children}
+              </main>
+            </AuthGuard>
+          {/* </DebugRouterProvider> */}
+          <Toaster />
+        </ToastProvider>
       </body>
     </html>
   );
