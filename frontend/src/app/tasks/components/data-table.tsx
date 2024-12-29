@@ -141,6 +141,11 @@ export function DataTable({
       return
     }
 
+    // 如果点击来自对话框或其背景遮罩，不做任何处理
+    if (target.closest('[role="alertdialog"]') || target.hasAttribute('data-state')) {
+      return
+    }
+
     // 检查是否点击了第一列或第二列(多选框列和编号列)的单元格区域
     const isFirstOrSecondCell = cell && (
       cell === cell.parentElement?.firstElementChild || 
