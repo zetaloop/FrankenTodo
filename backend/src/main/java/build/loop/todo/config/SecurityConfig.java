@@ -41,8 +41,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/_next/**", "/static/**", "/", "/login", "/register", "/*.html", "/*.txt", "/*.js", "/*.css", "/assets/**", "/images/**", "/favicon.ico", "/avatar.png").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/system/health", "/api/v1/system/shutdown").permitAll()
                 .requestMatchers("/error").permitAll()
-                .requestMatchers("/api/v1/system/shutdown").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
