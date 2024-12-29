@@ -103,28 +103,49 @@ fn main() {
 
                 // 2. 获取状态和窗口句柄
                 let app_handle = window.app_handle().clone();
+                let window = window.clone();
 
                 // 3. 新线程中进行后端关闭并退出应用
                 std::thread::spawn(move || {
+                    // 使用 Manager 获取窗口并执行 JavaScript 进行页面跳转
+                    if let Some(webview) = app_handle.get_webview_window("main") {
+                        let _ = webview.eval("window.location.href = 'http://tauri.localhost/'");
+                        // 给页面切换一点时间
+                        std::thread::sleep(std::time::Duration::from_millis(500));
+                        // 发送切换到关闭模式的事件
+                        let _ = webview.emit("switch-to-closing", ());
+                    }
+
                     // 首先等待后端完全启动
                     let client = reqwest::blocking::Client::new();
                     let mut health_attempts = 0;
                     let max_health_attempts = 30; // 最多等待15秒（30 * 500ms）
 
+                    // 发送关闭状态到前端
+                    let _ = window.emit("backend-output", "正在等待后端服务就绪...\n");
+
                     while health_attempts < max_health_attempts {
                         match client.get("http://localhost:8080/api/v1/system/health").send() {
-                            Ok(response) if response.status().is_success() => break,
+                            Ok(response) if response.status().is_success() => {
+                                let _ = window.emit("backend-output", "后端服务已就绪，开始关闭...\n");
+                                break;
+                            }
                             _ => {
                                 std::thread::sleep(std::time::Duration::from_millis(500));
                                 health_attempts += 1;
+                                if health_attempts % 4 == 0 { // 每2秒发送一次状态
+                                    let _ = window.emit("backend-output", format!("等待后端服务就绪... ({}/{})\n", health_attempts, max_health_attempts));
+                                }
                             }
                         }
                     }
 
                     // 然后调用后端的关闭接口，并确保得到正确响应
+                    let _ = window.emit("backend-output", "正在发送关闭命令...\n");
                     match client.post("http://localhost:8080/api/v1/system/shutdown")
                         .send() {
                         Ok(response) if response.status().is_success() => {
+                            let _ = window.emit("backend-output", "关闭命令已发送，等待进程结束...\n");
                             // 等待后端进程完全关闭
                             let pm = app_handle.state::<ProcessManager>();
                             let mut attempts = 0;
@@ -134,14 +155,23 @@ fn main() {
                                 let mut lock = pm.0.lock().unwrap();
                                 if let Some(child) = lock.as_mut() {
                                     match child.try_wait() {
-                                        Ok(Some(_)) => break, // 进程已结束
+                                        Ok(Some(_)) => {
+                                            let _ = window.emit("backend-output", "后端进程已结束\n");
+                                            break;
+                                        }
                                         Ok(None) => {
                                             // 进程仍在运行，等待500ms后重试
                                             drop(lock);
                                             std::thread::sleep(std::time::Duration::from_millis(500));
                                             attempts += 1;
+                                            if attempts % 4 == 0 { // 每2秒发送一次状态
+                                                let _ = window.emit("backend-output", format!("等待进程结束... ({}/{})\n", attempts, max_attempts));
+                                            }
                                         }
-                                        Err(_) => break, // 出错，退出循环
+                                        Err(_) => {
+                                            let _ = window.emit("backend-output", "检查进程状态时出错\n");
+                                            break;
+                                        }
                                     }
                                 } else {
                                     break; // 没有进程需要等待
@@ -149,15 +179,19 @@ fn main() {
                             }
 
                             // 如果进程仍在运行，强制结束它
+                            let _ = window.emit("backend-output", "正在确保进程已完全结束...\n");
                             let _ = stop_backend_service(pm);
                         }
                         _ => {
                             // 如果关闭接口调用失败，直接强制结束进程
+                            let _ = window.emit("backend-output", "关闭命令发送失败，正在强制结束进程...\n");
                             let pm = app_handle.state::<ProcessManager>();
                             let _ = stop_backend_service(pm);
                         }
                     }
 
+                    let _ = window.emit("backend-output", "关闭完成，即将退出...\n");
+                    std::thread::sleep(std::time::Duration::from_secs(1)); // 给用户一秒钟时间看到最后的消息
                     // 退出应用
                     app_handle.exit(0);
                 });

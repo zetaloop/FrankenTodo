@@ -5,6 +5,9 @@ const BACKEND_URL = 'http://localhost:8080'
 const MAX_RETRIES = 30
 const RETRY_INTERVAL = 1000
 
+// 检查当前是否是关闭流程
+const isClosing = new URLSearchParams(window.location.search).has('closing');
+
 /**
  * 更新状态显示
  * @param {string} message 
@@ -113,5 +116,29 @@ async function startBackendService() {
   }
 }
 
+/**
+ * 切换到关闭模式
+ */
+function switchToClosingMode() {
+  const statusElement = document.getElementById('status')
+  if (statusElement) {
+    statusElement.textContent = '准备关闭服务...';
+  }
+}
+
 // 页面加载完成后启动服务
-window.addEventListener('DOMContentLoaded', startBackendService)
+window.addEventListener('DOMContentLoaded', () => {
+  // 监听后端输出
+  listen('backend-output', (event) => {
+    appendLog(event.payload)
+  });
+
+  // 监听关闭模式切换事件
+  listen('switch-to-closing', () => {
+    switchToClosingMode();
+  });
+
+  if (!isClosing) {
+    startBackendService();
+  }
+});
