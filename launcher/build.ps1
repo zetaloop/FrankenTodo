@@ -1,10 +1,8 @@
-﻿# 解析命令行参数
-param(
-    [switch]$skip
-)
-
-# 设置错误时停止执行
+﻿# 设置错误时停止执行
 $ErrorActionPreference = "Stop"
+
+# 检查命令行参数
+$skipBuild = $args -contains "skip"
 
 # 定义路径
 $rootDir = Split-Path -Parent $PSScriptRoot
@@ -21,7 +19,8 @@ if (Test-Path $outputDir) {
 }
 New-Item -ItemType Directory -Path $outputDir | Out-Null
 
-if (-not $skip) {
+if (-not $skipBuild) {
+    Write-Host "执行完整构建..."
     # 构建前端
     Write-Host "构建前端..."
     Push-Location $frontendDir
