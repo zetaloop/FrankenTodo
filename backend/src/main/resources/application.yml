@@ -4,24 +4,7 @@ server:
 spring:
   application:
     name: todo-backend
-  
-  # 数据库配置
-  datasource:
-    driver-class-name: org.opengauss.Driver
-    url: jdbc:opengauss://localhost:5432/todo
-    username: todo
-    password: todo@123
-  
-  # JPA 配置
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  
+
   # Jackson 配置
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
