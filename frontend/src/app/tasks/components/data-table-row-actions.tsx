@@ -2,6 +2,7 @@
 
 import { Row } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,16 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 import { labels } from "../data/data";
 import { taskSchema } from "../data/schema";
@@ -32,78 +43,113 @@ export function DataTableRowActions<TData>({
     onDelete,
 }: DataTableRowActionsProps<TData>) {
     const task = taskSchema.parse(row.original);
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            setIsDeleting(true);
+            if (onDelete) {
+                await onDelete(row.original);
+            }
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteAlert(false);
+        }
+    };
 
     return (
-        <div className="flex items-center gap-2">
-            <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={(e) => {
-                    e.stopPropagation()
-                    if (onEdit) {
-                        onEdit(row.original)
-                    }
-                }}
-            >
-                <Pencil className="h-4 w-4" />
-                <span className="sr-only">编辑</span>
-            </Button>
-            <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={async (e) => {
-                    e.stopPropagation()
-                    if (onDelete) {
-                        await onDelete(row.original)
-                    }
-                }}
-            >
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">删除</span>
-            </Button>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">更多操作</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                    align="end" 
-                    className="w-[160px]"
+        <>
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
                     onClick={(e) => {
                         e.stopPropagation()
+                        if (onEdit) {
+                            onEdit(row.original)
+                        }
                     }}
                 >
-                    <DropdownMenuItem onSelect={() => {
-                        console.log("复制", task)
-                    }}>
-                        复制
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                            <DropdownMenuRadioGroup value={task.labels[0] || ""}>
-                                {labels.map((label) => (
-                                    <DropdownMenuRadioItem
-                                        key={label}
-                                        value={label}
-                                    >
-                                        {label}
-                                    </DropdownMenuRadioItem>
-                                ))}
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only">编辑</span>
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        setShowDeleteAlert(true)
+                    }}
+                >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">删除</span>
+                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">更多操作</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                        align="end" 
+                        className="w-[160px]"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                        }}
+                    >
+                        <DropdownMenuItem onSelect={() => {
+                            console.log("复制", task)
+                        }}>
+                            复制
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>标签</DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuRadioGroup value={task.labels[0] || ""}>
+                                    {labels.map((label) => (
+                                        <DropdownMenuRadioItem
+                                            key={label}
+                                            value={label}
+                                        >
+                                            {label}
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除任务？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            此操作不可撤销。将会删除任务 &quot;{task.title}&quot;。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            {isDeleting ? "删除中..." : "删除"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }
