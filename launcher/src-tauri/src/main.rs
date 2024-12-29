@@ -69,14 +69,48 @@ fn main() {
 
                 // 2. 获取状态和窗口句柄
                 let app_handle = window.app_handle().clone();
-                // let window = window.clone();  // 暂未使用
 
                 // 3. 新线程中进行后端关闭并退出应用
                 std::thread::spawn(move || {
-                    let pm = app_handle.state::<ProcessManager>();
-                    let _ = stop_backend_service(pm);
+                    // 首先调用后端的关闭接口，并确保得到正确响应
+                    let client = reqwest::blocking::Client::new();
+                    match client.post("http://localhost:8080/api/v1/system/shutdown")
+                        .send() {
+                        Ok(response) if response.status().is_success() => {
+                            // 等待后端进程完全关闭
+                            let pm = app_handle.state::<ProcessManager>();
+                            let mut attempts = 0;
+                            let max_attempts = 20; // 最多等待10秒（20 * 500ms）
 
-                    // 退出整个应用
+                            while attempts < max_attempts {
+                                let mut lock = pm.0.lock().unwrap();
+                                if let Some(child) = lock.as_mut() {
+                                    match child.try_wait() {
+                                        Ok(Some(_)) => break, // 进程已结束
+                                        Ok(None) => {
+                                            // 进程仍在运行，等待200ms后重试
+                                            drop(lock);
+                                            std::thread::sleep(std::time::Duration::from_millis(200));
+                                            attempts += 1;
+                                        }
+                                        Err(_) => break, // 出错，退出循环
+                                    }
+                                } else {
+                                    break; // 没有进程需要等待
+                                }
+                            }
+
+                            // 如果进程仍在运行，强制结束它
+                            let _ = stop_backend_service(pm);
+                        }
+                        _ => {
+                            // 如果关闭接口调用失败，直接强制结束进程
+                            let pm = app_handle.state::<ProcessManager>();
+                            let _ = stop_backend_service(pm);
+                        }
+                    }
+
+                    // 退出应用
                     app_handle.exit(0);
                 });
             }
