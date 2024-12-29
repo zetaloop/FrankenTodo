@@ -55,7 +55,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
         header: ({ column, table }) => (
             <div 
                 className="cursor-pointer whitespace-nowrap" 
-                onClick={() => table.toggleAllPageRowsSelected()}
+                onClick={() => table.toggleAllRowsSelected()}
             >
                 <DataTableColumnHeader column={column} title="编号" />
             </div>
