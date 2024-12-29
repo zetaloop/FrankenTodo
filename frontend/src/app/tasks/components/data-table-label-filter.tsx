@@ -123,7 +123,11 @@ export function DataTableLabelFilter<TData, TValue>({
 
     return (
         <>
-            <Popover>
+            <Popover onOpenChange={(open) => {
+                if (open) {
+                    onLabelsChange()
+                }
+            }}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
