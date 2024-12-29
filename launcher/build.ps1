@@ -32,8 +32,7 @@ Pop-Location
 # 构建launcher
 Write-Host "构建launcher..."
 Push-Location $launcherDir
-npm install
-npm run tauri build
+cargo tauri build
 Pop-Location
 
 # 创建发布包
@@ -42,7 +41,7 @@ $releaseDir = Join-Path $outputDir "FrankenTodo"
 New-Item -ItemType Directory -Path $releaseDir | Out-Null
 
 # 复制文件
-Copy-Item (Join-Path $launcherDir "src-tauri/target/release/FrankenTodo.exe") $releaseDir
+Copy-Item (Join-Path $launcherDir "src-tauri/target/release/launcher.exe") (Join-Path $releaseDir "FrankenTodo.exe")
 New-Item -ItemType Directory -Path (Join-Path $releaseDir "backend") | Out-Null
 Copy-Item (Join-Path $backendDir "target/todo-0.0.1-SNAPSHOT.jar") (Join-Path $releaseDir "backend")
 

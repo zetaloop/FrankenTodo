@@ -1,2 +1,4 @@
 /.vscode
 /backend/src/main/resources/static
+/launcher/src-tauri/resources
+/dist
