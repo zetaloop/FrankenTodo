@@ -42,6 +42,16 @@ public class TaskServiceImpl implements TaskService {
             task.setDescription("");
         }
         
+        // 检查并创建不存在的标签
+        if (task.getLabels() != null && !task.getLabels().isEmpty()) {
+            for (String label : task.getLabels()) {
+                if (!project.getLabels().contains(label)) {
+                    project.getLabels().add(label);
+                }
+            }
+            projectRepository.save(project);
+        }
+        
         return taskRepository.save(task);
     }
 
@@ -50,6 +60,24 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectRepository.findById(projectId)
             .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
             
+        // 收集所有需要创建的标签
+        List<String> labelsToCreate = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getLabels() != null) {
+                for (String label : task.getLabels()) {
+                    if (!project.getLabels().contains(label) && !labelsToCreate.contains(label)) {
+                        labelsToCreate.add(label);
+                    }
+                }
+            }
+        }
+        
+        // 创建新标签
+        if (!labelsToCreate.isEmpty()) {
+            project.getLabels().addAll(labelsToCreate);
+            projectRepository.save(project);
+        }
+        
         List<Task> createdTasks = new ArrayList<>();
         for (Task task : tasks) {
             task.setProject(project);
@@ -59,6 +87,9 @@ public class TaskServiceImpl implements TaskService {
             }
             if (task.getPriority() == null) {
                 task.setPriority(TaskPriority.MEDIUM);
+            }
+            if (task.getDescription() == null || task.getDescription().trim().isEmpty()) {
+                task.setDescription("");
             }
             createdTasks.add(taskRepository.save(task));
         }
