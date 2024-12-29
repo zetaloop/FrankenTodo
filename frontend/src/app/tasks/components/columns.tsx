@@ -186,7 +186,7 @@ export function createColumns({ projectId, labels }: ColumnsProps): ColumnDef<Ta
             );
         },
         sortingFn: "datetime",
-        sortDescFirst: true,
+        sortDescFirst: false,
     },
     {
         accessorKey: "updated_at",

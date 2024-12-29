@@ -93,7 +93,7 @@ export function DataTable({
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: "created_at",
-      desc: true
+      desc: false
     }
   ])
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null)
