@@ -8,6 +8,17 @@ import { DataTable } from "./components/data-table"
 import { UserNav } from "./components/user-nav"
 import { ProjectDialog } from "./components/project-dialog"
 import { TaskDialog } from "./components/task-dialog"
+import { toast } from "@/hooks/use-toast"
+import { z } from "zod"
+
+// 定义导入数据的格式
+const importTaskSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  status: z.string(),
+  priority: z.string(),
+  labels: z.array(z.string())
+})
 
 export default function TaskPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -206,6 +217,59 @@ export default function TaskPage() {
     }
     fetchProjects()
   }
+
+  // 添加快捷键处理函数
+  useEffect(() => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      // 检查是否按下 Ctrl+Shift+V
+      if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+        try {
+          // 如果没有选择项目，不处理
+          if (!selectedProjectId) {
+            toast({
+              title: "导入失败",
+              description: "请先选择一个项目",
+              variant: "destructive"
+            })
+            return
+          }
+
+          // 从剪贴板读取数据
+          const text = await navigator.clipboard.readText()
+          const data = JSON.parse(text)
+          
+          // 验证数据格式
+          const taskData = importTaskSchema.parse(data)
+
+          // 创建任务
+          await api.tasks.create(selectedProjectId, taskData)
+          
+          // 刷新数据
+          handleRefreshData()
+
+          toast({
+            title: "导入成功",
+            description: "任务已成功导入"
+          })
+        } catch (error) {
+          console.error('导入失败:', error)
+          toast({
+            title: "导入失败",
+            description: error instanceof Error ? error.message : "数据格式不正确",
+            variant: "destructive"
+          })
+        }
+      }
+    }
+
+    // 添加事件监听
+    window.addEventListener('keydown', handleKeyDown)
+
+    // 清理函数
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedProjectId]) // 依赖项包含 selectedProjectId
 
   return (
     <>
