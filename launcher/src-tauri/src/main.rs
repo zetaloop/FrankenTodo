@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::process::{Command, Child};
-use std::path::PathBuf;
 use std::env;
 use std::sync::Mutex;
 use tauri::State;

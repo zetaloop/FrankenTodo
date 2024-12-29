@@ -21,9 +21,14 @@ function updateStatus(message) {
  */
 async function checkBackendService() {
   try {
+    console.log('正在检查后端服务...')
     const response = await fetch(`${BACKEND_URL}/`)
-    return response.ok
+    console.log('后端响应状态:', response.status)
+    
+    // 任何响应都认为是成功的，因为后端可能返回302等状态码
+    return response.status < 500
   } catch (error) {
+    console.log('检查失败:', error.message)
     return false
   }
 }
