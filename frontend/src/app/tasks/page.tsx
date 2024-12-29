@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { api } from "@/lib/api"
 import type { Project, Task, Label } from "@/lib/api/types"
 import { createColumns } from "./components/columns"
@@ -79,7 +79,7 @@ export default function TaskPage() {
     fetchData()
   }, [selectedProjectId])
 
-  const handleRefreshData = async () => {
+  const handleRefreshData = useCallback(async () => {
     if (!selectedProjectId) return
     setLoading(true)
     try {
@@ -94,7 +94,7 @@ export default function TaskPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedProjectId])
 
   const handleCreateProject = () => {
     setProjectDialogMode("create")
@@ -269,7 +269,7 @@ export default function TaskPage() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [selectedProjectId]) // 依赖项包含 selectedProjectId
+  }, [selectedProjectId, handleRefreshData])
 
   return (
     <>
