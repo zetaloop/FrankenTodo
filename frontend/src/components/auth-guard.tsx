@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/hooks/use-toast"
 
 const publicPaths = ["/login", "/register"]
 
@@ -22,7 +23,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (pathname !== lastPathRef.current) {
       lastPathRef.current = pathname
       checkingRef.current = true
-      checkAuth().finally(() => {
+      checkAuth().catch(() => {
+        toast({
+          title: "登录已过期",
+          description: "请重新登录",
+          variant: "destructive"
+        })
+      }).finally(() => {
         checkingRef.current = false
       })
     }
@@ -34,6 +41,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const isPublicPath = publicPaths.includes(pathname)
     if (!user && !isPublicPath) {
+      toast({
+        title: "未登录",
+        description: "请先登录",
+        variant: "destructive"
+      })
       lastPathRef.current = "/login"
       router.push("/login")
     } else if (user && isPublicPath) {

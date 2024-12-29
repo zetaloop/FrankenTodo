@@ -1,3 +1,5 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +12,31 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
     const { user, logout } = useAuth();
-    
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast({
+                title: "已退出登录",
+                description: "期待您的下次访问"
+            });
+            router.push("/login");
+        } catch (error) {
+            console.error("退出登录失败:", error);
+            toast({
+                title: "退出失败",
+                description: "请稍后重试",
+                variant: "destructive"
+            });
+        }
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -44,7 +67,7 @@ export function UserNav() {
                     <DropdownMenuItem>设置</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>退出登录</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>退出登录</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

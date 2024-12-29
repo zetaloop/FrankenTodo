@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Loader2 } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -53,12 +54,26 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
       if (mode === "login") {
         const { email, password } = values
         await login(email, password)
+        toast({
+          title: "登录成功",
+          description: "欢迎回来"
+        })
       } else {
         const { email, password, username } = values
         await register(username, email, password)
+        toast({
+          title: "注册成功",
+          description: "欢迎加入"
+        })
       }
     } catch (error: Error | unknown) {
-      setError(error instanceof Error ? error.message : "发生错误，请重试")
+      const message = error instanceof Error ? error.message : "发生错误，请重试"
+      setError(message)
+      toast({
+        title: mode === "login" ? "登录失败" : "注册失败",
+        description: message,
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
