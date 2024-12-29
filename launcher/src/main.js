@@ -63,7 +63,7 @@ async function waitForBackend() {
     if (isReady) {
       return true
     }
-    updateStatus(`等待 ${RETRY_INTERVAL}ms 后重试...`)
+    updateStatus(`请稍后...`)
     await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL))
   }
   return false
