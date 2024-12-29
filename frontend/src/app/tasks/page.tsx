@@ -116,8 +116,17 @@ export default function TaskPage() {
       await api.projects.delete(selectedProjectId)
       setProjects(prev => prev.filter(p => p.id !== selectedProjectId))
       setSelectedProjectId("")
+      toast({
+        title: "删除成功",
+        description: "项目已删除"
+      })
     } catch (error) {
       console.error("删除项目失败:", error)
+      toast({
+        title: "删除失败",
+        description: "删除项目时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
@@ -127,14 +136,27 @@ export default function TaskPage() {
         const newProject = await api.projects.create(data)
         setProjects(prev => [...prev, newProject])
         setSelectedProjectId(newProject.id)
+        toast({
+          title: "创建成功",
+          description: `项目"${data.name}"已创建`
+        })
       } else {
         const updatedProject = await api.projects.update(selectedProjectId, data)
         setProjects(prev => 
           prev.map(p => p.id === updatedProject.id ? updatedProject : p)
         )
+        toast({
+          title: "更新成功",
+          description: `项目"${data.name}"已更新`
+        })
       }
     } catch (error) {
       console.error("操作项目失败:", error)
+      toast({
+        title: projectDialogMode === "create" ? "创建失败" : "更新失败",
+        description: "操作项目时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
@@ -154,8 +176,17 @@ export default function TaskPage() {
     try {
       await api.tasks.delete(selectedProjectId, task.id)
       setTasks(prev => prev.filter(t => t.id !== task.id))
+      toast({
+        title: "删除成功",
+        description: `任务"${task.title}"已删除`
+      })
     } catch (error) {
       console.error("删除任务失败:", error)
+      toast({
+        title: "删除失败",
+        description: "删除任务时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
@@ -169,8 +200,17 @@ export default function TaskPage() {
     try {
       const newTask = await api.tasks.create(selectedProjectId, data)
       setTasks(prev => [...prev, newTask])
+      toast({
+        title: "创建成功",
+        description: `任务"${data.title}"已创建`
+      })
     } catch (error) {
       console.error("创建任务失败:", error)
+      toast({
+        title: "创建失败",
+        description: "创建任务时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
@@ -184,8 +224,17 @@ export default function TaskPage() {
     try {
       const updatedTask = await api.tasks.update(selectedProjectId, task.id, data)
       setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t))
+      toast({
+        title: "更新成功",
+        description: `任务"${data.title}"已更新`
+      })
     } catch (error) {
       console.error("更新任务失败:", error)
+      toast({
+        title: "更新失败",
+        description: "更新任务时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
@@ -193,8 +242,17 @@ export default function TaskPage() {
     try {
       await api.tasks.batchDelete(selectedProjectId, tasks.map(t => t.id))
       setTasks(prev => prev.filter(t => !tasks.find(dt => dt.id === t.id)))
+      toast({
+        title: "删除成功",
+        description: `已删除 ${tasks.length} 个任务`
+      })
     } catch (error) {
       console.error("删除任务失败:", error)
+      toast({
+        title: "删除失败",
+        description: "批量删除任务时出现错误",
+        variant: "destructive"
+      })
     }
   }
 
