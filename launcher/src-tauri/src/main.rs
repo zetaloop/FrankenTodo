@@ -3,8 +3,10 @@
 
 use std::{
     env,
-    process::{Child, Command},
+    process::{Child, Command, Stdio},
     sync::Mutex,
+    io::{BufRead, BufReader},
+    os::windows::process::CommandExt,
 };
 
 use tauri::{
@@ -12,12 +14,16 @@ use tauri::{
     State,
     Builder,
     WindowEvent,
+    Emitter,
 };
+
+// Windows 上隐藏命令行窗口的标志
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 struct ProcessManager(Mutex<Option<Child>>);
 
 #[tauri::command]
-fn start_backend_service(pm: State<ProcessManager>) -> Result<(), String> {
+fn start_backend_service(window: tauri::Window, pm: State<ProcessManager>) -> Result<(), String> {
     let mut lock = pm.0.lock().map_err(|_| "进程锁获取失败")?;
     if let Some(child) = lock.as_mut() {
         match child.try_wait() {
@@ -34,11 +40,39 @@ fn start_backend_service(pm: State<ProcessManager>) -> Result<(), String> {
         return Err(format!("后端 JAR 不存在: {:?}", backend_jar));
     }
 
-    let child = Command::new("java")
+    let mut child = Command::new("java")
         .arg("-jar")
         .arg(&backend_jar)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .creation_flags(CREATE_NO_WINDOW)
         .spawn()
         .map_err(|e| format!("启动 Java 进程失败: {}", e))?;
+
+    // 获取标准输出和错误输出
+    let stdout = child.stdout.take().ok_or("无法获取标准输出")?;
+    let stderr = child.stderr.take().ok_or("无法获取标准错误")?;
+
+    // 创建新线程处理标准输出
+    let window_clone = window.clone();
+    std::thread::spawn(move || {
+        let reader = BufReader::new(stdout);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let _ = window_clone.emit("backend-output", format!("{}\n", line));
+            }
+        }
+    });
+
+    // 创建新线程处理标准错误
+    std::thread::spawn(move || {
+        let reader = BufReader::new(stderr);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let _ = window.emit("backend-output", format!("[ERROR] {}\n", line));
+            }
+        }
+    });
 
     *lock = Some(child);
     Ok(())

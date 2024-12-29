@@ -1,4 +1,5 @@
 const { invoke } = window.__TAURI__.core;
+const { listen } = window.__TAURI__.event;
 
 const BACKEND_URL = 'http://localhost:8080'
 const MAX_RETRIES = 30
@@ -66,11 +67,31 @@ async function waitForBackend() {
 }
 
 /**
+ * 添加日志内容
+ * @param {string} text 
+ */
+function appendLog(text) {
+  const logElement = document.getElementById('log')
+  const container = document.querySelector('.log-container')
+  if (logElement && container) {
+    logElement.textContent += text
+    // 自动滚动到底部
+    container.scrollTop = container.scrollHeight
+  }
+}
+
+/**
  * 启动后端服务
  */
 async function startBackendService() {
   try {
     updateStatus('正在启动后端服务...')
+    
+    // 监听后端输出
+    await listen('backend-output', (event) => {
+      appendLog(event.payload)
+    })
+    
     await invoke('start_backend_service')
     updateStatus('后端服务启动命令已发送，等待服务就绪...')
     
