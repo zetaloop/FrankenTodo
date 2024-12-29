@@ -72,8 +72,22 @@ fn main() {
 
                 // 3. 新线程中进行后端关闭并退出应用
                 std::thread::spawn(move || {
-                    // 首先调用后端的关闭接口，并确保得到正确响应
+                    // 首先等待后端完全启动
                     let client = reqwest::blocking::Client::new();
+                    let mut health_attempts = 0;
+                    let max_health_attempts = 30; // 最多等待15秒（30 * 500ms）
+
+                    while health_attempts < max_health_attempts {
+                        match client.get("http://localhost:8080/api/v1/system/health").send() {
+                            Ok(response) if response.status().is_success() => break,
+                            _ => {
+                                std::thread::sleep(std::time::Duration::from_millis(500));
+                                health_attempts += 1;
+                            }
+                        }
+                    }
+
+                    // 然后调用后端的关闭接口，并确保得到正确响应
                     match client.post("http://localhost:8080/api/v1/system/shutdown")
                         .send() {
                         Ok(response) if response.status().is_success() => {
@@ -88,9 +102,9 @@ fn main() {
                                     match child.try_wait() {
                                         Ok(Some(_)) => break, // 进程已结束
                                         Ok(None) => {
-                                            // 进程仍在运行，等待200ms后重试
+                                            // 进程仍在运行，等待500ms后重试
                                             drop(lock);
-                                            std::thread::sleep(std::time::Duration::from_millis(200));
+                                            std::thread::sleep(std::time::Duration::from_millis(500));
                                             attempts += 1;
                                         }
                                         Err(_) => break, // 出错，退出循环
