@@ -63,7 +63,7 @@ async function waitForBackend() {
     if (isReady) {
       return true
     }
-    updateStatus(`请稍后...`)
+    updateStatus(`请稍候...`)
     await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL))
   }
   return false
@@ -122,7 +122,7 @@ async function startBackendService() {
 function switchToClosingMode() {
   const statusElement = document.getElementById('status')
   if (statusElement) {
-    statusElement.textContent = '准备关闭服务...';
+    statusElement.textContent = '正在关闭服务...';
   }
 }
 
