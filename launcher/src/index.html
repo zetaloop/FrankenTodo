@@ -13,6 +13,36 @@
         font-family: Arial, sans-serif;
         background: #f5f5f5;
       }
+      @keyframes pageIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes floatIn {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInScale {
+        0% {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
       .loading-container {
         display: flex;
         flex-direction: column;
@@ -21,11 +51,22 @@
         height: 100vh;
         padding: 20px;
         box-sizing: border-box;
+        animation: pageIn 0.8s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+      }
+      .app-icon {
+        width: 96px;
+        height: 96px;
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: floatIn 0.7s cubic-bezier(0.33, 1, 0.68, 1) forwards;
       }
       .loading-text {
         font-size: 24px;
         color: #333;
         margin-bottom: 20px;
+        opacity: 0;
+        animation: fadeInScale 0.7s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        animation-delay: 0.22s;
       }
       .loading-spinner {
         width: 50px;
@@ -43,6 +84,9 @@
         margin-top: 20px;
         font-size: 16px;
         color: #666;
+        opacity: 0;
+        animation: pageIn 0.4s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        animation-delay: 0.25s;
       }
       .log-container {
         margin-top: 20px;
@@ -55,6 +99,9 @@
         overflow-y: auto;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border: 1px solid #e0e0e0;
+        opacity: 0;
+        animation: pageIn 0.4s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        animation-delay: 0.3s;
       }
       .log-content {
         font-family: 'Consolas', 'Monaco', monospace;
@@ -90,6 +137,7 @@
   </head>
   <body>
     <div class="loading-container">
+      <img src="icon.png" alt="FrankenTodo" class="app-icon" />
       <div class="loading-text">FrankenTodo</div>
       <div class="loading-spinner"></div>
       <div id="status" class="status">正在启动服务...</div>
