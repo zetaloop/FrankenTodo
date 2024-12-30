@@ -128,7 +128,7 @@ async function startBackendService() {
         window.location.href = BACKEND_URL
       }, 1000)
     } else {
-      updateStatus('后端服务连接超时。如果你能直接访问 localhost:8080，请报告这个问题。', 'error')
+      updateStatus('后端服务连接超时', 'error')
     }
   } catch (error) {
     console.error('启动后端服务失败:', error)
