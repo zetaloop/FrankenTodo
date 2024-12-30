@@ -53,20 +53,40 @@ async function checkBackendService() {
 }
 
 /**
+ * 检查进程状态
+ * @returns {Promise<string>} 返回进程状态
+ */
+async function checkProcessStatus() {
+  try {
+    return await invoke('check_process_status');
+  } catch (error) {
+    console.error('检查进程状态失败:', error);
+    return 'Failed';
+  }
+}
+
+/**
  * 等待后端服务启动
  * @returns {Promise<boolean>}
  */
 async function waitForBackend() {
   for (let i = 0; i < MAX_RETRIES; i++) {
-    updateStatus(`尝试连接后端服务 (${i + 1}/${MAX_RETRIES})...`)
-    const isReady = await checkBackendService()
-    if (isReady) {
-      return true
+    // 首先检查进程状态
+    const processStatus = await checkProcessStatus();
+    if (processStatus === 'Failed') {
+      updateStatus('后端进程已异常退出，启动失败', 'error');
+      return false;
     }
-    updateStatus(`请稍候...`)
-    await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL))
+    
+    updateStatus(`尝试连接后端服务 (${i + 1}/${MAX_RETRIES})...`);
+    const isReady = await checkBackendService();
+    if (isReady) {
+      return true;
+    }
+    updateStatus(`请稍候...`);
+    await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
   }
-  return false
+  return false;
 }
 
 /**
@@ -119,18 +139,35 @@ async function startBackendService() {
 /**
  * 切换到关闭模式
  */
-function switchToClosingMode() {
-  const statusElement = document.getElementById('status')
+async function switchToClosingMode() {
+  const statusElement = document.getElementById('status');
   if (statusElement) {
     statusElement.textContent = '正在关闭服务...';
+  }
+
+  // 检查进程状态
+  const processStatus = await checkProcessStatus();
+  if (processStatus === 'Failed') {
+    // 如果进程已经失败，直接强制结束
+    try {
+      await invoke('stop_backend_service');
+      updateStatus('服务已强制关闭', 'success');
+    } catch (error) {
+      updateStatus(`关闭服务失败: ${error}`, 'error');
+    }
+    // 延迟一秒后退出
+    setTimeout(() => {
+      window.__TAURI__.process.exit(0);
+    }, 1000);
+    return;
   }
 }
 
 // 页面加载完成后启动服务
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   // 监听后端输出
   listen('backend-output', (event) => {
-    appendLog(event.payload)
+    appendLog(event.payload);
   });
 
   // 监听关闭模式切换事件
@@ -139,6 +176,12 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   if (!isClosing) {
+    // 先检查进程状态
+    const processStatus = await checkProcessStatus();
+    if (processStatus === 'Failed') {
+      updateStatus('检测到后端进程已异常退出，请重启应用', 'error');
+      return;
+    }
     startBackendService();
   }
 });
