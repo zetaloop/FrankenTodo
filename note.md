@@ -219,28 +219,316 @@ CREATE TRIGGER update_users_updated_at
 ```
 
 ## 五、详细设计
-- 模块详细设计
-  - 用户认证模块
-  - 项目管理模块
-  - 任务管理模块
-  - 标签管理模块
-- 接口设计
-  - API接口设计
-  - 数据访问接口设计
-- 安全设计
-  - JWT认证设计
-  - 权限控制设计
+
+### 5.1 模块详细设计
+
+#### 5.1.1 用户认证模块
+1. **认证流程**
+   - 用户注册：通过 `/api/v1/auth/register` 接口创建新用户
+   - 用户登录：通过 `/api/v1/auth/login` 接口获取 JWT Token
+   - Token 刷新：通过 `/api/v1/auth/refresh` 接口刷新 Token
+   - 用户登出：通过 `/api/v1/auth/logout` 接口清除认证状态
+
+2. **核心组件**
+   - `JwtAuthenticationFilter`：JWT 认证过滤器
+   - `JwtService`：JWT Token 的生成和验证服务
+   - `AuthService`：认证业务逻辑服务
+   - `SecurityConfig`：Spring Security 安全配置
+
+3. **安全机制**
+   - 使用 BCrypt 加密存储密码
+   - 实现基于 JWT 的无状态认证
+   - 支持 Token 自动刷新机制
+   - 实现 CORS 和 CSRF 防护
+
+#### 5.1.2 项目管理模块
+1. **核心功能**
+   - 项目的 CRUD 操作
+   - 项目成员管理
+   - 项目标签管理
+
+2. **权限控制**
+   - 项目创建者自动成为 OWNER 角色
+   - 支持添加/移除项目成员
+   - 基于角色的权限控制
+
+#### 5.1.3 任务管理模块
+1. **核心功能**
+   - 任务的 CRUD 操作
+   - 任务状态管理（TODO、IN_PROGRESS、DONE 等）
+   - 任务优先级管理
+   - 任务标签管理
+
+2. **业务规则**
+   - 任务必须属于特定项目
+   - 支持批量操作
+   - 支持任务筛选和排序
+
+### 5.2 接口设计
+
+#### 5.2.1 API 接口设计
+1. **认证接口**
+```java
+@RestController
+@RequestMapping("/api/v1/auth")
+public class AuthController {
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterRequest request)
+    
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request)
+    
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestHeader("Authorization") String refreshToken)
+    
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout()
+}
+```
+
+2. **项目接口**
+```java
+@RestController
+@RequestMapping("/api/v1/projects")
+public class ProjectController {
+    @GetMapping
+    public ResponseEntity<ProjectListResponse> getAllProjects()
+    
+    @PostMapping
+    public ResponseEntity<Project> createProject(@RequestBody Project project)
+    
+    @PutMapping("/{projectId}")
+    public ResponseEntity<Project> updateProject(@PathVariable String projectId, @RequestBody Project project)
+    
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<Void> deleteProject(@PathVariable String projectId)
+}
+```
+
+3. **任务接口**
+```java
+@RestController
+@RequestMapping("/api/v1/projects/{projectId}/tasks")
+public class TaskController {
+    @GetMapping
+    public ResponseEntity<TaskListResponse> getAllTasks(@PathVariable String projectId)
+    
+    @PostMapping
+    public ResponseEntity<Task> createTask(@PathVariable String projectId, @RequestBody Task task)
+    
+    @PutMapping("/{taskId}")
+    public ResponseEntity<Task> updateTask(@PathVariable String projectId, @PathVariable String taskId, @RequestBody Task task)
+    
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable String projectId, @PathVariable String taskId)
+}
+```
+
+#### 5.2.2 数据访问接口设计
+1. **用户数据访问**
+```java
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
+}
+```
+
+2. **项目数据访问**
+```java
+@Repository
+public interface ProjectRepository extends JpaRepository<Project, String> {
+    List<Project> findAllByUser(User user);
+    boolean isUserMemberOfProject(String projectId, String userId);
+    boolean isUserOwnerOfProject(String projectId, String userId);
+}
+```
+
+3. **任务数据访问**
+```java
+@Repository
+public interface TaskRepository extends JpaRepository<Task, String> {
+    List<Task> findByProject(Project project);
+    void deleteByProject(Project project);
+}
+```
+
+### 5.3 安全设计
+
+#### 5.3.1 JWT 认证设计
+1. **Token 结构**
+   - Header：算法和 Token 类型
+   - Payload：用户 ID、邮箱、用户名等信息
+   - Signature：使用密钥签名确保数据完整性
+
+2. **Token 管理**
+   - Access Token：短期有效（1小时）
+   - Refresh Token：长期有效（24小时）
+   - Token 自动刷新机制
+
+#### 5.3.2 权限控制设计
+1. **基于角色的访问控制**
+   - 默认用户角色：ROLE_USER
+   - 项目角色：OWNER、MEMBER
+
+2. **URL 级别的权限控制**
+```java
+http.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/api/v1/auth/**").permitAll()
+    .requestMatchers("/api/v1/system/**").permitAll()
+    .anyRequest().authenticated()
+)
+```
 
 ## 六、系统实现
-- 数据库实现
-  - 表结构实现
-  - 索引实现
-  - 触发器实现
-- 核心功能实现
-  - 用户认证实现
-  - 项目管理实现
-  - 任务管理实现
-- 关键代码展示与说明
+
+### 6.1 数据库实现
+
+#### 6.1.1 表结构实现
+已在数据库设计部分详细说明，包括：
+- 用户表（users）
+- 用户设置表（user_settings）
+- 项目表（projects）
+- 项目成员表（project_members）
+- 任务表（tasks）
+- 标签表（project_labels, task_labels）
+
+#### 6.1.2 索引实现
+1. **主键索引**
+   - 所有表使用 UUID 作为主键
+   - 使用自定义 ID 生成器
+
+2. **外键索引**
+   - project_members：project_id, user_id
+   - tasks：project_id
+   - user_settings：user_id
+
+#### 6.1.3 触发器实现
+1. **更新时间触发器**
+```sql
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language plpgsql;
+```
+
+### 6.2 核心功能实现
+
+#### 6.2.1 用户认证实现
+1. **JWT 认证过滤器**
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        jwt = authHeader.substring(7);
+        try {
+            userEmail = jwtService.extractEmail(jwt);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                if (jwtService.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+2. **认证服务实现**
+```java
+@Service
+public class AuthService {
+    public LoginResponse login(LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return LoginResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .tokenType("Bearer")
+            .expiresIn(3600)
+            .user(user)
+            .build();
+    }
+}
+```
+
+#### 6.2.2 项目管理实现
+```java
+@Service
+@Transactional
+public class ProjectServiceImpl implements ProjectService {
+    public Project create(Project project, User creator) {
+        Project savedProject = projectRepository.save(project);
+        
+        // 创建项目成员关系（创建者为OWNER）
+        ProjectMember member = new ProjectMember();
+        member.setProject(savedProject);
+        member.setUser(creator);
+        member.setRole(ProjectRole.OWNER);
+        projectMemberRepository.save(member);
+        
+        return savedProject;
+    }
+}
+```
+
+#### 6.2.3 任务管理实现
+```java
+@Service
+@Transactional
+public class TaskServiceImpl implements TaskService {
+    public Task create(String projectId, Task task) {
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
+            
+        task.setProject(project);
+        // 设置默认值
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.TODO);
+        }
+        if (task.getPriority() == null) {
+            task.setPriority(TaskPriority.MEDIUM);
+        }
+        
+        return taskRepository.save(task);
+    }
+}
+```
 
 ## 七、系统测试
 - 测试环境
@@ -270,5 +558,5 @@ CREATE TRIGGER update_users_updated_at
 
 后续步骤：
 1. [x] 已完成数据库设计部分
-2. 需要继续分析系统实现代码，完成详细设计和实现部分
+2. [x] 已完成详细设计和实现部分
 3. 需要查看测试相关代码，完成测试部分 
