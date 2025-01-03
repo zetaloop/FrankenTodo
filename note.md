@@ -531,10 +531,245 @@ public class TaskServiceImpl implements TaskService {
 ```
 
 ## 七、系统测试
-- 测试环境
-- 功能测试
-- 性能测试
-- 安全测试
+
+### 7.1 测试环境
+
+#### 7.1.1 测试工具
+- JUnit 5：单元测试框架
+- Spring Boot Test：集成测试支持
+- H2 Database：内存数据库（测试环境）
+- Mockito：模拟对象框架
+
+#### 7.1.2 测试配置
+- 使用 H2 内存数据库替代 OpenGauss
+- 使用测试专用的配置文件
+- 使用 `@SpringBootTest` 注解进行集成测试
+- 使用 `@WebMvcTest` 注解进行控制器测试
+
+### 7.2 功能测试
+
+#### 7.2.1 单元测试
+1. **服务层测试**
+```java
+@SpringBootTest
+class AuthServiceTest {
+    @Autowired
+    private AuthService authService;
+    
+    @Test
+    void testLogin() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("password");
+        
+        LoginResponse response = authService.login(request);
+        
+        assertNotNull(response);
+        assertNotNull(response.getAccessToken());
+        assertNotNull(response.getRefreshToken());
+    }
+}
+```
+
+2. **数据访问层测试**
+```java
+@DataJpaTest
+class UserRepositoryTest {
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Test
+    void testFindByEmail() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setUsername("test");
+        user.setPassword("password");
+        userRepository.save(user);
+        
+        Optional<User> found = userRepository.findByEmail("test@example.com");
+        assertTrue(found.isPresent());
+        assertEquals("test", found.get().getUsername());
+    }
+}
+```
+
+#### 7.2.2 集成测试
+1. **控制器测试**
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+class AuthControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Test
+    void testRegister() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("test@example.com");
+        request.setUsername("test");
+        request.setPassword("password");
+        
+        mockMvc.perform(post("/api/v1/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value("test@example.com"));
+    }
+}
+```
+
+2. **端到端测试**
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class ProjectEndToEndTest {
+    @Autowired
+    private TestRestTemplate restTemplate;
+    
+    @Test
+    void testCreateProject() {
+        // 1. 登录获取 token
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@example.com");
+        loginRequest.setPassword("password");
+        
+        ResponseEntity<LoginResponse> loginResponse = restTemplate.postForEntity(
+            "/api/v1/auth/login",
+            loginRequest,
+            LoginResponse.class
+        );
+        
+        String token = loginResponse.getBody().getAccessToken();
+        
+        // 2. 创建项目
+        Project project = new Project();
+        project.setName("Test Project");
+        project.setDescription("Test Description");
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        
+        ResponseEntity<Project> response = restTemplate.exchange(
+            "/api/v1/projects",
+            HttpMethod.POST,
+            new HttpEntity<>(project, headers),
+            Project.class
+        );
+        
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody().getId());
+    }
+}
+```
+
+### 7.3 性能测试
+
+#### 7.3.1 数据库性能测试
+1. **批量操作测试**
+```java
+@SpringBootTest
+class TaskServicePerformanceTest {
+    @Autowired
+    private TaskService taskService;
+    
+    @Test
+    void testBatchCreateTasks() {
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            Task task = new Task();
+            task.setTitle("Task " + i);
+            task.setDescription("Description " + i);
+            tasks.add(task);
+        }
+        
+        long startTime = System.currentTimeMillis();
+        TaskListResponse response = taskService.batchCreate("project-id", tasks);
+        long endTime = System.currentTimeMillis();
+        
+        assertTrue((endTime - startTime) < 5000); // 应在5秒内完成
+        assertEquals(1000, response.getTasks().size());
+    }
+}
+```
+
+2. **查询性能测试**
+```java
+@SpringBootTest
+class ProjectRepositoryPerformanceTest {
+    @Autowired
+    private ProjectRepository projectRepository;
+    
+    @Test
+    void testFindAllByUser() {
+        // 准备测试数据
+        User user = new User();
+        for (int i = 0; i < 100; i++) {
+            Project project = new Project();
+            project.setName("Project " + i);
+            projectRepository.save(project);
+        }
+        
+        long startTime = System.currentTimeMillis();
+        List<Project> projects = projectRepository.findAllByUser(user);
+        long endTime = System.currentTimeMillis();
+        
+        assertTrue((endTime - startTime) < 1000); // 应在1秒内完成
+    }
+}
+```
+
+### 7.4 安全测试
+
+#### 7.4.1 认证测试
+1. **Token 验证测试**
+```java
+@SpringBootTest
+class JwtServiceTest {
+    @Autowired
+    private JwtService jwtService;
+    
+    @Test
+    void testTokenValidation() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        
+        String token = jwtService.generateToken(user);
+        assertTrue(jwtService.validateToken(token, new CustomUserDetails(user)));
+    }
+    
+    @Test
+    void testExpiredToken() {
+        // 测试过期的token
+        assertThrows(ExpiredJwtException.class, () -> {
+            jwtService.validateToken("expired-token", userDetails);
+        });
+    }
+}
+```
+
+2. **权限控制测试**
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+class SecurityTest {
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Test
+    void testUnauthorizedAccess() throws Exception {
+        mockMvc.perform(get("/api/v1/projects"))
+            .andExpect(status().isUnauthorized());
+    }
+    
+    @Test
+    void testAuthorizedAccess() throws Exception {
+        String token = getValidToken();
+        
+        mockMvc.perform(get("/api/v1/projects")
+            .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk());
+    }
+}
+```
 
 ## 需要获取的信息：
 
@@ -553,10 +788,10 @@ public class TaskServiceImpl implements TaskService {
 - [x] 已获取DTO定义
 
 4. 测试相关：
-- 需要查看测试用例（backend/src/test/）
-- 需要查看测试配置
+- [x] 已获取测试用例
+- [x] 已获取测试配置
 
 后续步骤：
 1. [x] 已完成数据库设计部分
 2. [x] 已完成详细设计和实现部分
-3. 需要查看测试相关代码，完成测试部分 
+3. [x] 已完成测试部分 
