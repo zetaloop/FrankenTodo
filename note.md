@@ -1,94 +1,109 @@
-# 《实验13 数据库应用程序开发》实验报告大纲
-
 ## 一、项目概述
-- 项目背景和目标
-  - 开发一个现代化的任务管理系统 FrankenTodo
-  - 支持多用户协作和项目管理，包括用户认证、项目成员管理、任务管理等功能
-  - 提供跨平台的桌面客户端，实现一键式启动和管理
-- 开发环境与技术栈
-  - 前端：Next.js 15.1.2 + React 19.0.0 + TypeScript 5.x
-    - UI框架：Tailwind CSS 3.4.17 + Shadcn UI
-    - 表单处理：React Hook Form + Zod
-    - 组件库：Radix UI + Lucide React
-  - 后端：Spring Boot 3.4.1 + Java 23
-    - 安全：Spring Security + JJWT 0.12.6
-    - ORM：JPA/Hibernate
-    - 工具：Lombok 1.18.36
-  - 启动器：Tauri 2.x + Rust 2021
-    - 依赖：serde、reqwest、tauri-plugin-shell
-    - 功能：进程管理、日志监控、WebView 集成
-  - 数据库：OpenGauss 6.0+（支持 Docker 部署）
-- 项目特点与创新点
-  - 前后端分离架构：独立开发与部署，通过 API 交互
-  - 桌面启动器整合：一键式启动后端、监控日志，内置 WebView 访问前端
-  - 现代化UI/UX设计：响应式布局、过渡动画、主题切换
-  - 开发便利性：支持开发和生产两种模式，提供完整的构建脚本
+
+### 1.1 项目背景和目标
+本实验旨在开发一个名为 **FrankenTodo** 的现代化任务管理系统。系统主要面向多用户协作和项目管理场景，提供如下功能：
+1. **用户认证**：注册、登录、退出和权限管理
+2. **项目管理**：项目的增删改查、成员管理、标签管理
+3. **任务管理**：任务的增删改查、状态和优先级管理、标签管理
+4. **跨平台桌面客户端**：使用 Tauri 作为启动器，一键式启动和管理后端服务，提供内置的 WebView 访问前端界面
+
+### 1.2 开发环境与技术栈
+- **前端**：Next.js 15.1.2 + React 19.0.0 + TypeScript 5.x  
+  - UI 框架：Tailwind CSS 3.4.17 + Shadcn UI  
+  - 表单处理：React Hook Form + Zod  
+  - 组件库：Radix UI + Lucide React  
+
+- **后端**：Spring Boot 3.4.1 + Java 23  
+  - 安全：Spring Security + JJWT 0.12.6  
+  - ORM：JPA/Hibernate  
+  - 工具：Lombok 1.18.36  
+
+- **启动器**：Tauri 2.x + Rust 2021  
+  - 依赖：serde、reqwest、tauri-plugin-shell  
+  - 功能：进程管理、日志监控、WebView 集成  
+
+- **数据库**：OpenGauss 6.0+（支持 Docker 部署）  
+
+### 1.3 项目特点与创新点
+1. **前后端分离**：前端和后端可独立构建和部署，通过 RESTful API 进行交互。  
+2. **一键式启动器整合**：Tauri 桌面应用启动后端进程并内置日志监控，同时内置 WebView 展示前端。  
+3. **现代化 UI/UX**：基于 Tailwind CSS + Shadcn UI 提供响应式布局、主题切换和过渡动画等。  
+4. **针对开发与生产的便捷脚本**：提供多种构建脚本，方便快速启动、调试和部署。
+
+---
 
 ## 二、系统需求分析
-- 功能需求
-  - 用户管理
-    - 用户注册与登录
-    - 个人信息管理
-    - 用户设置管理
-  - 项目管理
-    - 项目的创建、编辑、删除
-    - 项目成员管理
-    - 项目标签管理
-  - 任务管理
-    - 任务的创建、编辑、删除
-    - 任务状态和优先级管理
-    - 任务标签管理
-  - 标签管理
-    - 项目标签
-    - 任务标签
-- 非功能需求
-  - 性能需求
-    - 响应时间
-    - 并发处理
-  - 安全需求
-    - 用户认证
-    - 数据加密
-  - 可靠性需求
-    - 数据一致性
-    - 错误处理
+
+### 2.1 功能需求
+1. **用户管理**  
+   - 用户注册与登录  
+   - 个人信息管理  
+   - 用户设置管理（如主题、通知开关）
+
+2. **项目管理**  
+   - 项目的创建、编辑、删除  
+   - 项目成员管理（角色分配：OWNER、MEMBER）  
+   - 项目标签管理  
+
+3. **任务管理**  
+   - 任务的创建、编辑、删除  
+   - 任务状态管理（如 BACKLOG、TODO、IN_PROGRESS、DONE、CANCELED）  
+   - 任务优先级管理（如 LOW、MEDIUM、HIGH）  
+   - 任务标签管理  
+
+4. **标签管理**  
+   - 项目标签  
+   - 任务标签  
+
+### 2.2 非功能需求
+1. **性能需求**  
+   - 主要操作在 1~3 秒内完成响应  
+   - 支持一定数量的并发访问
+
+2. **安全需求**  
+   - 采用 JWT 进行用户认证和权限控制  
+   - 敏感数据加密存储（密码使用 BCrypt 等）
+
+3. **可靠性需求**  
+   - 数据一致性：事务处理、外键约束  
+   - 错误处理：提供统一的异常处理机制  
+
+---
 
 ## 三、系统总体设计
-- 系统架构设计
-  - 前后端分离架构
-  - 桌面启动器架构
-- 技术架构设计
-  - 前端：Next.js + React + TypeScript
-  - 后端：Spring Boot + Java
-  - 启动器：Tauri + Rust
-  - 数据库：OpenGauss
+
+### 3.1 系统架构设计
+- **前后端分离架构**：前端使用 Next.js & React，后端使用 Spring Boot 提供 RESTful API  
+- **桌面启动器架构**：使用 Tauri (Rust) 作为封装壳，一键启动后端进程并内置浏览器视图  
+
+### 3.2 技术架构设计
+1. **前端**：Next.js + React + TypeScript  
+2. **后端**：Spring Boot + Java  
+3. **启动器**：Tauri + Rust  
+4. **数据库**：OpenGauss  
+
+---
 
 ## 四、数据库设计
 
 ### 4.1 需求分析
-根据系统需求，数据库需要存储以下主要信息：
-1. 用户信息：包括基本信息、认证信息和个人设置
-2. 项目信息：包括项目基本信息、成员关系和项目标签
-3. 任务信息：包括任务详情、状态、优先级和标签
+数据库需要存储如下核心信息：
+1. **用户信息**（基本信息、认证信息、个性化设置）  
+2. **项目信息**（项目描述、成员关系、标签）  
+3. **任务信息**（任务详情、状态、优先级、任务标签）
 
-### 4.2 概念结构设计（E-R图）
-主要实体：
-1. 用户（User）
-2. 用户设置（UserSettings）
-3. 项目（Project）
-4. 项目成员（ProjectMember）
-5. 任务（Task）
-6. 标签（Label）
-
-实体间关系：
-- 用户 1:1 用户设置
-- 用户 N:M 项目（通过项目成员关系）
-- 项目 1:N 任务
-- 项目 1:N 项目标签
-- 任务 1:N 任务标签
+### 4.2 概念结构设计（E-R 图）
+主要实体及关系：
+1. **User**（用户）  
+2. **UserSettings**（用户设置，1:1 关系）  
+3. **Project**（项目）  
+4. **ProjectMember**（项目成员，User 与 Project 的 N:M 关系表）  
+5. **Task**（任务，Project 与 Task 为 1:N）  
+6. **Label**（标签，Project 与 Label 1:N，Task 与 Label 1:N）
 
 ### 4.3 逻辑结构设计
 
-#### 4.3.1 用户表（users）
+#### 4.3.1 users 表
 ```sql
 CREATE TABLE users (
     id VARCHAR(36) PRIMARY KEY,
@@ -100,7 +115,7 @@ CREATE TABLE users (
 );
 ```
 
-#### 4.3.2 用户设置表（user_settings）
+#### 4.3.2 user_settings 表
 ```sql
 CREATE TABLE user_settings (
     id VARCHAR(36) PRIMARY KEY,
@@ -112,7 +127,7 @@ CREATE TABLE user_settings (
 );
 ```
 
-#### 4.3.3 项目表（projects）
+#### 4.3.3 projects 表
 ```sql
 CREATE TABLE projects (
     id VARCHAR(36) PRIMARY KEY,
@@ -123,7 +138,7 @@ CREATE TABLE projects (
 );
 ```
 
-#### 4.3.4 项目成员表（project_members）
+#### 4.3.4 project_members 表
 ```sql
 CREATE TABLE project_members (
     id VARCHAR(36) PRIMARY KEY,
@@ -136,7 +151,7 @@ CREATE TABLE project_members (
 );
 ```
 
-#### 4.3.5 任务表（tasks）
+#### 4.3.5 tasks 表
 ```sql
 CREATE TABLE tasks (
     id VARCHAR(36) PRIMARY KEY,
@@ -150,8 +165,8 @@ CREATE TABLE tasks (
 );
 ```
 
-#### 4.3.6 标签表设计
-项目标签表（project_labels）：
+#### 4.3.6 标签表
+**project_labels** 表：
 ```sql
 CREATE TABLE project_labels (
     project_id VARCHAR(36) NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
@@ -160,7 +175,7 @@ CREATE TABLE project_labels (
 );
 ```
 
-任务标签表（task_labels）：
+**task_labels** 表：
 ```sql
 CREATE TABLE task_labels (
     task_id VARCHAR(36) NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
@@ -172,45 +187,29 @@ CREATE TABLE task_labels (
 ### 4.4 物理结构设计
 
 #### 4.4.1 索引设计
-1. 主键索引
-   - 所有表都使用UUID作为主键，长度为36的VARCHAR类型
-   - 使用自定义ID生成器（CustomIdGenerator）生成时间戳前缀的ID
+1. **主键索引**  
+   - 所有表使用 UUID 作为主键  
+   - 可通过自定义 ID 生成器生成时间戳前缀或随机 UUID  
 
-2. 外键索引
-   - project_members表：project_id, user_id
-   - tasks表：project_id
-   - user_settings表：user_id
+2. **外键索引**  
+   - **project_members**：`(project_id, user_id)`  
+   - **tasks**：`project_id`  
+   - **user_settings**：`user_id`  
 
-3. 唯一索引
-   - users表：username, email
-   - project_members表：(project_id, user_id)组合唯一索引
+3. **唯一索引**  
+   - users 表：`username, email`  
+   - project_members 表：`(project_id, user_id)` 组合唯一
 
 #### 4.4.2 存储设计
-1. 字段类型选择
-   - 使用VARCHAR(36)存储ID
-   - 使用VARCHAR(50)存储用户名
-   - 使用VARCHAR(255)存储邮箱
-   - 使用VARCHAR(500)存储描述文本
-   - 使用TIMESTAMP存储时间戳
-
-2. 默认值设计
-   - created_at和updated_at默认为CURRENT_TIMESTAMP
-   - task.status默认为'TODO'
-   - task.priority默认为'MEDIUM'
-   - user_settings.theme默认为'light'
-   - user_settings.notifications_enabled默认为true
+- 使用 `VARCHAR(36)` 存储主键 ID  
+- `created_at` / `updated_at` 默认为 `CURRENT_TIMESTAMP`  
+- 其他字段根据业务需求使用合适长度（如 `VARCHAR(255)` 存储密码或描述等）
 
 #### 4.4.3 安全设计
-1. 密码安全
-   - 使用BCrypt加密存储密码
-   - 密码字段使用VARCHAR(255)确保足够长度
+- 使用 **BCrypt** 加密存储密码  
+- 级联删除：删除用户时级联删除其设置，删除项目时级联删除关联的任务、成员和标签等  
+- 审计字段自动更新：可通过触发器或应用层逻辑维护 `updated_at`  
 
-2. 级联删除
-   - 用户删除时级联删除用户设置
-   - 项目删除时级联删除项目成员、任务和标签
-   - 任务删除时级联删除任务标签
-
-3. 触发器
 ```sql
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -219,946 +218,121 @@ BEGIN
     RETURN NEW;
 END;
 $$ language plpgsql;
-
--- 为所有表添加更新时间触发器
-CREATE TRIGGER update_users_updated_at
-    BEFORE UPDATE ON users
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_updated_at_column();
 ```
+
+---
 
 ## 五、详细设计
 
 ### 5.1 模块详细设计
 
 #### 5.1.1 用户认证模块
-1. **认证流程**
-   - 用户注册：通过 `/api/v1/auth/register` 接口创建新用户
-   - 用户登录：通过 `/api/v1/auth/login` 接口获取 JWT Token
-   - Token 刷新：通过 `/api/v1/auth/refresh` 接口刷新 Token
-   - 用户登出：通过 `/api/v1/auth/logout` 接口清除认证状态
+- **认证流程**  
+  - 注册（`/api/v1/auth/register`）  
+  - 登录（`/api/v1/auth/login`）获取 JWT  
+  - 刷新 Token（`/api/v1/auth/refresh`）  
+  - 登出（`/api/v1/auth/logout`）  
 
-2. **核心组件**
-   - `JwtAuthenticationFilter`：JWT 认证过滤器
-   - `JwtService`：JWT Token 的生成和验证服务
-   - `AuthService`：认证业务逻辑服务
-   - `SecurityConfig`：Spring Security 安全配置
+- **核心组件**  
+  - `JwtAuthenticationFilter`：JWT 认证过滤器  
+  - `JwtService`：Token 的生成和验证  
+  - `AuthService`：业务逻辑实现（登录、刷新等）  
+  - `SecurityConfig`：Spring Security 配置  
 
-3. **安全机制**
-   - 使用 BCrypt 加密存储密码
-   - 实现基于 JWT 的无状态认证
-   - 支持 Token 自动刷新机制
-   - 实现 CORS 和 CSRF 防护
+- **安全机制**  
+  - BCrypt 加密密码  
+  - 基于 JWT 的无状态认证  
+  - 支持 Token 刷新  
 
 #### 5.1.2 项目管理模块
-1. **核心功能**
-   - 项目的 CRUD 操作
-   - 项目成员管理
-   - 项目标签管理
+- **核心功能**  
+  - 项目 CRUD  
+  - 项目成员管理  
+  - 项目标签管理  
 
-2. **权限控制**
-   - 项目创建者自动成为 OWNER 角色
-   - 支持添加/移除项目成员
-   - 基于角色的权限控制
+- **权限控制**  
+  - 创建者默认 OWNER  
+  - 基于角色（OWNER、MEMBER）的访问权限  
 
 #### 5.1.3 任务管理模块
-1. **核心功能**
-   - 任务的 CRUD 操作
-   - 任务状态管理（TODO、IN_PROGRESS、DONE 等）
-   - 任务优先级管理
-   - 任务标签管理
+- **核心功能**  
+  - 任务 CRUD  
+  - 任务状态管理（BACKLOG/TODO/IN_PROGRESS/DONE/CANCELED）  
+  - 任务优先级管理（LOW/MEDIUM/HIGH）  
+  - 任务标签管理  
 
-2. **业务规则**
-   - 任务必须属于特定项目
-   - 支持批量操作
-   - 支持任务筛选和排序
+- **业务规则**  
+  - 任务必须关联到一个项目  
+  - 可以批量操作任务  
+  - 支持根据状态或标签进行筛选  
 
 ### 5.2 接口设计
 
-#### 5.2.1 API 接口设计
-1. **认证接口**
-```java
-@RestController
-@RequestMapping("/api/v1/auth")
-public class AuthController {
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterRequest request)
-    
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request)
-    
-    @PostMapping("/refresh")
-    public ResponseEntity<LoginResponse> refresh(@RequestHeader("Authorization") String refreshToken)
-    
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout()
-}
-```
+#### 5.2.1 API 接口（示例）
+- **认证接口**：`/api/v1/auth/**`  
+  - `POST /register` / `POST /login` / `POST /refresh` / `POST /logout`  
+- **项目接口**：`/api/v1/projects/**`  
+  - `GET /` / `POST /` / `PUT /{projectId}` / `DELETE /{projectId}`  
+- **任务接口**：`/api/v1/projects/{projectId}/tasks/**`  
+  - `GET /` / `POST /` / `PUT /{taskId}` / `DELETE /{taskId}`  
 
-2. **项目接口**
-```java
-@RestController
-@RequestMapping("/api/v1/projects")
-public class ProjectController {
-    @GetMapping
-    public ResponseEntity<ProjectListResponse> getAllProjects()
-    
-    @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project)
-    
-    @PutMapping("/{projectId}")
-    public ResponseEntity<Project> updateProject(@PathVariable String projectId, @RequestBody Project project)
-    
-    @DeleteMapping("/{projectId}")
-    public ResponseEntity<Void> deleteProject(@PathVariable String projectId)
-}
-```
-
-3. **任务接口**
-```java
-@RestController
-@RequestMapping("/api/v1/projects/{projectId}/tasks")
-public class TaskController {
-    @GetMapping
-    public ResponseEntity<TaskListResponse> getAllTasks(@PathVariable String projectId)
-    
-    @PostMapping
-    public ResponseEntity<Task> createTask(@PathVariable String projectId, @RequestBody Task task)
-    
-    @PutMapping("/{taskId}")
-    public ResponseEntity<Task> updateTask(@PathVariable String projectId, @PathVariable String taskId, @RequestBody Task task)
-    
-    @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable String projectId, @PathVariable String taskId)
-}
-```
-
-#### 5.2.2 数据访问接口设计
-1. **用户数据访问**
-```java
-@Repository
-public interface UserRepository extends JpaRepository<User, String> {
-    Optional<User> findByEmail(String email);
-    Optional<User> findByUsername(String username);
-    boolean existsByEmail(String email);
-    boolean existsByUsername(String username);
-}
-```
-
-2. **项目数据访问**
-```java
-@Repository
-public interface ProjectRepository extends JpaRepository<Project, String> {
-    List<Project> findAllByUser(User user);
-    boolean isUserMemberOfProject(String projectId, String userId);
-    boolean isUserOwnerOfProject(String projectId, String userId);
-}
-```
-
-3. **任务数据访问**
-```java
-@Repository
-public interface TaskRepository extends JpaRepository<Task, String> {
-    List<Task> findByProject(Project project);
-    void deleteByProject(Project project);
-}
-```
+#### 5.2.2 数据访问接口
+- `UserRepository` / `ProjectRepository` / `TaskRepository` 等，继承 JPA 的 `JpaRepository`，实现基础 CRUD 和自定义查询。
 
 ### 5.3 安全设计
+- **JWT 认证**  
+  - `accessToken` 一般 1 小时有效  
+  - `refreshToken` 一般 24 小时有效  
+  - 过期后需刷新或重新登录  
 
-#### 5.3.1 JWT 认证设计
-1. **Token 结构**
-   - Header：算法和 Token 类型
-   - Payload：用户 ID、邮箱、用户名等信息
-   - Signature：使用密钥签名确保数据完整性
+- **权限控制**  
+  - 采用角色控制 + URL 级别安全配置  
+  - `SecurityConfig` 中配置需要认证访问的路径
 
-2. **Token 管理**
-   - Access Token：短期有效（1小时）
-   - Refresh Token：长期有效（24小时）
-   - Token 自动刷新机制
-
-#### 5.3.2 权限控制设计
-1. **基于角色的访问控制**
-   - 默认用户角色：ROLE_USER
-   - 项目角色：OWNER、MEMBER
-
-2. **URL 级别的权限控制**
-```java
-http.authorizeHttpRequests(auth -> auth
-    .requestMatchers("/api/v1/auth/**").permitAll()
-    .requestMatchers("/api/v1/system/**").permitAll()
-    .anyRequest().authenticated()
-)
-```
+---
 
 ## 六、系统实现
 
 ### 6.1 数据库实现
-
-#### 6.1.1 表结构实现
-已在数据库设计部分详细说明，包括：
-- 用户表（users）
-- 用户设置表（user_settings）
-- 项目表（projects）
-- 项目成员表（project_members）
-- 任务表（tasks）
-- 标签表（project_labels, task_labels）
-
-#### 6.1.2 索引实现
-1. **主键索引**
-   - 所有表使用 UUID 作为主键
-   - 使用自定义 ID 生成器
-
-2. **外键索引**
-   - project_members：project_id, user_id
-   - tasks：project_id
-   - user_settings：user_id
-
-#### 6.1.3 触发器实现
-1. **更新时间触发器**
-```sql
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ language plpgsql;
-```
+- **表结构**：已在数据库设计章节给出，包含 `users`, `user_settings`, `projects`, `project_members`, `tasks`, `project_labels`, `task_labels` 等。  
+- **索引**：主键索引（UUID），外键索引，唯一索引等均在建表语句中体现。  
+- **触发器**：实现自动更新 `updated_at`，或由应用层逻辑控制。
 
 ### 6.2 核心功能实现
+- **用户认证**：在 `AuthService`、`AuthController` 中实现注册、登录、Token 刷新等逻辑。  
+- **项目管理**：在 `ProjectService`、`ProjectController` 中实现增删改查及成员管理。  
+- **任务管理**：在 `TaskService`、`TaskController` 中实现 CRUD、状态与优先级管理、标签管理等业务逻辑。
 
-#### 6.2.1 用户认证实现
-1. **JWT 认证过滤器**
-```java
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        jwt = authHeader.substring(7);
-        try {
-            userEmail = jwtService.extractEmail(jwt);
-            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                if (jwtService.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
-        }
-        
-        filterChain.doFilter(request, response);
-    }
-}
-```
-
-2. **认证服务实现**
-```java
-@Service
-public class AuthService {
-    public LoginResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        String accessToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        return LoginResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .tokenType("Bearer")
-            .expiresIn(3600)
-            .user(user)
-            .build();
-    }
-}
-```
-
-#### 6.2.2 项目管理实现
-```java
-@Service
-@Transactional
-public class ProjectServiceImpl implements ProjectService {
-    public Project create(Project project, User creator) {
-        Project savedProject = projectRepository.save(project);
-        
-        // 创建项目成员关系（创建者为OWNER）
-        ProjectMember member = new ProjectMember();
-        member.setProject(savedProject);
-        member.setUser(creator);
-        member.setRole(ProjectRole.OWNER);
-        projectMemberRepository.save(member);
-        
-        return savedProject;
-    }
-}
-```
-
-#### 6.2.3 任务管理实现
-```java
-@Service
-@Transactional
-public class TaskServiceImpl implements TaskService {
-    public Task create(String projectId, Task task) {
-        Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
-            
-        task.setProject(project);
-        // 设置默认值
-        if (task.getStatus() == null) {
-            task.setStatus(TaskStatus.TODO);
-        }
-        if (task.getPriority() == null) {
-            task.setPriority(TaskPriority.MEDIUM);
-        }
-        
-        return taskRepository.save(task);
-    }
-}
-```
+---
 
 ## 七、系统测试
 
-### 7.1 测试环境
+### 7.1 测试现状
+当前测试覆盖面较低，主要存在以下情况：
+1. **测试工具和配置**：目前仅引入了基础的 JUnit 5 和 Spring Boot Test 依赖，但尚未设置单独的测试环境配置文件，也未使用内存数据库（如 H2）进行数据测试。
+2. **单元测试**：未编写针对服务层和数据访问层的单元测试（如 `AuthServiceTest`、`TaskRepositoryTest` 等）。
+3. **集成测试**：未见对控制器接口的集成测试实现（如 `AuthControllerTest`）。
+4. **性能与安全测试**：暂未进行性能测试和安全测试（如批量操作性能、权限控制验证等）。
 
-#### 7.1.1 测试工具
-- JUnit 5：单元测试框架
-- Spring Boot Test：集成测试支持
-- H2 Database：内存数据库（测试环境）
-- Mockito：模拟对象框架
+### 7.2 后续计划
+为补足测试缺失，后续工作将重点围绕以下方向：
+1. **单元测试**：逐步补充服务层和数据访问层的核心功能测试，确保关键业务逻辑的准确性。
+2. **集成测试**：针对接口设计的 RESTful API，编写集成测试验证数据流和权限控制的正确性。
+3. **性能与安全测试**：使用工具（如 JMeter）对批量任务操作、Token 认证和权限控制进行验证，确保系统稳定性与安全性。
+4. **测试环境配置**：完善内存数据库和测试专用配置文件，减少对生产环境的依赖。
 
-#### 7.1.2 测试配置
-- 使用 H2 内存数据库替代 OpenGauss
-- 使用测试专用的配置文件
-- 使用 `@SpringBootTest` 注解进行集成测试
-- 使用 `@WebMvcTest` 注解进行控制器测试
+### 7.3 测试总结
+由于项目进度限制，当前测试内容不够完善，后续工作将优先补充核心功能测试和接口测试。通过逐步完善测试用例与环境配置，可提高系统的健壮性和稳定性，进一步验证其在多场景下的适用性。
 
-### 7.2 功能测试
+## 八、结论与改进建议
 
-#### 7.2.1 单元测试
-1. **服务层测试**
-```java
-@SpringBootTest
-class AuthServiceTest {
-    @Autowired
-    private AuthService authService;
-    
-    @Test
-    void testLogin() {
-        LoginRequest request = new LoginRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("password");
-        
-        LoginResponse response = authService.login(request);
-        
-        assertNotNull(response);
-        assertNotNull(response.getAccessToken());
-        assertNotNull(response.getRefreshToken());
-    }
-}
-```
+1. **数据库设计**：已相对完善，涵盖了常见需求和约束（主键、外键、唯一索引、触发器等）。  
+2. **详细设计与实现**：功能模块（用户、项目、任务）设计合理，采用前后端分离和一键启动器的创新形式，代码结构清晰。  
+3. **测试不足**：目前测试覆盖率较低，性能测试和安全测试也缺失；与报告目标尚有一定差距。  
+4. **改进方向**：  
+   - **补齐测试用例**：单元测试、集成测试、性能测试、安全测试等；  
+   - **完善文档**：将已实现的接口、数据结构与实际测试结果对照，以保障文档与项目进度一致；  
+   - **持续集成**：引入 CI/CD 流程，自动执行测试并生成报告；  
+   - **可用性优化**：前端界面细节、桌面启动器功能和日志监控可继续增强。
 
-2. **数据访问层测试**
-```java
-@DataJpaTest
-class UserRepositoryTest {
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Test
-    void testFindByEmail() {
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setUsername("test");
-        user.setPassword("password");
-        userRepository.save(user);
-        
-        Optional<User> found = userRepository.findByEmail("test@example.com");
-        assertTrue(found.isPresent());
-        assertEquals("test", found.get().getUsername());
-    }
-}
-```
-
-#### 7.2.2 集成测试
-1. **控制器测试**
-```java
-@SpringBootTest
-@AutoConfigureMockMvc
-class AuthControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @Test
-    void testRegister() throws Exception {
-        RegisterRequest request = new RegisterRequest();
-        request.setEmail("test@example.com");
-        request.setUsername("test");
-        request.setPassword("password");
-        
-        mockMvc.perform(post("/api/v1/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email").value("test@example.com"));
-    }
-}
-```
-
-2. **端到端测试**
-```java
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ProjectEndToEndTest {
-    @Autowired
-    private TestRestTemplate restTemplate;
-    
-    @Test
-    void testCreateProject() {
-        // 1. 登录获取 token
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@example.com");
-        loginRequest.setPassword("password");
-        
-        ResponseEntity<LoginResponse> loginResponse = restTemplate.postForEntity(
-            "/api/v1/auth/login",
-            loginRequest,
-            LoginResponse.class
-        );
-        
-        String token = loginResponse.getBody().getAccessToken();
-        
-        // 2. 创建项目
-        Project project = new Project();
-        project.setName("Test Project");
-        project.setDescription("Test Description");
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        
-        ResponseEntity<Project> response = restTemplate.exchange(
-            "/api/v1/projects",
-            HttpMethod.POST,
-            new HttpEntity<>(project, headers),
-            Project.class
-        );
-        
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(response.getBody().getId());
-    }
-}
-```
-
-### 7.3 性能测试
-
-#### 7.3.1 数据库性能测试
-1. **批量操作测试**
-```java
-@SpringBootTest
-class TaskServicePerformanceTest {
-    @Autowired
-    private TaskService taskService;
-    
-    @Test
-    void testBatchCreateTasks() {
-        List<Task> tasks = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            Task task = new Task();
-            task.setTitle("Task " + i);
-            task.setDescription("Description " + i);
-            tasks.add(task);
-        }
-        
-        long startTime = System.currentTimeMillis();
-        TaskListResponse response = taskService.batchCreate("project-id", tasks);
-        long endTime = System.currentTimeMillis();
-        
-        assertTrue((endTime - startTime) < 5000); // 应在5秒内完成
-        assertEquals(1000, response.getTasks().size());
-    }
-}
-```
-
-2. **查询性能测试**
-```java
-@SpringBootTest
-class ProjectRepositoryPerformanceTest {
-    @Autowired
-    private ProjectRepository projectRepository;
-    
-    @Test
-    void testFindAllByUser() {
-        // 准备测试数据
-        User user = new User();
-        for (int i = 0; i < 100; i++) {
-            Project project = new Project();
-            project.setName("Project " + i);
-            projectRepository.save(project);
-        }
-        
-        long startTime = System.currentTimeMillis();
-        List<Project> projects = projectRepository.findAllByUser(user);
-        long endTime = System.currentTimeMillis();
-        
-        assertTrue((endTime - startTime) < 1000); // 应在1秒内完成
-    }
-}
-```
-
-### 7.4 安全测试
-
-#### 7.4.1 认证测试
-1. **Token 验证测试**
-```java
-@SpringBootTest
-class JwtServiceTest {
-    @Autowired
-    private JwtService jwtService;
-    
-    @Test
-    void testTokenValidation() {
-        User user = new User();
-        user.setEmail("test@example.com");
-        
-        String token = jwtService.generateToken(user);
-        assertTrue(jwtService.validateToken(token, new CustomUserDetails(user)));
-    }
-    
-    @Test
-    void testExpiredToken() {
-        // 测试过期的token
-        assertThrows(ExpiredJwtException.class, () -> {
-            jwtService.validateToken("expired-token", userDetails);
-        });
-    }
-}
-```
-
-2. **权限控制测试**
-```java
-@SpringBootTest
-@AutoConfigureMockMvc
-class SecurityTest {
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @Test
-    void testUnauthorizedAccess() throws Exception {
-        mockMvc.perform(get("/api/v1/projects"))
-            .andExpect(status().isUnauthorized());
-    }
-    
-    @Test
-    void testAuthorizedAccess() throws Exception {
-        String token = getValidToken();
-        
-        mockMvc.perform(get("/api/v1/projects")
-            .header("Authorization", "Bearer " + token))
-            .andExpect(status().isOk());
-    }
-}
-```
-
-## 需要获取的信息：
-
-1. 数据库设计相关：
-- [x] 已获取数据库初始化脚本（init-db.sql）
-- [x] 已获取实体类定义
-- [x] 已获取数据库配置
-
-2. 系统实现相关：
-- [x] 已获取认证相关实现
-- [x] 已获取服务层实现
-- [x] 已获取数据访问层实现
-
-3. 接口设计相关：
-- [x] 已获取控制器实现
-- [x] 已获取DTO定义
-
-4. 测试相关：
-- [x] 已获取测试用例
-- [x] 已获取测试配置
-
-后续步骤：
-1. [x] 已完成数据库设计部分
-2. [x] 已完成详细设计和实现部分
-3. [x] 已完成测试部分 
-
-# 验证任务列表
-
-## 任务1：验证项目概述
-- [x] 1.1 验证项目背景和目标
-- [x] 1.2 验证开发环境与技术栈
-- [x] 1.3 验证项目特点与创新点
-
-## 任务2：验证系统需求分析
-- [x] 2.1 验证功能需求
-  - [x] 用户管理功能
-  - [x] 项目管理功能
-  - [x] 任务管理功能
-  - [x] 标签管理功能
-- [x] 2.2 验证非功能需求
-  - [x] 性能需求
-  - [x] 安全需求
-  - [x] 可靠性需求
-
-## 任务3：验证数据库设计
-- [x] 3.1 验证需求分析
-- [x] 3.2 验证概念结构设计（E-R图）
-- [x] 3.3 验证逻辑结构设计（表结构）
-- [x] 3.4 验证物理结构设计（索引、存储、安全）
-
-## 任务4：验证详细设计
-- [x] 4.1 验证模块详细设计
-  - [x] 用户认证模块
-  - [x] 项目管理模块
-  - [x] 任务管理模块
-    - [x] 核心功能设计
-      - 已验证任务CRUD操作完整实现
-      - 已验证任务状态管理(5种状态)实现
-      - 已验证任务优先级管理(3级)实现
-      - 已验证任务标签管理功能实现
-    - [x] 数据模型设计
-      - 已验证Task实体设计完整
-      - 已验证TaskStatus枚举实现
-      - 已验证TaskPriority枚举实现
-    - [x] 业务逻辑设计
-      - 已验证TaskService接口完整
-      - 已验证TaskServiceImpl实现
-    - [x] 数据访问设计
-      - 已验证TaskRepository实现
-    - [x] 接口设计
-      - 已验证TaskController实现
-      - 已验证请求/响应格式规范
-    - [x] 前端实现
-      - 已验证任务列表页面
-      - 已验证任务表单组件
-      - 已验证API客户端
-    - [ ] 测试验证
-      - 未找到单元测试实现
-      - 未找到集成测试实现
-      - 未找到性能测试实现
-    
-    验证结论：任务管理模块的详细设计在功能实现、数据模型、业务逻辑、接口设计和前端实现方面都完整且准确,符合现代Web应用的设计规范和最佳实践。但在测试方面存在明显不足,需要补充完整的测试用例。
-
-- [x] 4.2 验证接口设计
-  - [x] API接口设计
-    - 已验证RESTful API规范(合适的HTTP方法和URL设计)
-    - 已验证请求/响应格式(JSON/DTO)
-    - 已验证错误处理机制(全局异常处理)
-  - [x] 数据访问接口设计
-    - 已验证Repository接口(基础CRUD和自定义查询)
-    - 已验证Service接口(业务操作和事务管理)
-
-- [x] 4.3 验证安全设计
-  - [x] JWT认证设计
-    - 已验证Token生成和验证(HMAC-SHA256)
-    - 已验证Token刷新机制(access/refresh token)
-    - 已验证过期时间设置(1h/24h)
-  - [x] 权限控制设计
-    - 已验证认证过滤器(JwtAuthenticationFilter)
-    - 已验证安全配置(SecurityConfig)
-    - 已验证用户权限(RBAC)
-
-验证结论：接口设计和安全设计完整且规范,实现了RESTful API规范、统一的数据访问接口、JWT认证机制和基于角色的访问控制,符合现代Web应用的安全最佳实践。
-
-## 任务5：验证系统实现
-
-### 5.1 数据库实现验证
-
-1. 表结构实现
-- 基础实体设计
-  - UUID主键设计
-  - 审计字段实现
-  - JPA实体监听器
-- 用户相关表实现
-  - User实体完整
-  - UserSettings关联正确
-  - 字段验证完善
-- 项目相关表实现
-  - Project实体完整
-  - ProjectMember关联正确
-  - 标签集合设计合理
-- 任务相关表实现
-  - Task实体完整
-  - 关联关系正确
-  - 枚举类型设计合理
-
-2. 索引实现
-- 主键索引完整
-  - UUID主键索引
-  - 自动生成机制
-- 外键索引完整
-  - 项目成员关联
-  - 任务项目关联
-- 唯一索引完整
-  - 用户名唯一索引
-  - 邮箱唯一索引
-
-3. 触发器实现
-- 审计字段触发器
-  - 创建时间自动设置
-  - 更新时间自动更新
-- ID生成触发器
-  - UUID自动生成
-  - 格式验证正确
-
-### 5.2 核心功能实现验证
-
-1. 用户认证实现
-- 用户服务完整
-  - 注册功能完整
-  - 查询功能完整
-  - 设置管理完整
-- 密码管理安全
-  - BCrypt加密使用
-  - 验证机制完善
-
-2. 项目管理实现
-- 项目服务完整
-  - CRUD操作完整
-  - 成员管理完整
-  - 标签管理完整
-- 权限控制完善
-  - 角色设计合理
-  - 权限验证完整
-
-3. 任务管理实现
-- 任务服务完整
-  - CRUD操作完整
-  - 状态管理完整
-  - 优先级管理完整
-- 业务逻辑完善
-  - 状态流转正确
-  - 标签管理正确
-
-### 总结
-任务5的实现整体完整且规范,主要发现:
-1. 数据库实现完整,包含了必要的表结构、索引和触发器
-2. 核心功能实现完善,覆盖所有业务需求
-3. 代码实现规范,遵循最佳实践
-4. 数据访问层和服务层实现完整
-5. 包含了必要的数据验证和错误处理
-
-## 任务6：验证系统测试
-- [x] 6.1 验证测试环境
-- [x] 6.2 验证功能测试
-- [x] 6.3 验证性能测试
-- [x] 6.4 验证安全测试
-
-# 当前任务：验证任务4.1 - 任务管理模块详细设计 
-
-# 任务管理模块验证结果
-
-## 1. 核心功能设计
-- [x] 已验证任务 CRUD 操作
-  - 通过 `/api/v1/projects/{projectId}/tasks` 接口实现
-  - 支持创建、读取、更新、删除任务
-  - 支持批量创建和删除任务
-- [x] 已验证任务状态管理
-  - 支持多种任务状态（BACKLOG/TODO/IN_PROGRESS/DONE/CANCELED）
-  - 实现了状态权重设计（用于排序）
-  - 支持状态独立更新接口
-- [x] 已验证任务优先级管理
-  - 支持多种优先级（LOW/MEDIUM/HIGH）
-  - 实现了优先级权重设计
-  - 支持优先级独立更新接口
-- [x] 已验证任务标签管理
-  - 支持添加/移除任务标签
-  - 实现了与项目标签的同步
-  - 支持标签的批量操作
-
-## 2. 数据模型设计
-- [x] 已验证 Task 实体
-  - 包含基本属性（id、title、description）
-  - 实现了审计字段（created_at、updated_at）
-  - 包含必要的验证约束（@NotBlank、@Size）
-- [x] 已验证 TaskStatus 枚举
-  - 定义了完整的状态集合
-  - 实现了值转换和验证方法
-  - 包含状态权重设计
-- [x] 已验证 TaskPriority 枚举
-  - 定义了优先级集合
-  - 实现了值转换和验证方法
-  - 包含优先级权重设计
-
-## 3. 业务逻辑设计
-- [x] 已验证 TaskService 接口
-  - 定义了完整的业务操作方法
-  - 包含事务和权限控制
-  - 支持批量操作和异常处理
-- [x] 已验证 TaskServiceImpl 实现
-  - 实现了完整的业务逻辑
-  - 包含必要的数据验证
-  - 实现了项目关系验证
-
-## 4. 数据访问设计
-- [x] 已验证 TaskRepository
-  - 实现了基本的 CRUD 操作
-  - 包含自定义查询方法
-  - 支持按项目查询和删除
-
-## 5. 接口设计
-- [x] 已验证 TaskController
-  - 实现了 RESTful API 设计
-  - 包含完整的请求参数验证
-  - 返回规范的响应格式
-- [x] 已验证请求/响应格式
-  - 使用 DTO 进行数据传输
-  - 实现了统一的响应封装
-  - 支持批量操作响应
-
-## 6. 前端实现验证
-- [x] 已验证任务列表页面
-  - 实现了任务的增删改查
-  - 支持任务状态和优先级更新
-  - 包含标签管理功能
-- [x] 已验证任务表单组件
-  - 实现了创建和编辑表单
-  - 包含字段验证和错误提示
-  - 支持标签的动态添加
-- [x] 已验证 API 客户端
-  - 实现了完整的 API 调用封装
-  - 支持开发环境的 Mock 实现
-  - 包含错误处理和类型定义
-
-## 7. 测试验证
-- [x] 已验证单元测试
-  - 包含 TaskService 的测试用例
-  - 包含实体和枚举的测试
-  - 实现了完整的业务逻辑测试
-- [x] 已验证集成测试
-  - 包含 TaskController 的测试用例
-  - 包含完整的 API 接口测试
-  - 实现了批量操作测试
-- [x] 已验证性能测试
-  - 包含批量创建任务的性能测试
-  - 验证了响应时间要求
-  - 测试了并发处理能力
-
-验证结论：任务管理模块的详细设计完整且准确，包含了必要的功能实现、数据模型、业务逻辑、接口设计和前端实现。实现符合现代Web应用的设计规范和最佳实践。 
-
-## 任务4验证结果
-
-### 4.1 任务管理模块验证
-- 核心功能完整实现
-- 数据模型设计合理
-- 业务逻辑实现正确
-- 接口设计规范
-- 前端实现完整
-- 缺少单元测试和集成测试
-
-### 4.2 API接口设计验证
-- 项目管理API完整实现
-  - 支持项目CRUD操作
-  - 支持成员管理
-  - 支持标签管理
-  - 使用RESTful风格
-  - 接口路径合理
-
-- 任务管理API完整实现
-  - 支持任务CRUD操作
-  - 支持状态和优先级更新
-  - 支持批量操作
-  - 接口设计清晰
-
-### 4.3 安全设计验证
-- JWT认证设计完整
-  - 包含token生成和验证
-  - 支持token刷新
-  - 安全的密钥管理
-  - 正确的错误处理
-
-- 权限控制设计完善
-  - 实现RBAC访问控制
-  - 正确的安全过滤器配置
-  - 完整的用户认证授权
-  - 合理的安全配置
-
-- 用户认证服务完整
-  - 支持注册登录注销
-  - 安全的密码管理
-  - 完善的会话控制
-  - 规范的错误处理
-
-### 总结
-任务4的设计和实现整体完整、准确,符合软件工程最佳实践。主要发现:
-1. API接口设计规范,支持完整的业务功能
-2. 数据访问接口实现合理,事务管理正确
-3. 安全设计完善,认证授权机制可靠
-4. 测试覆盖率需要提高,建议补充单元测试和集成测试 
-
-## 任务6验证结果
-
-### 6.1 测试环境验证
-- 测试工具
-  - [x] JUnit 5框架: 仅基础依赖存在
-  - [x] Spring Boot Test: 仅基础依赖存在
-  - [ ] H2数据库: 未找到配置和依赖
-  - [ ] Mockito: 未找到配置和依赖
-- 测试配置
-  - [ ] 未找到测试专用配置文件
-  - [ ] 未找到H2数据库配置
-  - [x] 仅有基础的@SpringBootTest注解使用
-  - [ ] 未找到@WebMvcTest等测试注解使用
-
-### 6.2 功能测试验证
-- 单元测试
-  - [ ] 未找到服务层测试(AuthServiceTest等)
-  - [ ] 未找到数据访问层测试(UserRepositoryTest等)
-  - [ ] 未找到实体类测试
-- 集成测试
-  - [ ] 未找到控制器测试(AuthControllerTest等)
-  - [ ] 未找到端到端测试(ProjectEndToEndTest等)
-  - [x] 仅有基础的应用程序上下文加载测试
-
-### 6.3 性能测试验证
-- 数据库性能测试
-  - [ ] 未找到批量操作测试(TaskServicePerformanceTest)
-  - [ ] 未找到查询性能测试(ProjectRepositoryPerformanceTest)
-- 接口性能测试
-  - [ ] 未找到并发测试
-  - [ ] 未找到响应时间测试
-
-### 6.4 安全测试验证
-- 认证测试
-  - [ ] 未找到Token验证测试(JwtServiceTest)
-  - [ ] 未找到过期Token测试
-- 权限控制测试
-  - [ ] 未找到未授权访问测试(SecurityTest)
-  - [ ] 未找到权限验证测试
-
-### 总结
-任务6的验证发现以下问题:
-1. 实验报告中描述的测试环境配置大部分不存在
-2. 报告中描述的大量测试用例在实际代码中完全找不到
-3. 实际代码中仅有一个基础的应用程序上下文加载测试
-4. 性能测试和安全测试相关的代码完全不存在
-5. 这表明报告在测试部分存在严重的虚构内容,需要修正
-
-建议:
-1. 补充完整的测试环境配置
-2. 实现必要的单元测试和集成测试
-3. 添加性能测试和安全测试用例
-4. 修正报告中虚构的内容,如实记录当前测试状态 
+通过后续的改进和迭代，FrankenTodo 系统将逐步完善在真实生产环境下的可靠性与可维护性，满足更多用户的任务管理需求。
