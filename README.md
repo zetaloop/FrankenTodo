@@ -17,7 +17,7 @@
 
 ```bash
 FrankenTodo/
-├── backend/                   # 后端（Spring Boot）
+├── backend/                          # 后端（Spring Boot）
 │   ├── src/
 │   │   └── main/
 │   │       ├── java/build/loop/todo/
@@ -34,7 +34,7 @@ FrankenTodo/
 │   │       │   └── BackendApplication.java
 │   │       └── resources/            # 应用配置 (application.yml 等)
 │   ├── pom.xml
-│   └── init-db.sql                   # 初始化数据库脚本 (可选)
+│   └── init-db.sql                   # 初始化数据库脚本
 │
 ├── frontend/                         # 前端 (Next.js)
 │   ├── src/
@@ -123,17 +123,201 @@ FrankenTodo/
 1. **认证模块**  
    该模块包含登录、注册与注销功能，核心是对 JWT Token 的获取与刷新。通过编写如 `useAuth` 等自定义 Hook，将 Token 的请求、存储及自动刷新流程统一管理。为了保证输入的合法性和用户体验，常会利用 `Zod` 或其他校验库进行表单验证，并在界面上辅以弹窗或 Toast 提示。当 Token 过期时，前端会自动向后端请求新的 Token，从而避免频繁的手动登录操作。此外，本地开发时支持 Mock API，在无后端环境的情况下也能模拟完整的登录流程。
 
+```typescript frontend/src/hooks/use-auth.ts
+const checkAuth = useCallback(async () => {
+  try {
+    const token = api.auth.getAccessToken()
+    const refreshToken = api.auth.getRefreshToken()
+
+    // 如果连 refresh token 都没有,说明确实未登录
+    if (!token && !refreshToken) {
+      setState(prev => ({ ...prev, isLoading: false }))
+      return
+    }
+
+    // 如果 access token 过期或不存在,尝试使用 refresh token
+    if (!token || api.auth.isTokenExpired()) {
+      try {
+        await api.auth.refreshToken()
+      } catch {
+        // 刷新失败,清除 token 并返回
+        api.auth.clearTokenInfo()
+        setState({ user: null, isLoading: false, error: null })
+        return
+      }
+    }
+```
+这段代码实现了完整的Token自动刷新流程：
+首先检查是否有token
+如果access token过期，自动尝试用refresh token获取新的token
+刷新失败则清除token信息并退出登录
+整个过程自动且对用户透明，确保了用户会话的连续性
+
 2. **任务管理**  
    前端提供了任务的创建、编辑、删除及标记完成等功能，并支持为任务设置优先级和多种状态（待办、进行中、已完成、已取消等）。用户可快速浏览任务列表，执行批量操作，或利用标签与筛选实现高效的分类管理。界面上通过骨架屏（Skeleton）在加载阶段做过渡处理，减少等待时间的感知，并且在任务的增删改后会自动刷新列表或触发 Toast 提示，确保操作结果直观可见。
+
+```typescript frontend/src/app/tasks/components/data-table-toolbar.tsx
+return (
+  <div className="flex items-center justify-between">
+    <div className="flex flex-1 items-center space-x-2">
+      {selectedProjectId && (
+        <>
+          <Input
+            placeholder="搜索任务..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="h-8 w-[150px] lg:w-[250px]"
+          />
+          {table.getColumn("status") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("status")}
+              title="状态"
+              options={statuses}
+            />
+          )}
+          {table.getColumn("priority") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("priority")}
+              title="优先级"
+              options={priorities}
+            />
+          )}
+```
+这段代码显示了任务的搜索框和状态、优先级的筛选器
+其提供了强大的任务筛选功能
+支持按标题搜索、状态筛选、优先级筛选
+使用 TanStack Table 实现高性能的数据处理
+UI设计直观且易用
 
 3. **项目管理**  
    与任务相似，项目管理包含了项目的创建、编辑和删除，且可与用户、任务进行多对多或一对多关联。通过切换项目，即可查看对应的成员及任务列表。当用户尚未拥有任何项目时，前端会以空状态视图指引其进行创建；出现加载错误时，则使用 Toast 或对话框告知并引导重试。项目标签和进度管理也被整合在对应的页面与组件中，以便用户对项目进行全局控制与跟踪。
 
+```typescript frontend/src/app/tasks/components/data-table-project-filter.tsx
+<Button
+    variant="outline"
+    role="combobox"
+    aria-expanded={open}
+    aria-label="选择项目"
+    className="h-8 w-[150px] lg:w-[250px] justify-between"
+    disabled={disabled}
+>
+    <span className={cn(
+        "truncate",
+        !selectedProject && "text-muted-foreground"
+    )}>
+        {selectedProject?.name ?? "选择项目"}
+    </span>
+    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+</Button>
+```
+这是项目选择器组件的一个片段
+项目选择器组件是一个下拉式的项目选择组件
+用户可以在这里选择、新建、编辑、删除项目
+
 4. **UI 组件 & 全局状态**  
    依托 Tailwind CSS、shadcn/ui 和 Radix UI，前端统一了 Button、Dialog、DropdownMenu 等基础组件的视觉风格，并提供了诸如 Avatar、Toast、Skeleton 等辅助组件。全局状态管理主要借助 React Hooks 或 Context，在登录态、当前项目、任务缓存等方面实现了数据的集中存储与监听。一些常用的结构或类型（例如 `User`, `Project`, `Task`）也都通过 TypeScript 进行定义，从而确保不同模块间的数据交互顺畅且安全。
 
+```typescript frontend/src/components/ui/toast.tsx
+const Toast = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Root>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
+    VariantProps<typeof toastVariants>
+>(({ className, variant, ...props }, ref) => {
+  return (
+    <ToastPrimitives.Root
+      ref={ref}
+      className={cn(toastVariants({ variant }), className)}
+      {...props}
+    />
+  )
+})
+```
+这是 shadcn/ui 的 Toast 组件的实现
+我们通过使用这样标准化的组件
+可以确保在不同页面和组件中拥有一致的样式和行为
+```typescript frontend/src/lib/api/types.ts
+export interface User {
+  id: string
+  username: string
+  email: string
+  created_at: string
+  updated_at?: string
+}
+
+export type Project = {
+  id: string
+  name: string
+  description: string
+  created_at: string
+  updated_at: string
+}
+
+export type Task = {
+  id: string
+  title: string
+  description: string
+  status: string
+  priority: string
+  labels: string[]
+} & BaseModel
+```
+这是类型定义系统的一个片段
+通过类型继承（如 & BaseModel）实现代码复用
+确保数据结构的一致性和可维护性
+
 5. **API 请求封装**  
    所有接口请求通过统一的客户端进行封装，自动附带 Token 及必要的请求头；若 Token 过期，该客户端会先尝试刷新 Token 并重试原请求，再根据返回结果决定是否跳转登录页。请求异常时，前端会利用 Toast 或其他组件进行统一提示，方便用户与开发者及时定位错误。若需要在开发环境下测试，也可以启用 Mock API 实现「本地自给自足」的模拟数据，这样就算后端暂时无法启动或某些接口未完成，也依然能进行页面的交互和调试。
+
+```typescript frontend/src/lib/api/auth.ts
+export const authApi = {
+  async login(data: {
+    email: string
+    password: string
+  }): Promise<LoginResponse> {
+    const response = await fetchApi<LoginResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+
+    // 保存 token 信息
+    this.saveTokenInfo({
+      access_token: response.access_token,
+      refresh_token: response.refresh_token,
+      token_type: response.token_type,
+      expires_in: response.expires_in,
+    })
+
+    return response
+  }
+```
+这是认证 API 的实现
+它封装了登录、登出、刷新 token 等操作
+可以调用它来向后端发送登录、登出、刷新等请求
+```typescript frontend/src/lib/api/auth-mock.ts
+export const authApiMock = {
+  async login(data: {
+    email: string
+    password: string
+  }): Promise<LoginResponse> {
+    const response = {
+      access_token: "mock_access_token",
+      refresh_token: "mock_refresh_token",
+      token_type: "Bearer",
+      expires_in: 3600,
+      user: mockUser
+    }
+
+    // 保存 token 信息
+    this.saveTokenInfo(response)
+
+    return response
+  }
+```
+这是上面登录接口的 mock 实现
+它是一个模拟接口，用于开发和调试
+它不需要接入后端和数据库，就可以方便地进行测试
 
 ### 4.2 后端（Spring Boot）
 
@@ -143,6 +327,33 @@ FrankenTodo/
    - **依赖注入**：通过构造器或 `@RequiredArgsConstructor` 将对应的 Service 注入 Controller；这样在请求到达后，可将业务逻辑的处理委托给 Service 层。  
    - **响应处理**：常使用 `ResponseEntity` 来返回结果，确保携带合适的 HTTP 状态码及可读的消息体。若有批量操作或复杂查询，可在响应中添加额外的统计或元信息（meta）。
 
+```java backend/src/main/java/build/loop/todo/controller/TaskController.java
+@DeleteMapping("/{taskId}")
+public ResponseEntity<Void> deleteTask(
+   @PathVariable String projectId,
+   @PathVariable String taskId
+) {
+   taskService.deleteById(projectId, taskId);
+   return ResponseEntity.noContent().build();
+}
+
+@DeleteMapping
+public ResponseEntity<BatchDeleteResponse> batchDeleteTasks(
+   @PathVariable String projectId,
+   @RequestBody Map<String, List<String>> request
+) {
+   List<String> taskIds = request.get("task_ids");
+   return ResponseEntity.ok(taskService.deleteByIds(projectId, taskIds));
+}
+```
+这是 TaskController 任务控制器（路由）的一个片段
+它展示了删除任务的网页接口
+这里访问的是 /api/v1/projects/{projectId}/tasks/{taskId} 方法为 DELETE
+即可删除 projectId 项目中的 taskId 任务
+或者访问 /api/v1/projects/{projectId}/tasks 方法为 DELETE
+请求体为 {"task_ids": ["taskId1", "taskId2"]}
+即可批量删除 projectId 项目中的 taskId1 和 taskId2 任务
+
 2. **Service 层**  
    该层负责核心业务逻辑的封装，例如 `AuthService`、`ProjectService`、`TaskService` 等。它包含权限校验、事务管理以及业务规则验证等。  
    - **业务规则**：如创建项目前需要检查当前用户是否有权限、或者删除任务时是否存在未完成的子任务等，都集中在此执行，从而保持 Controller 层的简洁。  
@@ -150,11 +361,62 @@ FrankenTodo/
    - **错误处理**：若在业务流程中遇到例如资源不存在或权限不足等情况，可抛出自定义异常（如 `ResourceNotFoundException`）或 Spring 自带异常，并让全局异常处理器转化为统一的 API 错误响应。  
    - **密码及安全**：在用户相关服务中（`AuthService` 等），通常通过 `BCryptPasswordEncoder` 等进行密码加密校验；Token 刷新逻辑会调用 `JwtService` 生成新令牌。
 
+```java backend/src/main/java/build/loop/todo/service/impl/ProjectServiceImpl.java
+@Transactional
+public User register(RegisterRequest request) {
+   if (userRepository.existsByEmail(request.getEmail())) {
+      throw new IllegalStateException("Email already exists");
+   }
+   if (userRepository.existsByUsername(request.getUsername())) {
+      throw new IllegalStateException("Username already exists");
+   }
+
+   User user = new User();
+   user.setEmail(request.getEmail());
+   user.setUsername(request.getUsername());
+   user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+   return userRepository.save(user);
+}
+```
+这是 ProjectServiceImpl 项目服务实现的一个片段
+它展示了注册用户的业务逻辑
+当用户注册时，会检查用户名和邮箱是否已存在
+如果存在，则抛出异常
+如果不存在，则创建用户并返回
+Service 层与 Controller 层相比
+Service 负责具体功能的实现，Controller 负责提供访问接口
+
 3. **Repository 层**  
    该层通过 JPA/Hibernate 与 OpenGauss 数据库交互，提供数据的增删改查方法。一些常用接口如 `UserRepository`、`ProjectRepository`、`TaskRepository` 等直接继承 `JpaRepository` 或 `CrudRepository`，可获得基础的 CRUD 功能。  
    - **查询方法**：在一些复杂查询中可使用方法名命名规则（如 `findByEmail`）或自定义 JPQL/SQL（如 `@Query` 注解）实现更灵活的筛选与分页。  
    - **实体关系**：项目通常会涉及到 `@OneToMany`、`@ManyToMany` 等映射关系，需要在对应实体类上合理设置级联属性和懒加载策略，避免出现 N+1 查询或数据同步困难。  
    - **数据一致性**：配合 Service 层的事务管理，以保证在执行批量操作或多表关联操作时，数据能保持一致。
+
+```java backend/src/main/java/build/loop/todo/repository/UserRepository.java
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
+
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    Optional<User> findByEmail(@Param("email") String email);
+
+    @Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
+
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email")
+    boolean existsByEmail(@Param("email") String email);
+
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username")
+    boolean existsByUsername(@Param("username") String username);
+}
+```
+这是 UserRepository 用户仓库的代码
+它展示了查询用户的数据库查询语句
+具体来说，这里实现了以下功能：
+- 通过 email 查询用户
+- 通过 username 查询用户
+- 检查 email 是否存在
+- 检查 username 是否存在
 
 4. **Model 层（Entity / DTO）**  
    该层主要分为两部分：  
@@ -162,11 +424,84 @@ FrankenTodo/
    - **DTO（Data Transfer Object）**：如 `UserDto`, `TaskDto` 等，用于请求或响应中的数据结构转换。例如，登录接口的 `LoginRequest`、`LoginResponse`，或者批量操作的 `BatchDeleteResponse`。通过 `@JsonProperty` 自定义序列化字段名，配合 `@Valid` 注解完成数据校验。  
    这层的设计可以将持久化的细节与外部数据交互隔离开来，提高可维护性和数据安全性。
 
+```java backend/src/main/java/build/loop/todo/model/entity/Task.java
+@Entity
+@Table(name = "tasks")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class Task extends BaseEntity {
+   @NotBlank
+   private String title;
+
+   @Size(max = 500)
+   @Column(nullable = true)
+   private String description = "";
+
+   @Enumerated(EnumType.STRING)
+   @Column(nullable = false)
+   private TaskStatus status = TaskStatus.TODO;
+
+   @JsonProperty("status")
+   public String getStatusValue() {
+      return status.getValue();
+   }
+
+   @JsonIgnore
+   public TaskStatus getStatus() {
+      return status;
+   }
+   ...
+```
+这是 Task 任务实体的一个片段
+它展示了任务的属性
+一个任务拥有 title 标题、description 描述、status 状态、project 项目、labels 标签等
+
 5. **Security & JWT**
    项目采用 Spring Security + JWT 进行安全管控。在 `config` 或 `security` 目录下配置相应的类，如 `SecurityConfig`、`JwtAuthenticationFilter` 等：
    - **过滤器链**：`JwtAuthenticationFilter` 会在请求到达 Controller 前解析 Header 中的 Token 并验证其有效性，若验证通过则构建 `Authentication` 放入 Security Context。
    - **Token 刷新**：`JwtService` 会提供生成、解析 Token 的方法，并可通过专门的刷新端点配合双 Token 模式来延长会话。
    - **角色权限**：在 User 实体或 `UserDetails` 中维护角色信息（如 `ROLE_ADMIN`, `ROLE_USER`），借助 Spring Security 的 `@PreAuthorize` 或全局配置来限制某些接口的访问权限。
+
+```java backend\src\main\java\build\loop\todo\security\JwtAuthenticationFilter.java
+@Component
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        jwt = authHeader.substring(7);
+        try {
+            userEmail = jwtService.extractEmail(jwt);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                if (jwtService.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        }
+```
+这是 JwtAuthenticationFilter 的代码
+它展示了 JWT Token 认证过滤器的实现
+它的功能是，从请求头中获取 JWT Token 保存了登录信息，并验证其有效性
+如果有效，则将用户信息设置到 Security Context 中
+
 
 6. **OpenGauss / 数据库**
    通过 OpenGauss JDBC (6.0.0-og) 与数据库交互。具体配置可在 `config.conf` 中声明，例如：
@@ -188,6 +523,8 @@ FrankenTodo/
    - **初始化**：可通过 `init-db.sql` 或 Spring Boot 启动时自动建表完成初始数据库环境的搭建，包括用户、项目、任务等表结构，以及相关索引与触发器。
    - **数据库特性**：OpenGauss 在语法上与 PostgreSQL 类似，可使用序列、触发器、以及 JSONB 字段等功能；若有特殊语法差异或 SQL 方言需求，需要在 JPA 或配置层进行适配。
    - **性能与维护**：在生产环境中，可结合 OpenGauss 自带的监控与优化工具（如 GUC 参数设置，Explain 分析等）提高查询性能；日常运维需注意定期备份与表 Vacuum，避免膨胀导致性能退化。
+
+
 
 ---
 
