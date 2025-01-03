@@ -2,18 +2,27 @@
 
 ## 一、项目概述
 - 项目背景和目标
-  - 开发一个现代化的任务管理系统
-  - 支持多用户协作和项目管理
-  - 提供跨平台的桌面客户端
+  - 开发一个现代化的任务管理系统 FrankenTodo
+  - 支持多用户协作和项目管理，包括用户认证、项目成员管理、任务管理等功能
+  - 提供跨平台的桌面客户端，实现一键式启动和管理
 - 开发环境与技术栈
-  - 前端：Next.js + React + TypeScript
-  - 后端：Spring Boot + Java
-  - 启动器：Tauri + Rust
-  - 数据库：OpenGauss 6.0+
+  - 前端：Next.js 15.1.2 + React 19.0.0 + TypeScript 5.x
+    - UI框架：Tailwind CSS 3.4.17 + Shadcn UI
+    - 表单处理：React Hook Form + Zod
+    - 组件库：Radix UI + Lucide React
+  - 后端：Spring Boot 3.4.1 + Java 23
+    - 安全：Spring Security + JJWT 0.12.6
+    - ORM：JPA/Hibernate
+    - 工具：Lombok 1.18.36
+  - 启动器：Tauri 2.x + Rust 2021
+    - 依赖：serde、reqwest、tauri-plugin-shell
+    - 功能：进程管理、日志监控、WebView 集成
+  - 数据库：OpenGauss 6.0+（支持 Docker 部署）
 - 项目特点与创新点
-  - 前后端分离架构
-  - 桌面启动器整合
-  - 现代化UI/UX设计
+  - 前后端分离架构：独立开发与部署，通过 API 交互
+  - 桌面启动器整合：一键式启动后端、监控日志，内置 WebView 访问前端
+  - 现代化UI/UX设计：响应式布局、过渡动画、主题切换
+  - 开发便利性：支持开发和生产两种模式，提供完整的构建脚本
 
 ## 二、系统需求分析
 - 功能需求
