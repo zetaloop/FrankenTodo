@@ -93,23 +93,33 @@
 ## 四、数据库设计
 
 ### 4.1 需求分析
-数据库需要存储如下核心信息：
+数据库需要存储如下核心信息：  
 1. **用户信息**（基本信息、认证信息、个性化设置）  
 2. **项目信息**（项目描述、成员关系、标签）  
-3. **任务信息**（任务详情、状态、优先级、任务标签）
+3. **任务信息**（任务详情、状态、优先级、任务标签）  
 
 ### 4.2 概念结构设计（E-R 图）
-主要实体及关系：
+主要实体及关系：  
 1. **User**（用户）  
 2. **UserSettings**（用户设置，1:1 关系）  
 3. **Project**（项目）  
 4. **ProjectMember**（项目成员，User 与 Project 的 N:M 关系表）  
 5. **Task**（任务，Project 与 Task 为 1:N）  
-6. **Label**（标签，Project 与 Label 1:N，Task 与 Label 1:N）
+6. **Label**（标签，Project 与 Label 1:N，Task 与 Label 1:N，实际建表时拆分为 `project_labels` 与 `task_labels`）
 
 ### 4.3 逻辑结构设计
 
-#### 4.3.1 users 表
+#### 4.3.1 序列（Sequences）
+在 `init-db.sql` 中，为了方便生成主键或做其他用途，我们额外创建了一组序列：
+```sql
+CREATE SEQUENCE user_id_seq;
+CREATE SEQUENCE user_settings_id_seq;
+CREATE SEQUENCE project_id_seq;
+CREATE SEQUENCE project_member_id_seq;
+CREATE SEQUENCE task_id_seq;
+```
+
+#### 4.3.2 users 表
 ```sql
 CREATE TABLE users (
     id VARCHAR(36) PRIMARY KEY,
@@ -121,7 +131,7 @@ CREATE TABLE users (
 );
 ```
 
-#### 4.3.2 user_settings 表
+#### 4.3.3 user_settings 表
 ```sql
 CREATE TABLE user_settings (
     id VARCHAR(36) PRIMARY KEY,
@@ -133,7 +143,7 @@ CREATE TABLE user_settings (
 );
 ```
 
-#### 4.3.3 projects 表
+#### 4.3.4 projects 表
 ```sql
 CREATE TABLE projects (
     id VARCHAR(36) PRIMARY KEY,
@@ -144,7 +154,7 @@ CREATE TABLE projects (
 );
 ```
 
-#### 4.3.4 project_members 表
+#### 4.3.5 project_members 表
 ```sql
 CREATE TABLE project_members (
     id VARCHAR(36) PRIMARY KEY,
@@ -156,8 +166,9 @@ CREATE TABLE project_members (
     UNIQUE (project_id, user_id)
 );
 ```
+> **注意**: 这里对 `project_id` 和 `user_id` 均设置了 `ON DELETE CASCADE`，以便删除项目时同时清理项目成员关系；删除用户时也可自动清理对应关系。
 
-#### 4.3.5 tasks 表
+#### 4.3.6 tasks 表
 ```sql
 CREATE TABLE tasks (
     id VARCHAR(36) PRIMARY KEY,
@@ -171,8 +182,7 @@ CREATE TABLE tasks (
 );
 ```
 
-#### 4.3.6 标签表
-**project_labels** 表：
+#### 4.3.7 project_labels 表
 ```sql
 CREATE TABLE project_labels (
     project_id VARCHAR(36) NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
@@ -181,7 +191,7 @@ CREATE TABLE project_labels (
 );
 ```
 
-**task_labels** 表：
+#### 4.3.8 task_labels 表
 ```sql
 CREATE TABLE task_labels (
     task_id VARCHAR(36) NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
@@ -194,28 +204,27 @@ CREATE TABLE task_labels (
 
 #### 4.4.1 索引设计
 1. **主键索引**  
-   - 所有表使用 UUID 作为主键  
-   - 可通过自定义 ID 生成器生成时间戳前缀或随机 UUID  
-
+   - 所有表使用 `VARCHAR(36)` 作为主键，用于存放 UUID。  
 2. **外键索引**  
    - **project_members**：`(project_id, user_id)`  
    - **tasks**：`project_id`  
    - **user_settings**：`user_id`  
-
 3. **唯一索引**  
-   - users 表：`username, email`  
-   - project_members 表：`(project_id, user_id)` 组合唯一
+   - `users` 表：`username, email`  
+   - `project_members` 表：`(project_id, user_id)` 组合唯一  
 
 #### 4.4.2 存储设计
-- 使用 `VARCHAR(36)` 存储主键 ID  
-- `created_at` / `updated_at` 默认为 `CURRENT_TIMESTAMP`  
-- 其他字段根据业务需求使用合适长度（如 `VARCHAR(255)` 存储密码或描述等）
+- 使用 `VARCHAR(36)` 存储主键 ID，建议使用 UUID。  
+- `created_at` / `updated_at` 默认为 `CURRENT_TIMESTAMP`。  
+- 其他字段根据业务需求使用合适长度（如 `VARCHAR(255)` 存储密码或描述等）。
 
 #### 4.4.3 安全设计
-- 使用 **BCrypt** 加密存储密码  
-- 级联删除：删除用户时级联删除其设置，删除项目时级联删除关联的任务、成员和标签等  
-- 审计字段自动更新：可通过触发器或应用层逻辑维护 `updated_at`  
+- 使用 **BCrypt** 加密存储密码。  
+- 级联删除：删除用户时级联删除其设置，删除项目时级联删除关联的任务、成员和标签等。  
+- 审计字段自动更新：可通过触发器或应用层逻辑维护 `updated_at`。  
 
+#### 4.4.4 触发器设计
+在 `init-db.sql` 中，为了在更新记录时自动刷新 `updated_at` 字段，定义并使用了统一的触发器函数：
 ```sql
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -223,8 +232,36 @@ BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
     RETURN NEW;
 END;
-$$ language plpgsql;
+$$ LANGUAGE plpgsql;
 ```
+随后，为每个需要维护更新时间的表（如 `users`, `user_settings`, `projects`, `project_members`, `tasks` 等）分别创建了 `BEFORE UPDATE` 触发器：
+```sql
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER update_user_settings_updated_at
+    BEFORE UPDATE ON user_settings
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER update_projects_updated_at
+    BEFORE UPDATE ON projects
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER update_project_members_updated_at
+    BEFORE UPDATE ON project_members
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER update_tasks_updated_at
+    BEFORE UPDATE ON tasks
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+```
+这样，在任何更新操作执行前，都能自动将 `updated_at` 更新为当前时间戳，不需要在应用层手动维护。
 
 ---
 
