@@ -8,26 +8,26 @@
 4. **跨平台桌面客户端**：使用 Tauri 作为启动器，一键式启动和管理后端服务，提供内置的 WebView 访问前端界面
 
 ### 1.2 开发环境与技术栈
-- **前端**：Next.js 15.1.2 + React 19.0.0 + TypeScript 5.x  
-  - UI 框架：Tailwind CSS 3.4.17 + Shadcn UI  
-  - 表单处理：React Hook Form + Zod  
-  - 组件库：Radix UI + Lucide React  
+- **前端**：Next.js 15.1.2 + React 19.0.0 + TypeScript 5.x
+  - UI 框架：Tailwind CSS 3.4.17 + Shadcn UI
+  - 表单处理：React Hook Form + Zod
+  - 组件库：Radix UI + Lucide React
 
-- **后端**：Spring Boot 3.4.1 + Java 23  
-  - 安全：Spring Security + JJWT 0.12.6  
-  - ORM：JPA/Hibernate  
-  - 工具：Lombok 1.18.36  
+- **后端**：Spring Boot 3.4.1 + Java 23
+  - 安全：Spring Security + JJWT 0.12.6
+  - ORM：JPA/Hibernate
+  - 工具：Lombok 1.18.36
 
-- **启动器**：Tauri 2.x + Rust 2021  
-  - 依赖：serde、reqwest、tauri-plugin-shell  
-  - 功能：进程管理、日志监控、WebView 集成  
+- **启动器**：Tauri 2.x + Rust 2021
+  - 依赖：serde、reqwest、tauri-plugin-shell
+  - 功能：进程管理、日志监控、WebView 集成
 
-- **数据库**：OpenGauss 6.0+（支持 Docker 部署）  
+- **数据库**：OpenGauss 6.0+（支持 Docker 部署）
 
 ### 1.3 项目特点与创新点
-1. **前后端分离**：前端和后端可独立构建和部署，通过 RESTful API 进行交互。  
-2. **一键式启动器整合**：Tauri 桌面应用启动后端进程并内置日志监控，同时内置 WebView 展示前端。  
-3. **现代化 UI/UX**：基于 Tailwind CSS + Shadcn UI 提供响应式布局、主题切换和过渡动画等。  
+1. **前后端分离**：前端和后端可独立构建和部署，通过 RESTful API 进行交互。
+2. **一键式启动器整合**：Tauri 桌面应用启动后端进程并内置日志监控，同时内置 WebView 展示前端。
+3. **现代化 UI/UX**：基于 Tailwind CSS + Shadcn UI 提供响应式布局、主题切换和过渡动画等。
 4. **针对开发与生产的便捷脚本**：提供多种构建脚本，方便快速启动、调试和部署。
 
 ---
@@ -35,76 +35,76 @@
 ## 二、系统需求分析
 
 ### 2.1 功能需求
-1. **用户管理**  
-   - 用户注册与登录  
-   - 个人信息管理  
+1. **用户管理**
+   - 用户注册与登录
+   - 个人信息管理
    - 用户设置管理（如主题、通知开关）
 
-2. **项目管理**  
-   - 项目的创建、编辑、删除  
+2. **项目管理**
+   - 项目的创建、编辑、删除
 +  - 支持批量删除项目
-   - 项目成员管理（角色分配：OWNER、MEMBER）  
+   - 项目成员管理（角色分配：OWNER、MEMBER）
 +  - 项目成员保护（禁止删除最后一个所有者）
-   - 项目标签管理  
+   - 项目标签管理
 
-3. **任务管理**  
-   - 任务的创建、编辑、删除  
+3. **任务管理**
+   - 任务的创建、编辑、删除
 +  - 支持批量创建和删除任务
-   - 任务状态管理（如 BACKLOG、TODO、IN_PROGRESS、DONE、CANCELED）  
-   - 任务优先级管理（如 LOW、MEDIUM、HIGH）  
-   - 任务标签管理  
+   - 任务状态管理（如 BACKLOG、TODO、IN_PROGRESS、DONE、CANCELED）
+   - 任务优先级管理（如 LOW、MEDIUM、HIGH）
+   - 任务标签管理
 +  - 新建任务时自动设置默认状态和优先级
 
-4. **标签管理**  
-   - 项目标签  
-   - 任务标签  
+4. **标签管理**
+   - 项目标签
+   - 任务标签
 +  - 批量创建任务时自动管理标签
 
 ### 2.2 非功能需求
-1. **性能需求**  
-   - 主要操作在 1~3 秒内完成响应  
+1. **性能需求**
+   - 主要操作在 1~3 秒内完成响应
    - 支持一定数量的并发访问
 
-2. **安全需求**  
-   - 采用 JWT 进行用户认证和权限控制  
+2. **安全需求**
+   - 采用 JWT 进行用户认证和权限控制
    - 敏感数据加密存储（密码使用 BCrypt 等）
 
-3. **可靠性需求**  
-   - 数据一致性：事务处理、外键约束  
+3. **可靠性需求**
+   - 数据一致性：事务处理、外键约束
 +  - 级联删除：删除项目时自动清理关联数据
-   - 错误处理：提供统一的异常处理机制  
+   - 错误处理：提供统一的异常处理机制
 
 ---
 
 ## 三、系统总体设计
 
 ### 3.1 系统架构设计
-- **前后端分离架构**：前端使用 Next.js & React，后端使用 Spring Boot 提供 RESTful API  
-- **桌面启动器架构**：使用 Tauri (Rust) 作为封装壳，一键启动后端进程并内置浏览器视图  
+- **前后端分离架构**：前端使用 Next.js & React，后端使用 Spring Boot 提供 RESTful API
+- **桌面启动器架构**：使用 Tauri (Rust) 作为封装壳，一键启动后端进程并内置浏览器视图
 
 ### 3.2 技术架构设计
-1. **前端**：Next.js + React + TypeScript  
-2. **后端**：Spring Boot + Java  
-3. **启动器**：Tauri + Rust  
-4. **数据库**：OpenGauss  
+1. **前端**：Next.js + React + TypeScript
+2. **后端**：Spring Boot + Java
+3. **启动器**：Tauri + Rust
+4. **数据库**：OpenGauss
 
 ---
 
 ## 四、数据库设计
 
 ### 4.1 需求分析
-数据库需要存储如下核心信息：  
-1. **用户信息**（基本信息、认证信息、个性化设置）  
-2. **项目信息**（项目描述、成员关系、标签）  
-3. **任务信息**（任务详情、状态、优先级、任务标签）  
+数据库需要存储如下核心信息：
+1. **用户信息**（基本信息、认证信息、个性化设置）
+2. **项目信息**（项目描述、成员关系、标签）
+3. **任务信息**（任务详情、状态、优先级、任务标签）
 
 ### 4.2 概念结构设计（E-R 图）
-主要实体及关系：  
-1. **User**（用户）  
-2. **UserSettings**（用户设置，1:1 关系）  
-3. **Project**（项目）  
-4. **ProjectMember**（项目成员，User 与 Project 的 N:M 关系表）  
-5. **Task**（任务，Project 与 Task 为 1:N）  
+主要实体及关系：
+1. **User**（用户）
+2. **UserSettings**（用户设置，1:1 关系）
+3. **Project**（项目）
+4. **ProjectMember**（项目成员，User 与 Project 的 N:M 关系表）
+5. **Task**（任务，Project 与 Task 为 1:N）
 6. **Label**（标签，Project 与 Label 1:N，Task 与 Label 1:N，实际建表时拆分为 `project_labels` 与 `task_labels`）
 
 ### 4.3 逻辑结构设计
@@ -203,25 +203,25 @@ CREATE TABLE task_labels (
 ### 4.4 物理结构设计
 
 #### 4.4.1 索引设计
-1. **主键索引**  
-   - 所有表使用 `VARCHAR(36)` 作为主键，用于存放 UUID。  
-2. **外键索引**  
-   - **project_members**：`(project_id, user_id)`  
-   - **tasks**：`project_id`  
-   - **user_settings**：`user_id`  
-3. **唯一索引**  
-   - `users` 表：`username, email`  
-   - `project_members` 表：`(project_id, user_id)` 组合唯一  
+1. **主键索引**
+   - 所有表使用 `VARCHAR(36)` 作为主键，用于存放 UUID。
+2. **外键索引**
+   - **project_members**：`(project_id, user_id)`
+   - **tasks**：`project_id`
+   - **user_settings**：`user_id`
+3. **唯一索引**
+   - `users` 表：`username, email`
+   - `project_members` 表：`(project_id, user_id)` 组合唯一
 
 #### 4.4.2 存储设计
-- 使用 `VARCHAR(36)` 存储主键 ID，建议使用 UUID。  
-- `created_at` / `updated_at` 默认为 `CURRENT_TIMESTAMP`。  
+- 使用 `VARCHAR(36)` 存储主键 ID，建议使用 UUID。
+- `created_at` / `updated_at` 默认为 `CURRENT_TIMESTAMP`。
 - 其他字段根据业务需求使用合适长度（如 `VARCHAR(255)` 存储密码或描述等）。
 
 #### 4.4.3 安全设计
-- 使用 **BCrypt** 加密存储密码。  
-- 级联删除：删除用户时级联删除其设置，删除项目时级联删除关联的任务、成员和标签等。  
-- 审计字段自动更新：可通过触发器或应用层逻辑维护 `updated_at`。  
+- 使用 **BCrypt** 加密存储密码。
+- 级联删除：删除用户时级联删除其设置，删除项目时级联删除关联的任务、成员和标签等。
+- 审计字段自动更新：可通过触发器或应用层逻辑维护 `updated_at`。
 
 #### 4.4.4 触发器设计
 在 `init-db.sql` 中，为了在更新记录时自动刷新 `updated_at` 字段，定义并使用了统一的触发器函数：
@@ -271,107 +271,107 @@ CREATE TRIGGER update_tasks_updated_at
 
 #### 5.1.1 用户认证模块
 
-- **认证流程**  
-  - 注册（`POST /api/v1/auth/register`）  
-  - 登录（`POST /api/v1/auth/login`）获取 JWT  
-  - 刷新 Token（`POST /api/v1/auth/refresh`）  
-  - 登出（`POST /api/v1/auth/logout`）  
+- **认证流程**
+  - 注册（`POST /api/v1/auth/register`）
+  - 登录（`POST /api/v1/auth/login`）获取 JWT
+  - 刷新 Token（`POST /api/v1/auth/refresh`）
+  - 登出（`POST /api/v1/auth/logout`）
 
-- **用户设置（UserSettings）**  
-  - 与用户（User）表一对一关系  
+- **用户设置（UserSettings）**
+  - 与用户（User）表一对一关系
   - 包含字段：
-    - `theme`：主题，默认为 `light`  
-    - `notifications_enabled`：通知开关，默认为 `true`  
+    - `theme`：主题，默认为 `light`
+    - `notifications_enabled`：通知开关，默认为 `true`
   - 提供更新接口：`PATCH /api/v1/user/settings`
 
-- **核心组件**  
-  - `JwtAuthenticationFilter`：JWT 认证过滤器  
-  - `JwtService`：Token 的生成和验证  
-  - `AuthService`：业务逻辑实现（登录、刷新等）  
-  - `SecurityConfig`：Spring Security 配置  
+- **核心组件**
+  - `JwtAuthenticationFilter`：JWT 认证过滤器
+  - `JwtService`：Token 的生成和验证
+  - `AuthService`：业务逻辑实现（登录、刷新等）
+  - `SecurityConfig`：Spring Security 配置
 
-- **安全机制**  
-  - 使用 BCrypt 对密码进行哈希加密  
-  - 基于 JWT 的无状态认证  
-  - 支持 Token 刷新  
+- **安全机制**
+  - 使用 BCrypt 对密码进行哈希加密
+  - 基于 JWT 的无状态认证
+  - 支持 Token 刷新
 
 #### 5.1.2 项目管理模块
 
-- **核心功能**  
-  - 项目 CRUD  
-  - 项目成员管理  
-  - 项目标签管理  
+- **核心功能**
+  - 项目 CRUD
+  - 项目成员管理
+  - 项目标签管理
 
-- **数据约束**  
-  - 项目名称：长度 `3~50` 字符，不能为空  
-  - 项目描述：最大 `500` 字符，可选  
-  - 项目成员的唯一性：同一用户在同一项目中只能有一个角色  
+- **数据约束**
+  - 项目名称：长度 `3~50` 字符，不能为空
+  - 项目描述：最大 `500` 字符，可选
+  - 项目成员的唯一性：同一用户在同一项目中只能有一个角色
 
-- **权限控制**  
-  - 创建者默认角色 `OWNER`  
-  - 其他成员可分配角色 `OWNER` 或 `MEMBER`  
-  - 不同角色对项目和任务的操作权限有所不同  
+- **权限控制**
+  - 创建者默认角色 `OWNER`
+  - 其他成员可分配角色 `OWNER` 或 `MEMBER`
+  - 不同角色对项目和任务的操作权限有所不同
 
 #### 5.1.3 任务管理模块
 
-- **核心功能**  
-  - 任务 CRUD  
-  - 任务状态管理（`BACKLOG`/`TODO`/`IN_PROGRESS`/`DONE`/`CANCELED`）  
-  - 任务优先级管理（`LOW`/`MEDIUM`/`HIGH`）  
-  - 任务标签管理  
-  - 支持批量创建、批量删除等操作  
+- **核心功能**
+  - 任务 CRUD
+  - 任务状态管理（`BACKLOG`/`TODO`/`IN_PROGRESS`/`DONE`/`CANCELED`）
+  - 任务优先级管理（`LOW`/`MEDIUM`/`HIGH`）
+  - 任务标签管理
+  - 支持批量创建、批量删除等操作
 
-- **数据约束**  
-  - 任务标题：不能为空  
-  - 任务描述：最大 `500` 字符，默认空字符串  
-  - 任务必须关联到一个项目  
-  - 状态权重（从低到高）：`BACKLOG(0) < TODO(1) < IN_PROGRESS(2) < DONE(3) < CANCELED(4)`  
+- **数据约束**
+  - 任务标题：不能为空
+  - 任务描述：最大 `500` 字符，默认空字符串
+  - 任务必须关联到一个项目
+  - 状态权重（从低到高）：`BACKLOG(0) < TODO(1) < IN_PROGRESS(2) < DONE(3) < CANCELED(4)`
   - 优先级权重（从低到高）：`LOW(0) < MEDIUM(1) < HIGH(2)`
 
-- **业务规则**  
-  - 支持根据状态或标签进行筛选  
-  - 可通过接口实现批量操作  
-    - 批量创建：`POST /api/v1/projects/{projectId}/tasks/batch`  
-    - 批量删除：`DELETE /api/v1/projects/{projectId}/tasks` （请求体携带 `task_ids` 列表）  
+- **业务规则**
+  - 支持根据状态或标签进行筛选
+  - 可通过接口实现批量操作
+    - 批量创建：`POST /api/v1/projects/{projectId}/tasks/batch`
+    - 批量删除：`DELETE /api/v1/projects/{projectId}/tasks` （请求体携带 `task_ids` 列表）
 
 ### 5.2 接口设计
 
 #### 5.2.1 API 接口（示例）
 
-- **认证接口**：`/api/v1/auth/**`  
-  - `POST /register`：注册  
-  - `POST /login`：登录  
-  - `POST /refresh`：刷新令牌  
-  - `POST /logout`：退出登录  
+- **认证接口**：`/api/v1/auth/**`
+  - `POST /register`：注册
+  - `POST /login`：登录
+  - `POST /refresh`：刷新令牌
+  - `POST /logout`：退出登录
 
-- **用户设置接口**：`/api/v1/user/settings`  
-  - `PATCH /`：更新用户主题、通知开关等设置  
+- **用户设置接口**：`/api/v1/user/settings`
+  - `PATCH /`：更新用户主题、通知开关等设置
 
-- **项目接口**：`/api/v1/projects/**`  
-  - `GET /`：获取所有项目  
-  - `POST /`：创建新项目  
-  - `GET /{projectId}`：获取项目详情  
-  - `PUT /{projectId}`：更新项目  
-  - `DELETE /{projectId}`：删除项目  
-  - `GET /{projectId}/members`：获取项目成员列表  
-  - `POST /{projectId}/members`：添加项目成员  
-  - `DELETE /{projectId}/members/{userId}`：移除项目成员  
+- **项目接口**：`/api/v1/projects/**`
+  - `GET /`：获取所有项目
+  - `POST /`：创建新项目
+  - `GET /{projectId}`：获取项目详情
+  - `PUT /{projectId}`：更新项目
+  - `DELETE /{projectId}`：删除项目
+  - `GET /{projectId}/members`：获取项目成员列表
+  - `POST /{projectId}/members`：添加项目成员
+  - `DELETE /{projectId}/members/{userId}`：移除项目成员
 
-- **任务接口**：`/api/v1/projects/{projectId}/tasks/**`  
-  - `GET /`：获取项目下所有任务  
-  - `POST /`：创建任务  
-  - `POST /batch`：批量创建任务  
-  - `GET /{taskId}`：获取任务详情  
-  - `PUT /{taskId}`：更新任务（完整更新）  
-  - `PATCH /{taskId}/status`：仅更新任务状态  
-  - `PATCH /{taskId}/priority`：仅更新任务优先级  
-  - `DELETE /{taskId}`：删除任务  
-  - `DELETE /`：批量删除任务（请求体中包含 `task_ids`）  
+- **任务接口**：`/api/v1/projects/{projectId}/tasks/**`
+  - `GET /`：获取项目下所有任务
+  - `POST /`：创建任务
+  - `POST /batch`：批量创建任务
+  - `GET /{taskId}`：获取任务详情
+  - `PUT /{taskId}`：更新任务（完整更新）
+  - `PATCH /{taskId}/status`：仅更新任务状态
+  - `PATCH /{taskId}/priority`：仅更新任务优先级
+  - `DELETE /{taskId}`：删除任务
+  - `DELETE /`：批量删除任务（请求体中包含 `task_ids`）
 
-- **标签接口**：`/api/v1/projects/{projectId}/labels/**`  
-  - `GET /`：获取项目的所有标签  
-  - `POST /`：添加新标签  
-  - `DELETE /`：删除标签  
+- **标签接口**：`/api/v1/projects/{projectId}/labels/**`
+  - `GET /`：获取项目的所有标签
+  - `POST /`：添加新标签
+  - `DELETE /`：删除标签
 
 #### 5.2.2 数据访问接口
 
@@ -379,56 +379,56 @@ CREATE TRIGGER update_tasks_updated_at
 
 ### 5.3 数据库设计
 
-- **ID 生成策略**  
-  - 使用 UUID 作为主键，存储为 `VARCHAR(36)`  
-  - 通过 `IdGeneratorListener` 在实体保存时自动生成 ID  
+- **ID 生成策略**
+  - 使用 UUID 作为主键，存储为 `VARCHAR(36)`
+  - 通过 `IdGeneratorListener` 在实体保存时自动生成 ID
 
-- **审计字段**  
-  - 所有实体继承自 `BaseEntity`  
-  - 包含 `created_at` 和 `updated_at` 字段  
-  - 通过 `AuditingEntityListener` 自动维护审计信息  
+- **审计字段**
+  - 所有实体继承自 `BaseEntity`
+  - 包含 `created_at` 和 `updated_at` 字段
+  - 通过 `AuditingEntityListener` 自动维护审计信息
 
 ### 5.4 前端与标签管理
 
-- **标签管理**  
-  - 在前端可预定义常用标签（如：`Bug`、`Feature`、`Documentation`）  
-  - 允许在任务中添加多个标签  
-  - 删除标签时，会自动从关联任务中移除该标签  
+- **标签管理**
+  - 在前端可预定义常用标签（如：`Bug`、`Feature`、`Documentation`）
+  - 允许在任务中添加多个标签
+  - 删除标签时，会自动从关联任务中移除该标签
 
-- **状态与优先级的 UI 展示**  
-  - 不同状态对应不同图标（`HelpCircle`/`Circle`/`Timer`/`CheckCircle`/`CircleOff`）  
-  - 不同优先级对应不同图标（`ArrowDown`/`ArrowRight`/`ArrowUp`）  
+- **状态与优先级的 UI 展示**
+  - 不同状态对应不同图标（`HelpCircle`/`Circle`/`Timer`/`CheckCircle`/`CircleOff`）
+  - 不同优先级对应不同图标（`ArrowDown`/`ArrowRight`/`ArrowUp`）
 
 ### 5.5 部署配置
 
-- **配置加载机制**  
-  - 支持从当前目录或 `backend` 子目录加载 `config.conf`  
-  - 主要包含数据库连接信息和 JPA 相关配置  
+- **配置加载机制**
+  - 支持从当前目录或 `backend` 子目录加载 `config.conf`
+  - 主要包含数据库连接信息和 JPA 相关配置
 
-- **版本要求**  
-  - Spring Boot: `3.4.1`  
-  - Java: `23`  
-  - JWT: `0.12.6`  
-  - Lombok: `1.18.36`  
+- **版本要求**
+  - Spring Boot: `3.4.1`
+  - Java: `23`
+  - JWT: `0.12.6`
+  - Lombok: `1.18.36`
 
 ### 5.6 安全设计
 
-- **JWT 认证**  
-  - `accessToken` 一般 1 小时有效  
-  - `refreshToken` 一般 24 小时有效  
-  - 过期后需刷新或重新登录  
+- **JWT 认证**
+  - `accessToken` 一般 1 小时有效
+  - `refreshToken` 一般 24 小时有效
+  - 过期后需刷新或重新登录
 
-- **权限控制**  
-  - 采用角色控制 + URL 级别安全配置  
-  - 在 `SecurityConfig` 中配置需要认证访问的路径  
+- **权限控制**
+  - 采用角色控制 + URL 级别安全配置
+  - 在 `SecurityConfig` 中配置需要认证访问的路径
 
 ---
 
 ## 六、系统实现
 
 ### 6.1 数据库实现
-- **表结构**：已在数据库设计章节给出，包含 `users`, `user_settings`, `projects`, `project_members`, `tasks`, `project_labels`, `task_labels` 等。  
-- **索引**：主键索引（UUID），外键索引，唯一索引等均在建表语句中体现。  
+- **表结构**：已在数据库设计章节给出，包含 `users`, `user_settings`, `projects`, `project_members`, `tasks`, `project_labels`, `task_labels` 等。
+- **索引**：主键索引（UUID），外键索引，唯一索引等均在建表语句中体现。
 - **触发器**：实现自动更新 `updated_at`，或由应用层逻辑控制。
 
 ### 6.2 核心功能实现
@@ -497,9 +497,9 @@ CREATE TRIGGER update_tasks_updated_at
 
 本项目通过前后端分离、Tauri 启动器整合、OpenGauss 数据库等多项技术的结合，构建了一个跨平台、多用户协作的现代化任务管理系统。其意义与价值主要体现在以下几个方面：
 
-1. **技术创新与实践**：项目涵盖了 Rust、Java、Next.js 等多端技术栈的综合运用，为学习与实践全栈开发提供了宝贵经验。  
-2. **跨平台一键启动**：Tauri 的引入大幅简化了环境部署与使用门槛，终端用户可通过桌面应用方便地访问和管理后端服务。  
-3. **灵活的数据库与安全设计**：采用 OpenGauss 作为数据库管理系统，并结合 Spring Security + JWT 进行权限控制，增强了项目的安全性与可扩展性。  
+1. **技术创新与实践**：项目涵盖了 Rust、Java、Next.js 等多端技术栈的综合运用，为学习与实践全栈开发提供了宝贵经验。
+2. **跨平台一键启动**：Tauri 的引入大幅简化了环境部署与使用门槛，终端用户可通过桌面应用方便地访问和管理后端服务。
+3. **灵活的数据库与安全设计**：采用 OpenGauss 作为数据库管理系统，并结合 Spring Security + JWT 进行权限控制，增强了项目的安全性与可扩展性。
 4. **可扩展的架构**：前端 React 组件化和后端 Spring Boot 的解耦设计，使系统易于迭代和维护，可根据需求快速扩展新功能。
 
 通过此次实验开发，团队对多层架构设计、现代化前端框架以及安全认证机制有了更深入的理解，为后续在企业级或大型项目中应用奠定了坚实基础。整个项目不仅验证了核心功能的可行性，也为后续的功能扩展和性能优化提供了可依赖的技术方案与实现思路。
