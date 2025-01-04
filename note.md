@@ -270,11 +270,19 @@ CREATE TRIGGER update_tasks_updated_at
 ### 5.1 模块详细设计
 
 #### 5.1.1 用户认证模块
+
 - **认证流程**  
-  - 注册（`/api/v1/auth/register`）  
-  - 登录（`/api/v1/auth/login`）获取 JWT  
-  - 刷新 Token（`/api/v1/auth/refresh`）  
-  - 登出（`/api/v1/auth/logout`）  
+  - 注册（`POST /api/v1/auth/register`）  
+  - 登录（`POST /api/v1/auth/login`）获取 JWT  
+  - 刷新 Token（`POST /api/v1/auth/refresh`）  
+  - 登出（`POST /api/v1/auth/logout`）  
+
+- **用户设置（UserSettings）**  
+  - 与用户（User）表一对一关系  
+  - 包含字段：
+    - `theme`：主题，默认为 `light`  
+    - `notifications_enabled`：通知开关，默认为 `true`  
+  - 提供更新接口：`PATCH /api/v1/user/settings`
 
 - **核心组件**  
   - `JwtAuthenticationFilter`：JWT 认证过滤器  
@@ -283,46 +291,128 @@ CREATE TRIGGER update_tasks_updated_at
   - `SecurityConfig`：Spring Security 配置  
 
 - **安全机制**  
-  - BCrypt 加密密码  
+  - 使用 BCrypt 对密码进行哈希加密  
   - 基于 JWT 的无状态认证  
   - 支持 Token 刷新  
 
 #### 5.1.2 项目管理模块
+
 - **核心功能**  
   - 项目 CRUD  
   - 项目成员管理  
   - 项目标签管理  
 
+- **数据约束**  
+  - 项目名称：长度 `3~50` 字符，不能为空  
+  - 项目描述：最大 `500` 字符，可选  
+  - 项目成员的唯一性：同一用户在同一项目中只能有一个角色  
+
 - **权限控制**  
-  - 创建者默认 OWNER  
-  - 基于角色（OWNER、MEMBER）的访问权限  
+  - 创建者默认角色 `OWNER`  
+  - 其他成员可分配角色 `OWNER` 或 `MEMBER`  
+  - 不同角色对项目和任务的操作权限有所不同  
 
 #### 5.1.3 任务管理模块
+
 - **核心功能**  
   - 任务 CRUD  
-  - 任务状态管理（BACKLOG/TODO/IN_PROGRESS/DONE/CANCELED）  
-  - 任务优先级管理（LOW/MEDIUM/HIGH）  
+  - 任务状态管理（`BACKLOG`/`TODO`/`IN_PROGRESS`/`DONE`/`CANCELED`）  
+  - 任务优先级管理（`LOW`/`MEDIUM`/`HIGH`）  
   - 任务标签管理  
+  - 支持批量创建、批量删除等操作  
+
+- **数据约束**  
+  - 任务标题：不能为空  
+  - 任务描述：最大 `500` 字符，默认空字符串  
+  - 任务必须关联到一个项目  
+  - 状态权重（从低到高）：`BACKLOG(0) < TODO(1) < IN_PROGRESS(2) < DONE(3) < CANCELED(4)`  
+  - 优先级权重（从低到高）：`LOW(0) < MEDIUM(1) < HIGH(2)`
 
 - **业务规则**  
-  - 任务必须关联到一个项目  
-  - 可以批量操作任务  
   - 支持根据状态或标签进行筛选  
+  - 可通过接口实现批量操作  
+    - 批量创建：`POST /api/v1/projects/{projectId}/tasks/batch`  
+    - 批量删除：`DELETE /api/v1/projects/{projectId}/tasks` （请求体携带 `task_ids` 列表）  
 
 ### 5.2 接口设计
 
 #### 5.2.1 API 接口（示例）
+
 - **认证接口**：`/api/v1/auth/**`  
-  - `POST /register` / `POST /login` / `POST /refresh` / `POST /logout`  
+  - `POST /register`：注册  
+  - `POST /login`：登录  
+  - `POST /refresh`：刷新令牌  
+  - `POST /logout`：退出登录  
+
+- **用户设置接口**：`/api/v1/user/settings`  
+  - `PATCH /`：更新用户主题、通知开关等设置  
+
 - **项目接口**：`/api/v1/projects/**`  
-  - `GET /` / `POST /` / `PUT /{projectId}` / `DELETE /{projectId}`  
+  - `GET /`：获取所有项目  
+  - `POST /`：创建新项目  
+  - `GET /{projectId}`：获取项目详情  
+  - `PUT /{projectId}`：更新项目  
+  - `DELETE /{projectId}`：删除项目  
+  - `GET /{projectId}/members`：获取项目成员列表  
+  - `POST /{projectId}/members`：添加项目成员  
+  - `DELETE /{projectId}/members/{userId}`：移除项目成员  
+
 - **任务接口**：`/api/v1/projects/{projectId}/tasks/**`  
-  - `GET /` / `POST /` / `PUT /{taskId}` / `DELETE /{taskId}`  
+  - `GET /`：获取项目下所有任务  
+  - `POST /`：创建任务  
+  - `POST /batch`：批量创建任务  
+  - `GET /{taskId}`：获取任务详情  
+  - `PUT /{taskId}`：更新任务（完整更新）  
+  - `PATCH /{taskId}/status`：仅更新任务状态  
+  - `PATCH /{taskId}/priority`：仅更新任务优先级  
+  - `DELETE /{taskId}`：删除任务  
+  - `DELETE /`：批量删除任务（请求体中包含 `task_ids`）  
+
+- **标签接口**：`/api/v1/projects/{projectId}/labels/**`  
+  - `GET /`：获取项目的所有标签  
+  - `POST /`：添加新标签  
+  - `DELETE /`：删除标签  
 
 #### 5.2.2 数据访问接口
-- `UserRepository` / `ProjectRepository` / `TaskRepository` 等，继承 JPA 的 `JpaRepository`，实现基础 CRUD 和自定义查询。
 
-### 5.3 安全设计
+- `UserRepository` / `ProjectRepository` / `TaskRepository` 等，均继承自 JPA 的 `JpaRepository`，实现基础 CRUD 和自定义查询。
+
+### 5.3 数据库设计
+
+- **ID 生成策略**  
+  - 使用 UUID 作为主键，存储为 `VARCHAR(36)`  
+  - 通过 `IdGeneratorListener` 在实体保存时自动生成 ID  
+
+- **审计字段**  
+  - 所有实体继承自 `BaseEntity`  
+  - 包含 `created_at` 和 `updated_at` 字段  
+  - 通过 `AuditingEntityListener` 自动维护审计信息  
+
+### 5.4 前端与标签管理
+
+- **标签管理**  
+  - 在前端可预定义常用标签（如：`Bug`、`Feature`、`Documentation`）  
+  - 允许在任务中添加多个标签  
+  - 删除标签时，会自动从关联任务中移除该标签  
+
+- **状态与优先级的 UI 展示**  
+  - 不同状态对应不同图标（`HelpCircle`/`Circle`/`Timer`/`CheckCircle`/`CircleOff`）  
+  - 不同优先级对应不同图标（`ArrowDown`/`ArrowRight`/`ArrowUp`）  
+
+### 5.5 部署配置
+
+- **配置加载机制**  
+  - 支持从当前目录或 `backend` 子目录加载 `config.conf`  
+  - 主要包含数据库连接信息和 JPA 相关配置  
+
+- **版本要求**  
+  - Spring Boot: `3.4.1`  
+  - Java: `23`  
+  - JWT: `0.12.6`  
+  - Lombok: `1.18.36`  
+
+### 5.6 安全设计
+
 - **JWT 认证**  
   - `accessToken` 一般 1 小时有效  
   - `refreshToken` 一般 24 小时有效  
@@ -330,7 +420,7 @@ CREATE TRIGGER update_tasks_updated_at
 
 - **权限控制**  
   - 采用角色控制 + URL 级别安全配置  
-  - `SecurityConfig` 中配置需要认证访问的路径
+  - 在 `SecurityConfig` 中配置需要认证访问的路径  
 
 ---
 
