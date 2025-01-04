@@ -432,9 +432,44 @@ CREATE TRIGGER update_tasks_updated_at
 - **触发器**：实现自动更新 `updated_at`，或由应用层逻辑控制。
 
 ### 6.2 核心功能实现
-- **用户认证**：在 `AuthService`、`AuthController` 中实现注册、登录、Token 刷新等逻辑。  
-- **项目管理**：在 `ProjectService`、`ProjectController` 中实现增删改查及成员管理。  
-- **任务管理**：在 `TaskService`、`TaskController` 中实现 CRUD、状态与优先级管理、标签管理等业务逻辑。
+- **用户认证**：
+ - 基于 Spring Security + JWT 实现，支持：
+   - 注册：邮箱+用户名+密码，自动校验唯一性
+   - 登录：邮箱+密码认证，返回 access_token 和 refresh_token
+   - Token 刷新：使用 refresh_token 获取新的 access_token
+   - 登出：清除安全上下文
+ - 安全特性：
+   - 密码使用 BCrypt 加密存储
+   - JWT Token 基于 HMAC-SHA256 签名
+   - access_token 1小时过期，refresh_token 24小时过期
+- **项目管理**：
+ - 基本操作：
+   - 项目的创建、编辑、删除和查询
+   - 支持项目描述和标签管理
+ - 成员管理：
+   - 角色分级：OWNER、MEMBER
+   - 权限控制：所有者可管理成员，成员仅可查看和操作任务
+   - 保护机制：禁止删除项目的最后一个所有者
+- **任务管理**：
+ - 基本操作：
+   - 任务的创建、编辑、删除和查询
+   - 支持批量创建和批量删除
+ - 状态管理：
+   - 五种状态：BACKLOG(0) < TODO(1) < IN_PROGRESS(2) < DONE(3) < CANCELED(4)
+   - 三级优先级：LOW(0) < MEDIUM(1) < HIGH(2)
+ - 标签系统：
+   - 支持任务标签的添加和移除
+   - 批量操作时自动处理标签
+ - 默认值处理：
+   - 新建任务默认状态为 TODO
+   - 新建任务默认优先级为 MEDIUM
+   - 描述字段默认为空字符串
+- **异常处理**：
+ - 统一异常处理（GlobalExceptionHandler）：
+   - 认证异常：无效凭证、Token过期等
+   - 业务异常：用户已存在、项目不存在等
+   - 验证异常：参数校验失败
+   - 约束异常：数据库约束违反
 
 ---
 
